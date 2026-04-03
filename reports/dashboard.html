@@ -681,19 +681,11 @@
             if (!monthId) return;
             
             try {
-                const monthPath = `${TIMESHEET_COLLECTION}/months/${monthId}`;
+                const monthPath = `${TIMESHEET_COLLECTION}/months`;
+                const monthDoc = await db.collection(monthPath).doc(monthId).get();
                 
-                // Get the latest report for this month
-                const reportsSnapshot = await db
-                    .collection(monthPath)
-                    .orderBy('timestamp', 'desc')
-                    .limit(1)
-                    .get();
-                
-                if (!reportsSnapshot.empty) {
-                    const reportDoc = reportsSnapshot.docs[0];
-                    const reportData = reportDoc.data();
-                    
+                if (monthDoc.exists) {
+                    const reportData = monthDoc.data();
                     rawData = reportData.employees || [];
                     filteredData = [...rawData];
                     dateRange = reportData.dateRange || { start: null, end: null, actualDays: 0 };
@@ -709,7 +701,7 @@
                     renderCharts();
                     renderDataTable();
                 } else {
-                    console.warn(`⚠️ No reports found for month: ${monthId}`);
+                    console.warn(`⚠️ No data found for month: ${monthId}`);
                 }
             } catch (error) {
                 console.error('❌ Error loading month data:', error);
@@ -1655,12 +1647,14 @@
                     return;
                 }
 
-                // Save to Firestore with month-based organization
-                const reportId = `report_${monthYear.year}_${String(monthYear.month).padStart(2, '0')}_${Date.now()}`;
-                const collectionPath = `${TIMESHEET_COLLECTION}/months/${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`;
+                // Save to Firestore with flat month-based organization
+                const monthId = `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`;
+                const reportId = `report_${monthId}_${Date.now()}`;
+                const monthsCollectionPath = `${TIMESHEET_COLLECTION}/months`;
                 
                 const reportData = {
                     reportId,
+                    monthId,
                     timestamp: new Date(),
                     month: monthYear.month,
                     year: monthYear.year,
@@ -1678,10 +1672,11 @@
                     dateRange: dateRange
                 };
                 
-                // Save report
-                await saveToFirestore(collectionPath, reportId, reportData);
+                // Save report to months collection
+                await saveToFirestore(monthsCollectionPath, monthId, reportData);
                 
                 // Save individual employees with audit trails
+                const employeesPath = `${TIMESHEET_COLLECTION}/employees`;
                 for (const emp of filteredData) {
                     const empData = {
                         ...emp,
@@ -1689,19 +1684,21 @@
                         lastReportId: reportId,
                         appId: TIMESHEET_APP_ID,
                         month: monthYear.month,
-                        year: monthYear.year
+                        year: monthYear.year,
+                        monthId: monthId
                     };
-                    await saveToFirestore(collectionPath, `emp_${emp.id}`, empData);
+                    await saveToFirestore(employeesPath, `emp_${emp.id}_${monthId}`, empData);
                 }
                 
                 // Save change log separately for audit
                 await saveToFirestore(
                     `${TIMESHEET_COLLECTION}/audit`,
-                    `audit_${monthYear.year}_${String(monthYear.month).padStart(2, '0')}_${Date.now()}`,
+                    `audit_${monthId}_${Date.now()}`,
                     {
                         timestamp: new Date(),
                         month: monthYear.month,
                         year: monthYear.year,
+                        monthId: monthId,
                         changes: changeLog,
                         summary: comparison,
                         reportId: reportId
