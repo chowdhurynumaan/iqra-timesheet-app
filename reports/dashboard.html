@@ -743,29 +743,55 @@
                 return;
             }
             
-            // Create employee cards using proper structure
+            // Create employee cards with all 6 metrics (matching PDF template)
             employees.forEach(emp => {
                 const card = document.createElement('div');
                 card.className = 'employee-card';
                 
-                // Determine tier based on punctuality
-                let tier = 'excellent';
-                if (typeof emp.punctuality === 'number') {
-                    if (emp.punctuality < 50) tier = 'critical';
-                    else if (emp.punctuality < 75) tier = 'warning';
-                    else if (emp.punctuality < 100) tier = 'good';
-                    else tier = 'excellent';
+                // Calculate attendance metrics
+                let daysWorked = emp.daysWorked;
+                if (!daysWorked && emp.dailyBreakdown) {
+                    daysWorked = emp.dailyBreakdown.filter(d => !d.isMissed).length;
                 }
+                if (!daysWorked) {
+                    daysWorked = dateRange.actualDays - (emp.absences || 0);
+                }
+                daysWorked = Math.max(0, daysWorked);
+                
+                // Calculate attendance %
+                const attendancePercent = dateRange.actualDays > 0 ? (daysWorked / dateRange.actualDays * 100) : 0;
+                
+                // Calculate punctuality from lateMins
+                let lateCount = 0;
+                if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
+                    lateCount = emp.dailyBreakdown.filter(d => d.lateMin > 0).length;
+                }
+                let punctualityPercent = '-';
+                if (daysWorked > 0) {
+                    punctualityPercent = Math.max(0, 100 - (lateCount / daysWorked * 100)).toFixed(0);
+                }
+                
+                // Fallback to stored punctuality if dailyBreakdown not available
+                if (punctualityPercent === '-' && emp.punctuality !== undefined) {
+                    punctualityPercent = typeof emp.punctuality === 'number' ? emp.punctuality.toFixed(0) : emp.punctuality;
+                }
+                
+                // Determine tier based on attendance and late minutes
+                const absences = Math.max(0, dateRange.actualDays - daysWorked);
+                let tier = 'excellent';
+                if (absences > 3 || emp.lateMin > 200) tier = 'critical';
+                else if (absences > 1 || emp.lateMin > 100) tier = 'warning';
+                else if (absences > 0 || emp.lateMin > 0) tier = 'good';
+                
                 card.setAttribute('data-tier', tier);
                 
                 const name = emp.name || 'Unknown';
                 const id = emp.id || '—';
                 const dept = emp.dept || '—';
-                const hours = emp.hours || '0:00';
+                const hoursNum = parseFloat(emp.hours) || 0;
                 const lateMin = emp.lateMin || 0;
-                const absences = emp.absences || 0;
-                const punctuality = emp.punctuality !== undefined ? (typeof emp.punctuality === 'number' ? emp.punctuality.toFixed(0) + '%' : emp.punctuality) : '—';
                 
+                // Use the same metric-card styling as renderTable
                 card.innerHTML = `
                     <div class="employee-header">
                         <div class="employee-info">
@@ -776,23 +802,35 @@
                             </div>
                         </div>
                     </div>
-                    <div style="padding: 0.75rem; font-size: 0.75rem;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; row-gap: 0.5rem;">
-                            <div>
-                                <div style="color: #64748b; font-size: 0.65rem; font-weight: 600; margin-bottom: 0.2rem;">Hours</div>
-                                <div style="font-weight: 700; color: #1e293b;">${hours}</div>
+                    <div class="visual-metrics">
+                        <div class="metrics-line">
+                            <div class="metric-card rate-card">
+                                <div class="metric-card-title">Attendance</div>
+                                <div class="metric-card-value">${attendancePercent.toFixed(0)}%</div>
                             </div>
-                            <div>
-                                <div style="color: #64748b; font-size: 0.65rem; font-weight: 600; margin-bottom: 0.2rem;">Late (min)</div>
-                                <div style="font-weight: 700; color: #1e293b;">${lateMin}</div>
+                            <div class="metric-card punctuality-card">
+                                <div class="metric-card-title">Punctuality</div>
+                                <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
                             </div>
-                            <div>
-                                <div style="color: #64748b; font-size: 0.65rem; font-weight: 600; margin-bottom: 0.2rem;">Absences</div>
-                                <div style="font-weight: 700; color: #1e293b;">${absences}</div>
+                            <div class="metric-card hours-card">
+                                <div class="metric-card-title">Hours</div>
+                                <div class="metric-card-value">${hoursNum.toFixed(0)}</div>
+                                <div class="metric-card-sub">hrs</div>
                             </div>
-                            <div>
-                                <div style="color: #64748b; font-size: 0.65rem; font-weight: 600; margin-bottom: 0.2rem;">Punctuality</div>
-                                <div style="font-weight: 700; color: #1e293b;">${punctuality}</div>
+                            <div class="metric-card late-card">
+                                <div class="metric-card-title">Late Min</div>
+                                <div class="metric-card-value">${lateMin}</div>
+                                <div class="metric-card-sub">min</div>
+                            </div>
+                            <div class="metric-card absence-card">
+                                <div class="metric-card-title">Absences</div>
+                                <div class="metric-card-value">${absences}</div>
+                                <div class="metric-card-sub">days</div>
+                            </div>
+                            <div class="metric-card worked-card">
+                                <div class="metric-card-title">Worked</div>
+                                <div class="metric-card-value">${daysWorked}</div>
+                                <div class="metric-card-sub">days</div>
                             </div>
                         </div>
                     </div>
@@ -801,7 +839,7 @@
                 tableBody.appendChild(card);
             });
             
-            console.log(`📊 Displayed ${employees.length} employees`);
+            console.log(`📊 Displayed ${employees.length} employees with complete metrics`);
         }
 
     </script>
