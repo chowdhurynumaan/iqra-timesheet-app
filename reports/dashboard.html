@@ -667,9 +667,11 @@
                 console.log(`📅 Found ${uploadedMonths.length} uploaded months:`, uploadedMonths.map(m => m.id));
                 populateMonthDropdown();
                 
-                // Auto-load latest month
+                // Auto-load February if available, otherwise load latest month
                 if (uploadedMonths.length > 0) {
-                    document.getElementById('monthSelector').value = uploadedMonths[0].id;
+                    const februaryMonth = uploadedMonths.find(m => m.id.includes('_02'));
+                    const monthToLoad = februaryMonth || uploadedMonths[0];
+                    document.getElementById('monthSelector').value = monthToLoad.id;
                     loadMonthData();
                 }
             } catch (error) {
@@ -712,6 +714,9 @@
                     // Show data panels
                     document.getElementById('statsGrid').style.display = 'grid';
                     document.getElementById('chartSection').style.display = 'grid';
+                    
+                    // Update stats cards with actual data
+                    renderDashboard(filteredData);
                     
                     // Display employee data in the table
                     displayEmployeeData(rawData);
