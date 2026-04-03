@@ -6,22 +6,22 @@ Your TimeSheet application is now ready to use Firebase Firestore safely with ot
 
 ### Files Created:
 
-1. **Updated Dashboard** (`reports/dashboard.html`)
+1. **Updated Dashboard**
    - ✅ Firebase SDK integrated
    - ✅ Firestore auth configured
    - ✅ "Save to Cloud" button added
    - ✅ Cloud save functionality implemented
 
-2. **Security Rules** (`firestore.rules`)
-   - ✅ TimeSheet data namespace: `timesheet_app/data/`
+2. **Security Rules**
+   - ✅ TimeSheet data namespace configured
    - ✅ All other apps protected and isolated
    - ✅ Admin-only delete permissions
    - ✅ Authenticated user read/write access
 
 3. **Configuration Files**
-   - `FIREBASE_SETUP.md` - Complete Firebase setup documentation
-   - `config.firebaserc.js` - Configuration constants
-   - `deploy-rules.sh` - Deployment script
+   - Complete Firebase setup documentation
+   - Configuration constants
+   - Deployment resources
 
 ---
 
@@ -29,9 +29,7 @@ Your TimeSheet application is now ready to use Firebase Firestore safely with ot
 
 ### Step 1: Open Dashboard in Browser
 
-```
-Open: reports/dashboard.html
-```
+Open your dashboard in a browser.
 
 The dashboard will:
 - Load Firebase automatically
@@ -49,40 +47,19 @@ The dashboard will:
 ### Step 3: Verify Data in Firestore
 
 1. Go to [Firebase Console](https://console.firebase.google.com)
-2. Select project: **apps-e1163**
+2. Select your Firebase project
 3. Click **Firestore Database**
-4. Look for collection: **timesheet_app**
-   ```
-   ├── timesheet_app
-   │   └── data
-   │       ├── reports/
-   │       │   └── report_1704067200000 ✅
-   │       └── employees/
-   │           └── emp_1001, emp_1002, ... ✅
-   ```
+4. Look for the timesheet collection in your database
 
 ---
 
 ## 🔒 Data Isolation Architecture
 
 ### Your Data (TimeSheet App)
-```
-timesheet_app/data/
-├── reports/report_1704067200000
-│   ├── reportId: "report_1704067200000"
-│   ├── timestamp: "2024-01-01T00:00:00Z"
-│   ├── totalEmployees: 45
-│   ├── employees: [...]
-│   └── dateRange: {...}
-```
+Your TimeSheet data is isolated in its own namespace within Firestore, containing reports and employee records.
 
 ### Other Apps (UNTOUCHED)
-```
-artifacts/              ← Other apps' data (NO CHANGE)
-hifz_classes/          ← Other projects' data (PROTECTED)
-hifz_students/         ← Other projects' data (PROTECTED)
-attendance_records/    ← Legacy data (UNTOUCHED)
-```
+Other applications' data is protected and isolated with separate namespaces.
 
 ✅ **Zero conflicts** - Each app has its own namespace
 
@@ -93,9 +70,9 @@ attendance_records/    ← Legacy data (UNTOUCHED)
 ### Option A: Using Firebase Console (Easiest)
 
 1. Go to https://console.firebase.google.com
-2. Select project: **apps-e1163**
+2. Select your Firebase project
 3. Go to **Firestore → Rules**
-4. Copy contents from `firestore.rules`
+4. Copy the security rules content
 5. Click **Publish**
 
 ### Option B: Command Line
@@ -108,22 +85,7 @@ npm install -g firebase-tools
 firebase login
 
 # Deploy rules
-firebase deploy --only firestore:rules --project apps-e1163
-```
-
-### Option C: Automated Script (Recommended)
-
-```bash
-# On Windows
-bash deploy-rules.sh
-
-# On Mac/Linux
-./deploy-rules.sh
-```
-
-**Status Check:**
-```bash
-firebase firestore:indexes --project apps-e1163
+firebase deploy --only firestore:rules
 ```
 
 ---
@@ -179,9 +141,8 @@ await deleteFromFirestore(path, docId)
 | Access `artifacts` | N/A | N/A (other app) |
 
 ### Admin Permissions
-- **UID**: `MpcB7f35m0bITsSK1D7ACWFmch32`
-- Can delete reports and reset data
-- Can manage other apps (unchanged)
+- Admins can delete reports and reset data
+- Managed through Firestore security rules
 
 ---
 
@@ -278,7 +239,6 @@ await deleteFromFirestore(path, docId)
 ## 📞 Support & Resources
 
 - **Firebase Console**: https://console.firebase.google.com
-- **Project**: apps-e1163
 - **Firestore Docs**: https://firebase.google.com/docs/firestore
 - **Security Rules**: https://firebase.google.com/docs/firestore/security/start
 
@@ -293,14 +253,11 @@ Your TimeSheet app is now:
 - ✅ Ready for production use
 
 **Start using it:**
-1. Open `reports/dashboard.html` in your browser
+1. Open your dashboard in your browser
 2. Upload an attendance report
 3. Click "☁️ Save to Cloud"
 4. View your data in Firebase Console
 
 ---
 
-**Created**: 2024
-**App ID**: timesheet_app
-**Project**: apps-e1163
 **Status**: ✅ Ready for Use
