@@ -418,11 +418,11 @@
             </label>
         </div>
 
-        <div id="controlPanel" class="control-panel hidden">
+        <div id="controlPanel" class="control-panel">
             <div class="control-section">
-                <label>Uploaded Months:</label>
+                <label>📅 Uploaded Months:</label>
                 <select id="monthSelector" onchange="loadMonthData()">
-                    <option value="">Select a month...</option>
+                    <option value="">Loading months...</option>
                 </select>
             </div>
             <div class="control-section">
@@ -452,7 +452,7 @@
             </div>
         </div>
 
-        <div id="statsGrid" class="stats-grid hidden">
+        <div id="statsGrid" class="stats-grid" style="display: none;">
             <div class="stat-card primary">
                 <div class="stat-label">Total Employees</div>
                 <div class="stat-value" id="statTotal">0</div>
@@ -701,9 +701,8 @@
                     console.log(`✅ Loaded ${rawData.length} employees from ${monthId}`);
                     console.log(`📅 Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);
                     
-                    // Update UI
-                    document.getElementById('controlPanel').classList.remove('hidden');
-                    document.getElementById('statsGrid').classList.remove('hidden');
+                    // Show data panels
+                    document.getElementById('statsGrid').style.display = 'grid';
                     document.getElementById('chartSection').style.display = 'grid';
                     
                     updateStats();
