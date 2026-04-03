@@ -761,9 +761,6 @@
             
             // Create employee cards with all 6 metrics (matching PDF template)
             employees.forEach(emp => {
-                const card = document.createElement('div');
-                card.className = 'employee-card';
-                
                 // Calculate attendance metrics
                 let daysWorked = emp.daysWorked;
                 if (!daysWorked && emp.dailyBreakdown) {
@@ -799,15 +796,22 @@
                 else if (absences > 1 || emp.lateMin > 100) tier = 'warning';
                 else if (absences > 0 || emp.lateMin > 0) tier = 'good';
                 
-                card.setAttribute('data-tier', tier);
-                
                 const name = emp.name || 'Unknown';
                 const id = emp.id || '—';
                 const dept = emp.dept || '—';
                 const hoursNum = parseFloat(emp.hours) || 0;
                 const lateMin = emp.lateMin || 0;
                 
-                // Use the same metric-card styling as renderTable
+                // Build daily breakdown HTML if available
+                let dailyBreakdownHtml = '';
+                if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
+                    dailyBreakdownHtml = renderDailyBreakdown(emp);
+                }
+                
+                // Create card with metrics AND daily breakdown
+                const card = document.createElement('div');
+                card.className = 'employee-card';
+                card.setAttribute('data-tier', tier);
                 card.innerHTML = `
                     <div class="employee-header">
                         <div class="employee-info">
@@ -850,16 +854,10 @@
                             </div>
                         </div>
                     </div>
+                    ${dailyBreakdownHtml}
                 `;
                 
                 tableBody.appendChild(card);
-                
-                // Add daily breakdown if available
-                if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
-                    const dailyDiv = document.createElement('div');
-                    dailyDiv.innerHTML = renderDailyBreakdown(emp);
-                    card.appendChild(dailyDiv.firstChild);
-                }
             });
             
             console.log(`📊 Displayed ${employees.length} employees with complete metrics & daily breakdown`);
