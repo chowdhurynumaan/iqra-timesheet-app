@@ -540,9 +540,25 @@
         console.log('📦 Using collections: months, employees, audit');
         
         // ========== FIREBASE UTILITY FUNCTIONS ==========
+        // Remove undefined values from objects (Firestore doesn't allow undefined)
+        function cleanUndefined(obj) {
+            if (Array.isArray(obj)) {
+                return obj.map(cleanUndefined);
+            } else if (obj && typeof obj === 'object') {
+                return Object.entries(obj)
+                    .filter(([_, value]) => value !== undefined)
+                    .reduce((acc, [key, value]) => {
+                        acc[key] = cleanUndefined(value);
+                        return acc;
+                    }, {});
+            }
+            return obj;
+        }
+        
         async function saveToFirestore(collectionPath, docId, data) {
             try {
-                await db.collection(collectionPath).doc(docId).set(data, { merge: true });
+                const cleanData = cleanUndefined(data);
+                await db.collection(collectionPath).doc(docId).set(cleanData, { merge: true });
                 console.log(`✅ Saved to Firestore: ${collectionPath}/${docId}`);
                 return true;
             } catch (error) {
