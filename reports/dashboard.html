@@ -712,12 +712,63 @@
                     // Show data panels
                     document.getElementById('statsGrid').style.display = 'grid';
                     document.getElementById('chartSection').style.display = 'grid';
+                    
+                    // Display employee data in the table
+                    displayEmployeeData(rawData);
                 } else {
                     console.warn(`⚠️ No data found for month: ${monthId}`);
                 }
             } catch (error) {
                 console.error('❌ Error loading month data:', error);
             }
+        }
+        
+        // ========== DISPLAY EMPLOYEE DATA ==========
+        function displayEmployeeData(employees) {
+            const tableBody = document.getElementById('tableBody');
+            if (!tableBody) {
+                console.warn('⚠️ tableBody element not found');
+                return;
+            }
+            
+            tableBody.innerHTML = ''; // Clear existing content
+            
+            if (!employees || employees.length === 0) {
+                tableBody.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #666;">No employee data to display</div>';
+                return;
+            }
+            
+            // Create employee cards
+            employees.forEach(emp => {
+                const card = document.createElement('div');
+                card.className = 'employee-card';
+                card.style.cssText = 'padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);';
+                
+                const name = emp.name || 'Unknown';
+                const id = emp.id || '—';
+                const dept = emp.dept || '—';
+                const hours = emp.hours || '0:00';
+                const lateMin = emp.lateMin || 0;
+                const absences = emp.absences || 0;
+                const punctuality = emp.punctuality || '—';
+                
+                card.innerHTML = `
+                    <div style="font-weight: bold; font-size: 1.1rem; margin-bottom: 0.5rem;">${name}</div>
+                    <div style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">
+                        <div>ID: ${id} | Dept: ${dept}</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
+                        <div><strong>Hours:</strong> ${hours}</div>
+                        <div><strong>Late (min):</strong> ${lateMin}</div>
+                        <div><strong>Absences:</strong> ${absences}</div>
+                        <div><strong>Punctuality:</strong> ${punctuality}${typeof punctuality === 'number' ? '%' : ''}</div>
+                    </div>
+                `;
+                
+                tableBody.appendChild(card);
+            });
+            
+            console.log(`📊 Displayed ${employees.length} employees`);
         }
 
     </script>
@@ -850,6 +901,7 @@
             // Initialize UI
             initializeControlPanel();
             renderDashboard(filteredData);
+            displayEmployeeData(filteredData);
             document.getElementById('statsGrid').classList.remove('hidden');
             document.getElementById('chartSection').style.display = 'grid';
             document.getElementById('chartSection').classList.remove('hidden');
