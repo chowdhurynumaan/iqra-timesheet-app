@@ -420,6 +420,12 @@
 
         <div id="controlPanel" class="control-panel hidden">
             <div class="control-section">
+                <label>Uploaded Months:</label>
+                <select id="monthSelector" onchange="loadMonthData()">
+                    <option value="">Select a month...</option>
+                </select>
+            </div>
+            <div class="control-section">
                 <label>Data Source:</label>
                 <select id="sheetSelector">
                     <option value="auto">Auto-Detect (Recommended)</option>
@@ -612,6 +618,100 @@
             }
         }
 
+        // ========== MONTH SELECTOR ==========
+        let uploadedMonths = [];
+        
+        async function loadAvailableMonths() {
+            try {
+                const monthsPath = `${TIMESHEET_COLLECTION}/months`;
+                const snapshot = await db.collection(monthsPath).get();
+                
+                uploadedMonths = [];
+                snapshot.forEach(doc => {
+                    uploadedMonths.push({
+                        id: doc.id,
+                        data: doc.data()
+                    });
+                });
+                
+                // Sort by year and month (descending - newest first)
+                uploadedMonths.sort((a, b) => {
+                    const [aYear, aMonth] = a.id.split('_').map(Number);
+                    const [bYear, bMonth] = b.id.split('_').map(Number);
+                    if (bYear !== aYear) return bYear - aYear;
+                    return bMonth - aMonth;
+                });
+                
+                console.log(`📅 Found ${uploadedMonths.length} uploaded months:`, uploadedMonths.map(m => m.id));
+                populateMonthDropdown();
+                
+                // Auto-load latest month
+                if (uploadedMonths.length > 0) {
+                    document.getElementById('monthSelector').value = uploadedMonths[0].id;
+                    loadMonthData();
+                }
+            } catch (error) {
+                console.error('❌ Error loading available months:', error);
+            }
+        }
+        
+        function populateMonthDropdown() {
+            const selector = document.getElementById('monthSelector');
+            selector.innerHTML = '<option value="">Select a month...</option>';
+            
+            uploadedMonths.forEach(month => {
+                const [year, monthNum] = month.id.split('_').map(Number);
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const displayText = `${monthNames[monthNum - 1]} ${year}`;
+                
+                const option = document.createElement('option');
+                option.value = month.id;
+                option.textContent = displayText;
+                selector.appendChild(option);
+            });
+        }
+        
+        async function loadMonthData() {
+            const monthId = document.getElementById('monthSelector').value;
+            if (!monthId) return;
+            
+            try {
+                const monthPath = `${TIMESHEET_COLLECTION}/months/${monthId}`;
+                
+                // Get the latest report for this month
+                const reportsSnapshot = await db
+                    .collection(monthPath)
+                    .orderBy('timestamp', 'desc')
+                    .limit(1)
+                    .get();
+                
+                if (!reportsSnapshot.empty) {
+                    const reportDoc = reportsSnapshot.docs[0];
+                    const reportData = reportDoc.data();
+                    
+                    rawData = reportData.employees || [];
+                    filteredData = [...rawData];
+                    dateRange = reportData.dateRange || { start: null, end: null, actualDays: 0 };
+                    
+                    console.log(`✅ Loaded ${rawData.length} employees from ${monthId}`);
+                    console.log(`📅 Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);
+                    
+                    // Update UI
+                    document.getElementById('controlPanel').classList.remove('hidden');
+                    document.getElementById('statsGrid').classList.remove('hidden');
+                    document.getElementById('chartSection').style.display = 'grid';
+                    
+                    updateStats();
+                    renderCharts();
+                    renderDataTable();
+                } else {
+                    console.warn(`⚠️ No reports found for month: ${monthId}`);
+                }
+            } catch (error) {
+                console.error('❌ Error loading month data:', error);
+            }
+        }
+
     </script>
     <script>
         const fileInput = document.getElementById('csvFile');
@@ -630,6 +730,9 @@
             console.error('❌ File input element not found! Check HTML structure.');
         } else {
             console.log('✅ File input element found, setting up listener...');
+            
+            // Load available months from Firebase on page load
+            loadAvailableMonths();
             
             fileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
@@ -1603,10 +1706,13 @@
                 
                 alert(`✅ Report saved successfully!\n\n${summaryMsg}\n\nData saved to Firestore with full change history.`);
                 btn.textContent = '☁️ Saved!';
+                
+                // Refresh month dropdown to show new month if added
                 setTimeout(() => {
+                    loadAvailableMonths();
                     btn.textContent = '☁️ Save to Cloud';
                     btn.disabled = false;
-                }, 3000);
+                }, 2000);
             } catch (error) {
                 alert('❌ Error: ' + error.message);
                 event.target.textContent = '☁️ Save to Cloud';
