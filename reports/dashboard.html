@@ -837,9 +837,16 @@
                 `;
                 
                 tableBody.appendChild(card);
+                
+                // Add daily breakdown if available
+                if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
+                    const dailyDiv = document.createElement('div');
+                    dailyDiv.innerHTML = renderDailyBreakdown(emp);
+                    card.appendChild(dailyDiv.firstChild);
+                }
             });
             
-            console.log(`📊 Displayed ${employees.length} employees with complete metrics`);
+            console.log(`📊 Displayed ${employees.length} employees with complete metrics & daily breakdown`);
         }
 
     </script>
