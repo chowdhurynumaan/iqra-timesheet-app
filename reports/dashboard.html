@@ -530,12 +530,14 @@
             console.error('❌ Anonymous auth error:', error);
         });
         
-        // TimeSheet App Namespace (isolated from other apps)
+        // TimeSheet App Namespace (isolated from other apps) - use flat collections
         const TIMESHEET_APP_ID = 'timesheet_app';
-        const TIMESHEET_COLLECTION = `${TIMESHEET_APP_ID}/data`;
+        const MONTHS_COLLECTION = 'timesheet_app_months';       // Stores month reports: 2026_02, 2026_03, etc.
+        const EMPLOYEES_COLLECTION = 'timesheet_app_employees'; // Stores employee data
+        const AUDIT_COLLECTION = 'timesheet_app_audit';         // Stores audit trail
         
         console.log('✅ Firebase initialized safely for TimeSheet App');
-        console.log('📦 Using collection namespace:', TIMESHEET_COLLECTION);
+        console.log('📦 Using collections: months, employees, audit');
         
         // ========== FIREBASE UTILITY FUNCTIONS ==========
         async function saveToFirestore(collectionPath, docId, data) {
@@ -628,8 +630,7 @@
         
         async function loadAvailableMonths() {
             try {
-                const monthsPath = `${TIMESHEET_COLLECTION}/months`;
-                const snapshot = await db.collection(monthsPath).get();
+                const snapshot = await db.collection(MONTHS_COLLECTION).get();
                 
                 uploadedMonths = [];
                 snapshot.forEach(doc => {
@@ -681,8 +682,7 @@
             if (!monthId) return;
             
             try {
-                const monthPath = `${TIMESHEET_COLLECTION}/months`;
-                const monthDoc = await db.collection(monthPath).doc(monthId).get();
+                const monthDoc = await db.collection(MONTHS_COLLECTION).doc(monthId).get();
                 
                 if (monthDoc.exists) {
                     const reportData = monthDoc.data();
@@ -1529,14 +1529,30 @@
         
         // ========== DATA COMPARISON & MERGING ==========
         async function compareWithExisting(newEmployees, monthYear) {
-            const collectionPath = `${TIMESHEET_COLLECTION}/months/${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`;
+            const monthId = `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`;
             
             try {
-                const snapshot = await db.collection(collectionPath).get();
-                const existing = {};
+                // Get the existing month document (if it exists)
+                const monthDoc = await db.collection(MONTHS_COLLECTION).doc(monthId).get();
                 
-                snapshot.forEach(doc => {
-                    existing[doc.data().id] = doc.data();
+                if (!monthDoc.exists) {
+                    // First upload for this month
+                    newEmployees.forEach(emp => {
+                        logChange(emp.id, emp.name, 'record', undefined, 'NEW RECORD');
+                    });
+                    return {
+                        new: newEmployees,
+                        modified: [],
+                        unchanged: [],
+                        deleted: []
+                    };
+                }
+                
+                const existingData = monthDoc.data();
+                const existingEmployees = existingData.employees || [];
+                const existing = {};
+                existingEmployees.forEach(emp => {
+                    existing[emp.id] = emp;
                 });
                 
                 const comparison = {
@@ -1576,7 +1592,7 @@
                 });
                 
                 // Check for deleted employees
-                Object.values(existing).forEach(existingEmp => {
+                existingEmployees.forEach(existingEmp => {
                     if (!newEmployees.find(e => e.id === existingEmp.id)) {
                         comparison.deleted.push(existingEmp);
                         logChange(existingEmp.id, existingEmp.name, 'record', 'EXISTING RECORD', 'REMOVED');
@@ -1650,7 +1666,6 @@
                 // Save to Firestore with flat month-based organization
                 const monthId = `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`;
                 const reportId = `report_${monthId}_${Date.now()}`;
-                const monthsCollectionPath = `${TIMESHEET_COLLECTION}/months`;
                 
                 const reportData = {
                     reportId,
@@ -1672,11 +1687,10 @@
                     dateRange: dateRange
                 };
                 
-                // Save report to months collection
-                await saveToFirestore(monthsCollectionPath, monthId, reportData);
+                // Save report to months collection (flat)
+                await saveToFirestore(MONTHS_COLLECTION, monthId, reportData);
                 
                 // Save individual employees with audit trails
-                const employeesPath = `${TIMESHEET_COLLECTION}/employees`;
                 for (const emp of filteredData) {
                     const empData = {
                         ...emp,
@@ -1687,12 +1701,12 @@
                         year: monthYear.year,
                         monthId: monthId
                     };
-                    await saveToFirestore(employeesPath, `emp_${emp.id}_${monthId}`, empData);
+                    await saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}_${monthId}`, empData);
                 }
                 
                 // Save change log separately for audit
                 await saveToFirestore(
-                    `${TIMESHEET_COLLECTION}/audit`,
+                    AUDIT_COLLECTION,
                     `audit_${monthId}_${Date.now()}`,
                     {
                         timestamp: new Date(),
