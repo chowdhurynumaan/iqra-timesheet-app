@@ -1834,14 +1834,16 @@
             if (changes.length > 0) {
                 // Save to Firestore with audit trail
                 const monthYear = detectMonthFromData(rawData);
-                const collectionPath = `${TIMESHEET_COLLECTION}/months/${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`;
                 
                 const empData = {
                     ...emp,
                     lastUpdated: new Date(),
                     appId: TIMESHEET_APP_ID,
                     edits: emp.edits || [],
-                    changes: changes
+                    changes: changes,
+                    month: monthYear.month,
+                    year: monthYear.year,
+                    monthId: `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`
                 };
                 
                 // Add to edit history
@@ -1851,7 +1853,7 @@
                     changedBy: auth.currentUser?.email || 'anonymous'
                 });
                 
-                await saveToFirestore(collectionPath, `emp_${emp.id}`, empData);
+                await saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}_${empData.monthId}`, empData);
                 
                 alert(`✅ Changes saved for ${emp.name}!\n\nModified fields:\n${changes.map(c => `• ${c.field}: ${c.oldValue} → ${c.newValue}`).join('\n')}`);
             } else {
