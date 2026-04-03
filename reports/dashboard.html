@@ -525,6 +525,11 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
         
+        // Enable anonymous authentication for public access
+        auth.signInAnonymously().catch((error) => {
+            console.error('❌ Anonymous auth error:', error);
+        });
+        
         // TimeSheet App Namespace (isolated from other apps)
         const TIMESHEET_APP_ID = 'timesheet_app';
         const TIMESHEET_COLLECTION = `${TIMESHEET_APP_ID}/data`;
