@@ -738,11 +738,20 @@
                 return;
             }
             
-            // Create employee cards
+            // Create employee cards using proper structure
             employees.forEach(emp => {
                 const card = document.createElement('div');
                 card.className = 'employee-card';
-                card.style.cssText = 'padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);';
+                
+                // Determine tier based on punctuality
+                let tier = 'excellent';
+                if (typeof emp.punctuality === 'number') {
+                    if (emp.punctuality < 50) tier = 'critical';
+                    else if (emp.punctuality < 75) tier = 'warning';
+                    else if (emp.punctuality < 100) tier = 'good';
+                    else tier = 'excellent';
+                }
+                card.setAttribute('data-tier', tier);
                 
                 const name = emp.name || 'Unknown';
                 const id = emp.id || '—';
@@ -750,18 +759,37 @@
                 const hours = emp.hours || '0:00';
                 const lateMin = emp.lateMin || 0;
                 const absences = emp.absences || 0;
-                const punctuality = emp.punctuality || '—';
+                const punctuality = emp.punctuality !== undefined ? (typeof emp.punctuality === 'number' ? emp.punctuality.toFixed(0) + '%' : emp.punctuality) : '—';
                 
                 card.innerHTML = `
-                    <div style="font-weight: bold; font-size: 1.1rem; margin-bottom: 0.5rem;">${name}</div>
-                    <div style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">
-                        <div>ID: ${id} | Dept: ${dept}</div>
+                    <div class="employee-header">
+                        <div class="employee-info">
+                            <div class="employee-name">${name}</div>
+                            <div class="employee-meta">
+                                <span class="employee-dept">${id}</span>
+                                <span class="employee-dept" style="background: #dbeafe; color: #0369a1;">${dept}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
-                        <div><strong>Hours:</strong> ${hours}</div>
-                        <div><strong>Late (min):</strong> ${lateMin}</div>
-                        <div><strong>Absences:</strong> ${absences}</div>
-                        <div><strong>Punctuality:</strong> ${punctuality}${typeof punctuality === 'number' ? '%' : ''}</div>
+                    <div style="padding: 0.75rem; font-size: 0.75rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; row-gap: 0.5rem;">
+                            <div>
+                                <div style="color: #64748b; font-size: 0.65rem; font-weight: 600; margin-bottom: 0.2rem;">Hours</div>
+                                <div style="font-weight: 700; color: #1e293b;">${hours}</div>
+                            </div>
+                            <div>
+                                <div style="color: #64748b; font-size: 0.65rem; font-weight: 600; margin-bottom: 0.2rem;">Late (min)</div>
+                                <div style="font-weight: 700; color: #1e293b;">${lateMin}</div>
+                            </div>
+                            <div>
+                                <div style="color: #64748b; font-size: 0.65rem; font-weight: 600; margin-bottom: 0.2rem;">Absences</div>
+                                <div style="font-weight: 700; color: #1e293b;">${absences}</div>
+                            </div>
+                            <div>
+                                <div style="color: #64748b; font-size: 0.65rem; font-weight: 600; margin-bottom: 0.2rem;">Punctuality</div>
+                                <div style="font-weight: 700; color: #1e293b;">${punctuality}</div>
+                            </div>
+                        </div>
                     </div>
                 `;
                 
