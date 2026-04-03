@@ -704,9 +704,25 @@
                 
                 if (monthDoc.exists) {
                     const reportData = monthDoc.data();
-                    rawData = reportData.employees || [];
-                    filteredData = [...rawData];
                     dateRange = reportData.dateRange || { start: null, end: null, actualDays: 0 };
+                    
+                    // Load individual employees from EMPLOYEES_COLLECTION (they have full dailyBreakdown data)
+                    const empSnapshot = await db.collection(EMPLOYEES_COLLECTION)
+                        .where('monthId', '==', monthId)
+                        .get();
+                    
+                    rawData = [];
+                    empSnapshot.forEach(doc => {
+                        rawData.push(doc.data());
+                    });
+                    
+                    // Fall back to month document employees if individual records not found
+                    if (rawData.length === 0) {
+                        rawData = reportData.employees || [];
+                        console.warn(`⚠️ No employees found in ${EMPLOYEES_COLLECTION}, using month document data`);
+                    }
+                    
+                    filteredData = [...rawData];
                     
                     console.log(`✅ Loaded ${rawData.length} employees from ${monthId}`);
                     console.log(`📅 Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);
@@ -718,7 +734,7 @@
                     // Update stats cards with actual data
                     renderDashboard(filteredData);
                     
-                    // Display employee data in the table
+                    // Display employee data in the table (with daily breakdown)
                     displayEmployeeData(rawData);
                 } else {
                     console.warn(`⚠️ No data found for month: ${monthId}`);
