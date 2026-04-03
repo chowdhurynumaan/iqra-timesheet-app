@@ -1487,12 +1487,21 @@
         // ========== SMART MONTH DETECTION ==========
         function detectMonthFromData(data) {
             // Extract month from:
-            // 1. Date range in header
-            // 2. Individual dates in data
-            // 3. File name metadata
+            // 1. Date range already detected in global dateRange variable
+            // 2. Date range in header cells
+            // 3. Month names in data
+            // 4. Fall back to current month
             
             let detectedMonth = null;
             let detectedYear = null;
+            
+            // First priority: Use dateRange if already detected from parsing
+            if (dateRange && dateRange.start) {
+                detectedMonth = dateRange.start.getMonth() + 1;
+                detectedYear = dateRange.start.getFullYear();
+                console.log(`📅 Month/year extracted from parsed date range: ${detectedMonth}/${detectedYear}`);
+                return { month: detectedMonth, year: detectedYear };
+            }
             
             // Check first 10 rows for date patterns
             for (let i = 0; i < Math.min(10, data.length); i++) {
