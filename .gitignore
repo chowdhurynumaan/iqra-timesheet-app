@@ -1,0 +1,67 @@
+# ========== DATA FILES (Keep Local, Don't Push) ==========
+data/
+documents/
+archives/
+
+# ========== LOCAL FILES (Keep Local) ==========
+*.xls
+*.xlsx
+*.csv
+*.pdf
+*.txt
+*.dat
+
+# ========== CONFIGURATION (Keep Local - Contains Sensitive Info) ==========
+config.firebaserc.js
+firestore.rules
+.env
+.env.local
+
+# ========== SYSTEM FILES ==========
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# ========== NODE/PYTHON ENVIRONMENT (Keep Local) ==========
+node_modules/
+.venv/
+.env
+venv/
+__pycache__/
+*.pyc
+
+# ========== BUILD/OUTPUT (Keep Local) ==========
+dist/
+build/
+out/
+
+# ========== LOGS ==========
+*.log
+npm-debug.log
+yarn-error.log
+
+# ========== IDE ==========
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ========== TEMPORARY FILES ==========
+.tmp/
+temp/
+*.temp
+
+# ========== HIDDEN FOLDERS ==========
+.zencoder/
+.zenflow/
+
+# ========== KEEP IN REPO ONLY ==========
+!reports/dashboard.html
+!src/
+!index.html
+!*.md
+!*.json (except node_modules)
+!.gitignore
