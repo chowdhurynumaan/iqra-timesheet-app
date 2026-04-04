@@ -103,6 +103,11 @@
         .metric-card.absence-card .metric-card-value { color: #dc2626; }
         .metric-card.worked-card .metric-card-value { color: #16a34a; }
         
+        /* Editable Hours Cells */
+        .editable-hours { background: #fef08a !important; border-radius: 3px; padding: 2px 4px !important; cursor: text; transition: all 0.2s ease; }
+        .editable-hours:hover { background: #fef3c7 !important; outline: 1px dashed #f59e0b; }
+        .editable-hours:focus { background: #fde047 !important; outline: 2px solid #2563eb; }
+        
         /* Secondary metrics line - smaller cards */
         .metrics-line-secondary { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25rem; margin-top: 0.25rem; }
         .metric-card-small { padding: 0.3rem 0.15rem; background: #fafbfc; border-radius: 0.35rem; border: 1px solid #e2e8f0; text-align: center; transition: all 0.2s ease; }
@@ -2800,7 +2805,7 @@
                 }
             });
             
-            const tableRows = emp.dailyBreakdown.map(day => `
+            const tableRows = emp.dailyBreakdown.map((day, idx) => `
                 <tr style="line-height: 1.2; background-color: ${day.lateMin > 0 ? '#fee2e2' : 'transparent'}; ${day.lateMin > 0 ? 'border-left: 3px solid #dc2626;' : ''}">
                     <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; ${day.lateMin > 0 ? 'color: #dc2626; font-weight: 700;' : ''}"><strong>${day.date}</strong></td>
                     <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; ${day.lateMin > 0 ? 'color: #dc2626; font-weight: 700;' : ''}"><strong>${day.dayName}</strong></td>
@@ -2810,7 +2815,7 @@
                             : '-'
                         }
                     </td>
-                    <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem;">${day.hours > 0 ? parseFloat(day.hours).toFixed(2) : '-'}</td>
+                    <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${idx}" class="editable-hours" onblur="updateEmployeeMetricsFromEdit(event)">${day.hours > 0 ? parseFloat(day.hours).toFixed(2) : '-'}</td>
                     <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; font-weight: ${day.lateMin > 0 ? '700' : '400'}; color: ${day.lateMin > 0 ? '#dc2626' : '#64748b'};">${day.lateMin > 0 ? day.lateMin : '-'}</td>
                     <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem;">${day.isMissed ? '❌' : (day.hasMissedPunch ? '⚠️' : '✅')}</td>
                 </tr>
@@ -2836,6 +2841,57 @@
                     </table>
                 </div>
             `;
+        }
+        
+        function updateEmployeeMetricsFromEdit(event) {
+            const empId = parseInt(event.target.dataset.empId);
+            const dayIdx = parseInt(event.target.dataset.dayIdx);
+            const newHours = parseFloat(event.target.textContent) || 0;
+            
+            // Find and update the employee
+            const emp = filteredData.find(e => e.id === empId);
+            if (!emp || !emp.dailyBreakdown) return;
+            
+            // Update the specific day's hours
+            emp.dailyBreakdown[dayIdx].hours = newHours;
+            
+            // Recalculate total hours
+            const totalMinutes = emp.dailyBreakdown.reduce((sum, day) => sum + (parseFloat(day.hours) || 0) * 60, 0);
+            emp.totalMinutes = totalMinutes;
+            emp.hours = (totalMinutes / 60).toFixed(2) + ' hrs';
+            
+            // Update the display card for this employee
+            const card = document.querySelector(`.employee-card[data-id="${empId}"]`);
+            if (card) {
+                updateCardDisplay(emp, card);
+            }
+            
+            console.log(`✏️ Updated hours for ${emp.name}: ${newHours}h on day ${dayIdx + 1}`);
+        }
+        
+        function updateCardDisplay(emp, card) {
+            // Recalculate metrics
+            const daysWorked = emp.daysWorked || (emp.dailyBreakdown ? emp.dailyBreakdown.filter(d => !d.isMissed).length : 0);
+            const hoursNum = parseFloat(emp.hours) || 0;
+            const attendancePercent = dateRange.actualDays > 0 ? (daysWorked / dateRange.actualDays * 100) : 0;
+            
+            let lateCount = 0;
+            if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
+                lateCount = emp.dailyBreakdown.filter(d => d.lateMin > 0).length;
+            }
+            const punctualityPercent = daysWorked > 0 ? Math.max(0, 100 - (lateCount / daysWorked * 100)).toFixed(0) : '-';
+            const absences = Math.max(0, dateRange.actualDays - daysWorked);
+            
+            // Update metric cards in the HTML
+            const metrics = card.querySelectorAll('.metric-card-value');
+            if (metrics && metrics.length >= 3) {
+                metrics[0].textContent = attendancePercent.toFixed(0) + '%'; // Attendance
+                metrics[1].textContent = punctualityPercent + (punctualityPercent !== '-' ? '%' : ''); // Punctuality
+                metrics[2].textContent = hoursNum.toFixed(0); // Hours
+                metrics[3].textContent = (emp.lateMin || 0); // Late Min (if exists)
+                metrics[4].textContent = absences; // Absences (if exists)
+                metrics[5].textContent = daysWorked; // Worked (if exists)
+            }
         }
         
         function updateCharts(data) {
