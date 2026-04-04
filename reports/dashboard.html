@@ -1892,7 +1892,18 @@
             
             console.log(`✅ Ready to print ${selectedEmployees.length} employee(s)`);
             
-            // Generate print HTML
+            // Group employees by department
+            const byDept = {};
+            selectedEmployees.forEach(emp => {
+                const dept = emp.dept || 'UNASSIGNED';
+                if (!byDept[dept]) byDept[dept] = [];
+                byDept[dept].push(emp);
+            });
+            
+            // Sort departments alphabetically
+            const deptList = Object.keys(byDept).sort();
+            
+            // Generate print HTML - LANDSCAPE, 2 CARDS PER PAGE, GROUPED BY DEPT
             let printHTML = `
             <!DOCTYPE html>
             <html lang="en">
@@ -1901,45 +1912,188 @@
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Attendance Report - ${new Date().toLocaleDateString()}</title>
                 <style>
-                    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; line-height: 1.6; margin: 0; padding: 20px; background: white; }
-                    .page { page-break-after: always; margin-bottom: 40px; }
-                    .header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #1e293b; padding-bottom: 15px; }
-                    .header h1 { margin: 0; font-size: 28px; color: #1e293b; }
-                    .header p { margin: 5px 0; color: #64748b; }
-                    .employee-section { margin-bottom: 30px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
-                    .employee-title { background: #f1f5f9; padding: 15px; border-bottom: 2px solid #cbd5e1; }
-                    .employee-title h2 { margin: 0; font-size: 18px; color: #1e293b; }
-                    .employee-title p { margin: 5px 0 0 0; font-size: 13px; color: #64748b; }
-                    .metrics { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; padding: 15px; background: #fafbfc; border-bottom: 1px solid #e2e8f0; }
-                    .metric { text-align: center; }
-                    .metric-title { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 5px; }
-                    .metric-value { font-size: 18px; font-weight: 700; color: #1e293b; }
-                    .metric-unit { font-size: 10px; color: #94a3b8; }
-                    .daily-table { width: 100%; border-collapse: collapse; font-size: 12px; padding: 15px; }
-                    .daily-table thead { background: #e2e8f0; }
-                    .daily-table th { padding: 8px; text-align: left; font-weight: 700; color: #1e293b; border: 0.5px solid #cbd5e1; }
-                    .daily-table td { padding: 6px 8px; border: 0.5px solid #e2e8f0; }
-                    .daily-table tr:nth-child(odd) { background: white; }
-                    .daily-table tr:nth-child(even) { background: #f8fafc; }
-                    .daily-table tr.late-row { background: #fee2e2; border-left: 3px solid #dc2626; }
-                    .daily-table td.late { color: #dc2626; font-weight: 700; }
+                    @page { size: A4 landscape; margin: 15px; }
+                    * { box-sizing: border-box; }
+                    body { 
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
+                        margin: 0; 
+                        padding: 0; 
+                        background: white; 
+                    }
+                    .dept-header-page {
+                        page-break-after: always;
+                        width: 100%;
+                        height: 100vh;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        text-align: center;
+                        border-bottom: 3px solid #1e293b;
+                    }
+                    .dept-header-page h1 {
+                        font-size: 48px;
+                        color: #1e293b;
+                        margin: 0;
+                        text-transform: uppercase;
+                        letter-spacing: 2px;
+                    }
+                    .dept-header-page p {
+                        font-size: 18px;
+                        color: #64748b;
+                        margin: 20px 0 0 0;
+                    }
+                    .cards-page {
+                        page-break-after: always;
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 15px;
+                        padding: 15px;
+                        width: 100%;
+                        height: auto;
+                    }
+                    .employee-card {
+                        border: 1px solid #e2e8f0;
+                        border-radius: 6px;
+                        overflow: hidden;
+                        background: white;
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    .employee-title { 
+                        background: #f1f5f9; 
+                        padding: 12px; 
+                        border-bottom: 2px solid #cbd5e1; 
+                    }
+                    .employee-title h2 { 
+                        margin: 0; 
+                        font-size: 16px; 
+                        color: #1e293b; 
+                    }
+                    .employee-title p { 
+                        margin: 3px 0 0 0; 
+                        font-size: 12px; 
+                        color: #64748b; 
+                    }
+                    .metrics { 
+                        display: grid; 
+                        grid-template-columns: repeat(6, 1fr); 
+                        gap: 8px; 
+                        padding: 12px; 
+                        background: #fafbfc; 
+                        border-bottom: 1px solid #e2e8f0; 
+                    }
+                    .metric { 
+                        text-align: center; 
+                        font-size: 11px;
+                    }
+                    .metric-title { 
+                        font-size: 10px; 
+                        font-weight: 600; 
+                        color: #64748b; 
+                        text-transform: uppercase; 
+                        margin-bottom: 3px; 
+                    }
+                    .metric-value { 
+                        font-size: 16px; 
+                        font-weight: 700; 
+                        color: #1e293b; 
+                    }
+                    .metric-unit { 
+                        font-size: 9px; 
+                        color: #94a3b8; 
+                    }
+                    .daily-table { 
+                        width: 100%; 
+                        border-collapse: collapse; 
+                        font-size: 10px;
+                        flex: 1;
+                        overflow-y: auto;
+                        max-height: 300px;
+                    }
+                    .daily-table thead { 
+                        background: #e2e8f0; 
+                        position: sticky;
+                        top: 0;
+                    }
+                    .daily-table th { 
+                        padding: 6px 4px; 
+                        text-align: left; 
+                        font-weight: 700; 
+                        color: #1e293b; 
+                        border: 0.5px solid #cbd5e1; 
+                    }
+                    .daily-table td { 
+                        padding: 4px 4px; 
+                        border: 0.5px solid #e2e8f0; 
+                    }
+                    .daily-table tr:nth-child(odd) { 
+                        background: white; 
+                    }
+                    .daily-table tr:nth-child(even) { 
+                        background: #f8fafc; 
+                    }
+                    .daily-table tr.late-row { 
+                        background: #fee2e2; 
+                        border-left: 3px solid #dc2626; 
+                    }
+                    .daily-table td.late { 
+                        color: #dc2626; 
+                        font-weight: 700; 
+                    }
                     @media print {
-                        body { padding: 0; }
-                        .page { page-break-after: always; }
+                        body { margin: 0; padding: 0; }
+                        * { margin: 0; padding: 0; }
                     }
                 </style>
             </head>
             <body>
-                <div class="page">
-                    <div class="header">
-                        <h1>Attendance Report</h1>
-                        <p>Period: ${dateRange.start ? new Date(dateRange.start).toLocaleDateString() : 'N/A'} to ${dateRange.end ? new Date(dateRange.end).toLocaleDateString() : 'N/A'}</p>
-                        <p>Generated: ${new Date().toLocaleString()}</p>
-                    </div>
             `;
             
-            // Add each selected employee
-            selectedEmployees.forEach(emp => {
+            // Generate department pages + employee cards
+            deptList.forEach(dept => {
+                const deptEmployees = byDept[dept];
+                
+                // Add department header page
+                printHTML += `
+                    <div class="dept-header-page">
+                        <div>
+                            <h1>${dept}</h1>
+                            <p>${deptEmployees.length} Employee${deptEmployees.length !== 1 ? 's' : ''}</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Add employee cards, 2 per page
+                for (let i = 0; i < deptEmployees.length; i += 2) {
+                    printHTML += `<div class="cards-page">`;
+                    
+                    // First card in the pair
+                    const emp1 = deptEmployees[i];
+                    printHTML += generateEmployeeCard(emp1);
+                    
+                    // Second card in the pair (if exists)
+                    if (i + 1 < deptEmployees.length) {
+                        const emp2 = deptEmployees[i + 1];
+                        printHTML += generateEmployeeCard(emp2);
+                    }
+                    
+                    printHTML += `</div>`;
+                }
+            });
+            
+            printHTML += `
+            </body>
+            </html>
+            `;
+            
+            // Open print window
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printHTML);
+            printWindow.document.close();
+            printWindow.print();
+            
+            // Helper function to generate a single employee card
+            function generateEmployeeCard(emp) {
                 const daysWorked = emp.daysWorked || (dateRange.actualDays - (emp.absences || 0));
                 const attendancePercent = dateRange.actualDays > 0 ? (daysWorked / dateRange.actualDays * 100) : 0;
                 
@@ -1951,11 +2105,11 @@
                 const hoursNum = parseFloat(emp.hours) || 0;
                 const absences = dateRange.actualDays - daysWorked;
                 
-                printHTML += `
-                    <div class="employee-section">
+                let cardHTML = `
+                    <div class="employee-card">
                         <div class="employee-title">
-                            <h2>${emp.name} <span style="font-size: 14px; color: #64748b;">(ID: ${emp.id})</span></h2>
-                            <p>Department: ${emp.dept || 'N/A'}</p>
+                            <h2>${emp.name}</h2>
+                            <p>ID: ${emp.id}</p>
                         </div>
                         <div class="metrics">
                             <div class="metric">
@@ -1991,7 +2145,7 @@
                 
                 // Add daily breakdown table if available
                 if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
-                    printHTML += `
+                    cardHTML += `
                         <table class="daily-table">
                             <thead>
                                 <tr>
@@ -2010,41 +2164,30 @@
                         const rowClass = day.lateMin > 0 ? 'late-row' : '';
                         const status = day.isMissed ? '❌' : (day.hasMissedPunch ? '⚠️' : '✅');
                         const punches = day.punchPairs && day.punchPairs.length > 0 
-                            ? day.punchPairs.map(p => `${p.in} → ${p.out || '(missing)'}`).join('<br>') 
+                            ? day.punchPairs.map(p => `${formatTime(p.in)} → ${p.out ? formatTime(p.out) : '(missing)'}`).join('<br>') 
                             : '—';
                         
-                        printHTML += `
+                        cardHTML += `
                             <tr class="${rowClass}">
                                 <td>${day.date}</td>
                                 <td>${day.dayName}</td>
                                 <td>${punches}</td>
-                                <td>${day.hours > 0 ? parseFloat(day.hours).toFixed(2) : '—'}</td>
+                                <td>${day.pairHours > 0 ? parseFloat(day.pairHours).toFixed(1) : '—'}</td>
                                 <td class="${day.lateMin > 0 ? 'late' : ''}">${day.lateMin > 0 ? day.lateMin : '—'}</td>
                                 <td>${status}</td>
                             </tr>
                         `;
                     });
                     
-                    printHTML += `
+                    cardHTML += `
                             </tbody>
                         </table>
                     `;
                 }
                 
-                printHTML += `</div>`;
-            });
-            
-            printHTML += `
-                </div>
-            </body>
-            </html>
-            `;
-            
-            // Open print window
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(printHTML);
-            printWindow.document.close();
-            printWindow.print();
+                cardHTML += `</div>`;
+                return cardHTML;
+            }
         }
 
         // ========== CHANGE TRACKING & AUDIT LOG ==========
