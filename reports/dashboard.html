@@ -108,6 +108,16 @@
         .editable-hours:hover { background: #fef3c7 !important; outline: 1px dashed #f59e0b; }
         .editable-hours:focus { background: #fde047 !important; outline: 2px solid #2563eb; }
         
+        /* Editable Punch Times (IN/OUT) */
+        .editable-punch-in, .editable-punch-out { background: #fef08a !important; border-radius: 3px; padding: 2px 4px !important; cursor: text; transition: all 0.2s ease; }
+        .editable-punch-in:hover, .editable-punch-out:hover { background: #fef3c7 !important; outline: 1px dashed #f59e0b; }
+        .editable-punch-in:focus, .editable-punch-out:focus { background: #fde047 !important; outline: 2px solid #f59e0b; }
+        
+        /* Editable Hours Per Pair */
+        .editable-hours-pair { background: #dbeafe !important; border-radius: 3px; padding: 2px 4px !important; cursor: text; transition: all 0.2s ease; }
+        .editable-hours-pair:hover { background: #bfdbfe !important; outline: 1px dashed #2563eb; }
+        .editable-hours-pair:focus { background: #93c5fd !important; outline: 2px solid #2563eb; }
+        
         /* Secondary metrics line - smaller cards */
         .metrics-line-secondary { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25rem; margin-top: 0.25rem; }
         .metric-card-small { padding: 0.3rem 0.15rem; background: #fafbfc; border-radius: 0.35rem; border: 1px solid #e2e8f0; text-align: center; transition: all 0.2s ease; }
@@ -430,6 +440,34 @@
                     <option value="">Loading months...</option>
                 </select>
             </div>
+            
+            <!-- NEW: Department/Shift Settings -->
+            <div class="control-section" id="deptShiftSection">
+                <label>🏢 Shift Settings:</label>
+                <div id="deptShiftEditor" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+                    <!-- Departments will be populated here -->
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <label style="margin: 0; font-size: 0.85rem;">WK (9AM):</label>
+                        <input type="time" id="shiftWK_start" value="09:00" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
+                        <span>to</span>
+                        <input type="time" id="shiftWK_end" value="17:30" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <label style="margin: 0; font-size: 0.85rem;">FT (9AM):</label>
+                        <input type="time" id="shiftFT_start" value="09:00" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
+                        <span>to</span>
+                        <input type="time" id="shiftFT_end" value="17:30" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <label style="margin: 0; font-size: 0.85rem;">EV (6PM):</label>
+                        <input type="time" id="shiftEV_start" value="18:00" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
+                        <span>to</span>
+                        <input type="time" id="shiftEV_end" value="02:30" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
+                    </div>
+                    <button onclick="saveShiftDefinitions()" style="padding: 0.35rem 1rem; background: #059669; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">Save Shifts</button>
+                </div>
+            </div>
+            
             <div class="control-section">
                 <label>Data Source:</label>
                 <select id="sheetSelector">
@@ -700,6 +738,56 @@
             });
         }
         
+        // ========== SHIFT DEFINITIONS ==========
+        let shiftDefinitions = {};
+        
+        async function loadShiftDefinitions() {
+            try {
+                const docRef = await db.collection(TIMESHEET_COLLECTION).doc('shiftDefinitions').get();
+                if (docRef.exists) {
+                    shiftDefinitions = docRef.data();
+                    console.log('✅ Loaded shift definitions:', shiftDefinitions);
+                } else {
+                    // Default shift definitions
+                    shiftDefinitions = {
+                        WK: { start: '09:00', end: '17:30' },
+                        FT: { start: '09:00', end: '17:30' },
+                        EV: { start: '18:00', end: '02:30' }
+                    };
+                    console.log('📋 Using default shift definitions');
+                }
+                
+                // Update UI with loaded values
+                document.getElementById('shiftWK_start').value = shiftDefinitions.WK?.start || '09:00';
+                document.getElementById('shiftWK_end').value = shiftDefinitions.WK?.end || '17:30';
+                document.getElementById('shiftFT_start').value = shiftDefinitions.FT?.start || '09:00';
+                document.getElementById('shiftFT_end').value = shiftDefinitions.FT?.end || '17:30';
+                document.getElementById('shiftEV_start').value = shiftDefinitions.EV?.start || '18:00';
+                document.getElementById('shiftEV_end').value = shiftDefinitions.EV?.end || '02:30';
+            } catch (error) {
+                console.error('❌ Error loading shift definitions:', error);
+            }
+        }
+        
+        async function saveShiftDefinitions() {
+            try {
+                const newDefs = {
+                    WK: { start: document.getElementById('shiftWK_start').value, end: document.getElementById('shiftWK_end').value },
+                    FT: { start: document.getElementById('shiftFT_start').value, end: document.getElementById('shiftFT_end').value },
+                    EV: { start: document.getElementById('shiftEV_start').value, end: document.getElementById('shiftEV_end').value }
+                };
+                
+                shiftDefinitions = newDefs;
+                
+                await saveToFirestore(TIMESHEET_COLLECTION, 'shiftDefinitions', shiftDefinitions);
+                console.log('✅ Saved shift definitions to Firestore');
+                alert('✅ Shift definitions saved!');
+            } catch (error) {
+                console.error('❌ Error saving shift definitions:', error);
+                alert('❌ Failed to save shift definitions');
+            }
+        }
+        
         async function loadMonthData() {
             const monthId = document.getElementById('monthSelector').value;
             if (!monthId) return;
@@ -763,6 +851,13 @@
                 tableBody.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #666;">No employee data to display</div>';
                 return;
             }
+            
+            // Sort employees by ID ascending
+            employees.sort((a, b) => {
+                const aId = parseInt(a.id) || 999999;
+                const bId = parseInt(b.id) || 999999;
+                return aId - bId;
+            });
             
             // Create employee cards with all 6 metrics (matching PDF template)
             employees.forEach(emp => {
@@ -890,6 +985,7 @@
             
             // Load available months from Firebase on page load
             loadAvailableMonths();
+            loadShiftDefinitions();  // Load shift definitions
             
             fileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
@@ -2795,42 +2891,52 @@
             const missedPunchDates = emp.dailyBreakdown.filter(d => d.hasMissedPunch).length;
             const missedDays = emp.dailyBreakdown.filter(d => d.isMissed).length;
             
-            // DIAGNOSTIC: Check for mismatches
-            emp.dailyBreakdown.forEach(day => {
-                if (day.lateMin > 0 && !day.isMissed) {
-                    // This day should be highlighted red
-                    if (!day.lateMin) {
-                        console.warn(`⚠️ MISMATCH: ${emp.name} ${day.date} has lateMin display but lateMin value is ${day.lateMin}`);
-                    }
+            // Build table rows with each punchPair on its own row
+            const tableRows = emp.dailyBreakdown.map((day, dayIdx) => {
+                const isLateDay = day.lateMin > 0;
+                const rowStyle = `line-height: 1.2; background-color: ${isLateDay ? '#fee2e2' : 'transparent'}; ${isLateDay ? 'border-left: 3px solid #dc2626;' : ''}`;
+                
+                // If no punch pairs, show a single row for the day
+                if (!day.punchPairs || day.punchPairs.length === 0) {
+                    return `
+                        <tr style="${rowStyle}">
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; ${isLateDay ? 'color: #dc2626; font-weight: 700;' : ''}"><strong>${day.date}</strong></td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; ${isLateDay ? 'color: #dc2626; font-weight: 700;' : ''}"><strong>${day.dayName}</strong></td>
+                            <td colspan="3" style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; color: #9ca3af; font-size: 0.6rem;">No punches</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem;">${day.isMissed ? '❌' : '⚠️'}</td>
+                        </tr>
+                    `;
                 }
-            });
-            
-            const tableRows = emp.dailyBreakdown.map((day, idx) => `
-                <tr style="line-height: 1.2; background-color: ${day.lateMin > 0 ? '#fee2e2' : 'transparent'}; ${day.lateMin > 0 ? 'border-left: 3px solid #dc2626;' : ''}">
-                    <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; ${day.lateMin > 0 ? 'color: #dc2626; font-weight: 700;' : ''}"><strong>${day.date}</strong></td>
-                    <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; ${day.lateMin > 0 ? 'color: #dc2626; font-weight: 700;' : ''}"><strong>${day.dayName}</strong></td>
-                    <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: left; font-size: 0.6rem; font-family: monospace;">
-                        ${day.punchPairs && day.punchPairs.length > 0 ? 
-                            day.punchPairs.map(pair => `<div style="${!pair.complete ? 'color: #f59e0b; font-weight: 600;' : ''}${day.lateMin > 0 ? ' color: #dc2626;' : ''}">${pair.in} ${pair.out ? '→ ' + pair.out : '→ (missing)'}</div>`).join('') 
-                            : '-'
-                        }
-                    </td>
-                    <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${idx}" class="editable-hours" onblur="updateEmployeeMetricsFromEdit(event)">${day.hours > 0 ? parseFloat(day.hours).toFixed(2) : '-'}</td>
-                    <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; font-weight: ${day.lateMin > 0 ? '700' : '400'}; color: ${day.lateMin > 0 ? '#dc2626' : '#64748b'};">${day.lateMin > 0 ? day.lateMin : '-'}</td>
-                    <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem;">${day.isMissed ? '❌' : (day.hasMissedPunch ? '⚠️' : '✅')}</td>
-                </tr>
-            `).join('');
+                
+                // Build rows for each punch pair
+                return day.punchPairs.map((pair, pairIdx) => `
+                    <tr style="${rowStyle}">
+                        ${pairIdx === 0 ? `
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; ${isLateDay ? 'color: #dc2626; font-weight: 700;' : ''}" rowspan="${day.punchPairs.length}"><strong>${day.date}</strong></td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; ${isLateDay ? 'color: #dc2626; font-weight: 700;' : ''}" rowspan="${day.punchPairs.length}"><strong>${day.dayName}</strong></td>
+                        ` : ''}
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" title="Click to edit sign-in time">${pair.in || '—'}</td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" title="Click to edit sign-out time">${pair.out || '—'}</td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #dbeafe;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-hours-pair" onblur="updateHoursPair(event)" title="Click to edit calculated hours">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : '—'}</td>
+                        ${pairIdx === 0 ? `
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; font-weight: ${isLateDay ? '700' : '400'}; color: ${isLateDay ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem;" rowspan="${day.punchPairs.length}">${day.isMissed ? '❌' : (day.hasMissedPunch ? '⚠️' : '✅')}</td>
+                        ` : ''}
+                    </tr>
+                `).join('');
+            }).join('');
             
             return `
                 <div style="padding: 0.2rem; background: #f8fafc; border-top: 1px solid #e2e8f0;">
-                    <!-- DAILY TABLE -->
+                    <!-- DAILY TABLE WITH EDITABLE PUNCH TIMES -->
                     <table style="width: 100%; font-size: 0.6rem; border-collapse: collapse; font-family: monospace; line-height: 1;">
                         <thead>
                             <tr style="background: #e2e8f0;">
                                 <th style="padding: 0.15rem 0.2rem; text-align: left; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Date</th>
                                 <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Day</th>
-                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Punches</th>
-                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Hrs</th>
+                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #fef08a;">IN</th>
+                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #fef08a;">OUT</th>
+                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #dbeafe;">Hrs</th>
                                 <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Late</th>
                                 <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">S</th>
                             </tr>
@@ -2867,6 +2973,146 @@
             }
             
             console.log(`✏️ Updated hours for ${emp.name}: ${newHours}h on day ${dayIdx + 1}`);
+        }
+        
+        function updatePunchTime(event, type) {
+            const empId = parseInt(event.target.dataset.empId);
+            const dayIdx = parseInt(event.target.dataset.dayIdx);
+            const pairIdx = parseInt(event.target.dataset.pairIdx);
+            const newTime = event.target.textContent.trim();
+            
+            // Validate time format (HH:MM)
+            if (!/^\d{1,2}:\d{2}$/.test(newTime)) {
+                alert('Please enter time in HH:MM format');
+                event.target.textContent = type === 'in' ? event.target.parentElement.dataset.originalIn : event.target.parentElement.dataset.originalOut;
+                return;
+            }
+            
+            const emp = filteredData.find(e => e.id === empId);
+            if (!emp || !emp.dailyBreakdown) return;
+            
+            const day = emp.dailyBreakdown[dayIdx];
+            const pair = day.punchPairs[pairIdx];
+            
+            if (type === 'in') {
+                pair.in = newTime;
+            } else {
+                pair.out = newTime;
+            }
+            
+            // Auto-calculate hours for this pair if both IN and OUT are present
+            if (pair.in && pair.out) {
+                const inParts = pair.in.split(':').map(Number);
+                const outParts = pair.out.split(':').map(Number);
+                const inMinutes = inParts[0] * 60 + inParts[1];
+                const outMinutes = outParts[0] * 60 + outParts[1];
+                
+                let diffMinutes = outMinutes - inMinutes;
+                if (diffMinutes < 0) {
+                    // Overnight shift
+                    diffMinutes += 24 * 60;
+                }
+                
+                pair.pairHours = (diffMinutes / 60).toFixed(2);
+                pair.complete = true;
+            } else {
+                pair.complete = false;
+                pair.pairHours = 0;
+            }
+            
+            // Recalculate day total hours from all punch pairs
+            let dayTotalMinutes = 0;
+            day.punchPairs.forEach(p => {
+                if (p.in && p.out) {
+                    const inParts = p.in.split(':').map(Number);
+                    const outParts = p.out.split(':').map(Number);
+                    let inMinutes = inParts[0] * 60 + inParts[1];
+                    let outMinutes = outParts[0] * 60 + outParts[1];
+                    
+                    let diff = outMinutes - inMinutes;
+                    if (diff < 0) diff += 24 * 60; // overnight
+                    dayTotalMinutes += diff;
+                }
+            });
+            
+            day.hours = (dayTotalMinutes / 60).toFixed(2);
+            
+            // Calculate late minutes from FIRST punch only (when first pair IN time is edited)
+            if (pairIdx === 0 && type === 'in') {
+                const dept = emp.dept || 'WK';
+                const shiftDef = shiftDefinitions[dept] || { start: '09:00', end: '17:30' };
+                const shiftStartParts = shiftDef.start.split(':').map(Number);
+                const shiftStartMinutes = shiftStartParts[0] * 60 + shiftStartParts[1];
+                
+                const inParts = pair.in.split(':').map(Number);
+                const actualStartMinutes = inParts[0] * 60 + inParts[1];
+                
+                if (actualStartMinutes > shiftStartMinutes) {
+                    day.lateMin = actualStartMinutes - shiftStartMinutes;
+                } else {
+                    day.lateMin = 0;
+                }
+            }
+            
+            // Recalculate total employee hours and late minutes
+            let totalMinutes = 0;
+            let totalLateMinutes = 0;
+            emp.dailyBreakdown.forEach(d => {
+                totalMinutes += (parseFloat(d.hours) || 0) * 60;
+                totalLateMinutes += (d.lateMin || 0);
+            });
+            emp.hours = (totalMinutes / 60).toFixed(2) + ' hrs';
+            emp.lateMin = Math.round(totalLateMinutes);
+            
+            // Update display
+            const card = document.querySelector(`.employee-card[data-id="${empId}"]`);
+            if (card) {
+                updateCardDisplay(emp, card);
+                // Re-render the daily breakdown to show updated values
+                const breakdownDiv = card.querySelector('.daily-breakdown');
+                if (breakdownDiv) {
+                    breakdownDiv.innerHTML = renderDailyBreakdown(emp);
+                }
+            }
+            
+            console.log(`✅ Updated ${type} time for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newTime}, Late: ${pairIdx === 0 ? day.lateMin : 'N/A'} min`);
+        }
+        }
+        
+        function updateHoursPair(event) {
+            const empId = parseInt(event.target.dataset.empId);
+            const dayIdx = parseInt(event.target.dataset.dayIdx);
+            const pairIdx = parseInt(event.target.dataset.pairIdx);
+            const newHours = parseFloat(event.target.textContent) || 0;
+            
+            const emp = filteredData.find(e => e.id === empId);
+            if (!emp || !emp.dailyBreakdown) return;
+            
+            const pair = emp.dailyBreakdown[dayIdx].punchPairs[pairIdx];
+            pair.pairHours = newHours;
+            
+            // Recalculate day total
+            const day = emp.dailyBreakdown[dayIdx];
+            let dayTotal = 0;
+            day.punchPairs.forEach(p => {
+                dayTotal += parseFloat(p.pairHours) || 0;
+            });
+            day.hours = dayTotal.toFixed(2);
+            
+            // Recalculate total employee hours
+            let totalMinutes = 0;
+            emp.dailyBreakdown.forEach(d => {
+                totalMinutes += (parseFloat(d.hours) || 0) * 60;
+            });
+            emp.hours = (totalMinutes / 60).toFixed(2) + ' hrs';
+            
+            // Update display
+            const card = document.querySelector(`.employee-card[data-id="${empId}"]`);
+            if (card) {
+                updateCardDisplay(emp, card);
+            }
+            
+            console.log(`✏️ Updated hours for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newHours}h`);
         }
         
         function updateCardDisplay(emp, card) {
