@@ -910,6 +910,33 @@
                     
                     filteredData = [...rawData];
                     
+                    // Calculate missing pairHours for all punch pairs
+                    filteredData.forEach(emp => {
+                        if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
+                            emp.dailyBreakdown.forEach(day => {
+                                if (day.punchPairs && day.punchPairs.length > 0) {
+                                    day.punchPairs.forEach(pair => {
+                                        // Calculate pairHours if not already set
+                                        if (!pair.pairHours && pair.in && pair.out) {
+                                            const inParts = pair.in.split(':').map(Number);
+                                            const outParts = pair.out.split(':').map(Number);
+                                            const inMinutes = inParts[0] * 60 + inParts[1];
+                                            const outMinutes = outParts[0] * 60 + outParts[1];
+                                            
+                                            let diffMinutes = outMinutes - inMinutes;
+                                            if (diffMinutes < 0) {
+                                                diffMinutes += 24 * 60; // overnight shift
+                                            }
+                                            
+                                            pair.pairHours = (diffMinutes / 60).toFixed(2);
+                                            pair.complete = true;
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                    
                     console.log(`✅ Loaded ${rawData.length} employees from ${monthId}`);
                     console.log(`📅 Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);
                     
@@ -1452,16 +1479,18 @@
                                 for (let p = 0; p < times.length; p += 2) {
                                     const inTime = times[p].trim();
                                     const outTime = times[p + 1].trim();
-                                    dayRecord.punchPairs.push({ in: inTime, out: outTime, complete: true });
                                     
                                     const inParts = inTime.split(':').map(Number);
                                     const outParts = outTime.split(':').map(Number);
                                     
+                                    let pairMin = 0;
                                     if (inParts.length >= 2 && outParts.length >= 2) {
-                                        let pairMin = (outParts[0] * 60 + outParts[1]) - (inParts[0] * 60 + inParts[1]);
+                                        pairMin = (outParts[0] * 60 + outParts[1]) - (inParts[0] * 60 + inParts[1]);
                                         if (pairMin < 0) pairMin += 24 * 60;
                                         dayMinutes += pairMin;
                                     }
+                                    
+                                    dayRecord.punchPairs.push({ in: inTime, out: outTime, complete: true, pairHours: (pairMin / 60).toFixed(2) });
                                 }
                                 
                                 dayRecord.hours = (dayMinutes / 60).toFixed(2);
@@ -1497,16 +1526,18 @@
                                     if (p + 1 < times.length) {
                                         const inTime = times[p].trim();
                                         const outTime = times[p + 1].trim();
-                                        dayRecord.punchPairs.push({ in: inTime, out: outTime, complete: true });
                                         
                                         const inParts = inTime.split(':').map(Number);
                                         const outParts = outTime.split(':').map(Number);
                                         
+                                        let pairMin = 0;
                                         if (inParts.length >= 2 && outParts.length >= 2) {
-                                            let pairMin = (outParts[0] * 60 + outParts[1]) - (inParts[0] * 60 + inParts[1]);
+                                            pairMin = (outParts[0] * 60 + outParts[1]) - (inParts[0] * 60 + inParts[1]);
                                             if (pairMin < 0) pairMin += 24 * 60;
                                             dayMinutes += pairMin;
                                         }
+                                        
+                                        dayRecord.punchPairs.push({ in: inTime, out: outTime, complete: true, pairHours: (pairMin / 60).toFixed(2) });
                                     }
                                 }
                                 
