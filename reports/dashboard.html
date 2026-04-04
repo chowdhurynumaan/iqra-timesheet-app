@@ -113,11 +113,6 @@
         .editable-punch-in:hover, .editable-punch-out:hover { background: #fef3c7 !important; outline: 1px dashed #f59e0b; }
         .editable-punch-in:focus, .editable-punch-out:focus { background: #fde047 !important; outline: 2px solid #f59e0b; }
         
-        /* Editable Hours Per Pair */
-        .editable-hours-pair { background: #dbeafe !important; border-radius: 3px; padding: 2px 4px !important; cursor: text; transition: all 0.2s ease; }
-        .editable-hours-pair:hover { background: #bfdbfe !important; outline: 1px dashed #2563eb; }
-        .editable-hours-pair:focus { background: #93c5fd !important; outline: 2px solid #2563eb; }
-        
         /* Secondary metrics line - smaller cards */
         .metrics-line-secondary { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25rem; margin-top: 0.25rem; }
         .metric-card-small { padding: 0.3rem 0.15rem; background: #fafbfc; border-radius: 0.35rem; border: 1px solid #e2e8f0; text-align: center; transition: all 0.2s ease; }
@@ -3083,7 +3078,7 @@
                         ` : ''}
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" title="Click to edit sign-in time">${pair.in || '—'}</td>
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" title="Click to edit sign-out time">${pair.out || '—'}</td>
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #dbeafe;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-hours-pair" onblur="updateHoursPair(event)" title="Click to edit calculated hours">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : '—'}</td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #dbeafe; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : '—'}</td>
                         ${pairIdx === 0 ? `
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; font-weight: ${isLateDay ? '700' : '400'}; color: ${isLateDay ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem;" rowspan="${day.punchPairs.length}">${day.isMissed ? '❌' : (day.hasMissedPunch ? '⚠️' : '✅')}</td>
@@ -3244,41 +3239,6 @@
             console.log(`✅ Updated ${type} time for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newTime}, Late: ${pairIdx === 0 ? day.lateMin : 'N/A'} min`);
         }
         
-        function updateHoursPair(event) {
-            const empId = parseInt(event.target.dataset.empId);
-            const dayIdx = parseInt(event.target.dataset.dayIdx);
-            const pairIdx = parseInt(event.target.dataset.pairIdx);
-            const newHours = parseFloat(event.target.textContent) || 0;
-            
-            const emp = filteredData.find(e => e.id === empId);
-            if (!emp || !emp.dailyBreakdown) return;
-            
-            const pair = emp.dailyBreakdown[dayIdx].punchPairs[pairIdx];
-            pair.pairHours = newHours;
-            
-            // Recalculate day total
-            const day = emp.dailyBreakdown[dayIdx];
-            let dayTotal = 0;
-            day.punchPairs.forEach(p => {
-                dayTotal += parseFloat(p.pairHours) || 0;
-            });
-            day.hours = dayTotal.toFixed(2);
-            
-            // Recalculate total employee hours
-            let totalMinutes = 0;
-            emp.dailyBreakdown.forEach(d => {
-                totalMinutes += (parseFloat(d.hours) || 0) * 60;
-            });
-            emp.hours = (totalMinutes / 60).toFixed(2) + ' hrs';
-            
-            // Update display
-            const card = document.querySelector(`.employee-card[data-id="${empId}"]`);
-            if (card) {
-                updateCardDisplay(emp, card);
-            }
-            
-            console.log(`✏️ Updated hours for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newHours}h`);
-        }
         
         function updateCardDisplay(emp, card) {
             // Recalculate metrics
