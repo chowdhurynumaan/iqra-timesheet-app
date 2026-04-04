@@ -1862,35 +1862,32 @@
         }
 
         function printSelected() {
-            // Get all employee-checkbox elements and check their checked state
-            const allCheckboxes = document.querySelectorAll('.employee-checkbox');
-            console.log(`DEBUG: Found ${allCheckboxes.length} total checkboxes`);
+            // Get only CHECKED employee-checkbox elements using CSS selector
+            const checkedCheckboxes = document.querySelectorAll('.employee-checkbox:checked');
+            console.log(`DEBUG: Found ${checkedCheckboxes.length} CHECKED checkboxes`);
             
-            const selectedEmployees = [];
-            
-            allCheckboxes.forEach(cb => {
-                if (cb.checked) {
-                    const checkboxId = cb.dataset.id;
-                    console.log(`✓ Checkbox checked with ID: ${checkboxId}`);
-                    
-                    // Find matching employee in filteredData
-                    const emp = filteredData.find(e => String(e.id) === String(checkboxId));
-                    if (emp) {
-                        selectedEmployees.push(emp);
-                        console.log(`   ✅ Found employee: ${emp.name} (ID: ${emp.id})`);
-                    } else {
-                        console.warn(`   ❌ No employee found with ID: ${checkboxId}`);
-                        console.log(`   Available IDs in filteredData: ${filteredData.map(e => e.id).join(', ')}`);
-                    }
-                }
-            });
-            
-            if (selectedEmployees.length === 0) {
+            if (checkedCheckboxes.length === 0) {
                 alert('❌ No employees selected.\n\nPlease check the checkboxes next to the employees you want to print.');
                 return;
             }
             
-            console.log(`✅ Ready to print ${selectedEmployees.length} employee(s)`);
+            const selectedEmployees = [];
+            
+            checkedCheckboxes.forEach(cb => {
+                const checkboxId = cb.dataset.id;
+                console.log(`✓ Processing checked box with ID: ${checkboxId}`);
+                
+                // Find matching employee in filteredData
+                const emp = filteredData.find(e => String(e.id) === String(checkboxId));
+                if (emp) {
+                    selectedEmployees.push(emp);
+                    console.log(`   ✅ Added employee: ${emp.name} (ID: ${emp.id}) - Dept: ${emp.dept}`);
+                } else {
+                    console.warn(`   ❌ Employee not found with ID: ${checkboxId}`);
+                }
+            });
+            
+            console.log(`✅ Ready to print ${selectedEmployees.length} employee(s):`, selectedEmployees.map(e => e.name).join(', '));
             
             // Group employees by department
             const byDept = {};
@@ -1902,6 +1899,11 @@
             
             // Sort departments alphabetically
             const deptList = Object.keys(byDept).sort();
+            
+            console.log(`📊 Department Grouping:`);
+            deptList.forEach(dept => {
+                console.log(`   ${dept}: ${byDept[dept].length} employees`);
+            });
             
             // Generate print HTML - LANDSCAPE, 2 CARDS PER PAGE, GROUPED BY DEPT
             let printHTML = `
