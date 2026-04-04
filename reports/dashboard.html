@@ -3266,19 +3266,34 @@
             
             // Build table rows with each punchPair on its own row
             const tableRows = emp.dailyBreakdown.map((day, dayIdx) => {
-                const isLateDay = day.lateMin > 0;
-                const rowStyle = `line-height: 1.2; background-color: ${isLateDay ? '#fee2e2' : 'transparent'}; ${isLateDay ? 'border-left: 3px solid #dc2626;' : ''}`;
+                // Determine row color based on punch status and lateness
+                let rowColor = 'white'; // Default: white for on-time days
+                let rowBorder = '';
+                
+                const hasNoPunches = !day.punchPairs || day.punchPairs.length === 0;
+                const hasPunches = day.punchPairs && day.punchPairs.some(p => p.in && p.out);
+                
+                if (hasNoPunches) {
+                    // Light gray for days with no punch times
+                    rowColor = '#f3f4f6';
+                } else if (day.lateMin > 0) {
+                    // Red for late days
+                    rowColor = '#fee2e2';
+                    rowBorder = 'border-left: 3px solid #dc2626;';
+                }
+                
+                const rowStyle = `line-height: 1.2; background-color: ${rowColor}; ${rowBorder}`;
                 
                 // If no punch pairs, show EDITABLE cells for IN/OUT
-                if (!day.punchPairs || day.punchPairs.length === 0) {
+                if (hasNoPunches) {
                     return `
                         <tr style="${rowStyle}">
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; ${isLateDay ? 'color: #dc2626; font-weight: 700;' : ''}"><strong>${day.date}</strong></td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; ${isLateDay ? 'color: #dc2626; font-weight: 700;' : ''}"><strong>${day.dayName}</strong></td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0;"><strong>${day.date}</strong></td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center;"><strong>${day.dayName}</strong></td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-is-new="true" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" placeholder="9:30 AM" title="Click to add IN time (e.g., 9:30 AM or 09:30)">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-is-new="true" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" placeholder="5:30 PM" title="Click to add OUT time (e.g., 5:30 PM or 17:30)">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #dbeafe; color: #0369a1; font-weight: 600;">—</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; font-weight: ${isLateDay ? '700' : '400'}; color: ${isLateDay ? '#dc2626' : '#64748b'};">—</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; font-weight: 400; color: #64748b;">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem;">❌</td>
                         </tr>
                     `;
@@ -3288,14 +3303,14 @@
                 return day.punchPairs.map((pair, pairIdx) => `
                     <tr style="${rowStyle}">
                         ${pairIdx === 0 ? `
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; ${isLateDay ? 'color: #dc2626; font-weight: 700;' : ''}" rowspan="${day.punchPairs.length}"><strong>${day.date}</strong></td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; ${isLateDay ? 'color: #dc2626; font-weight: 700;' : ''}" rowspan="${day.punchPairs.length}"><strong>${day.dayName}</strong></td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0;" rowspan="${day.punchPairs.length}"><strong>${day.date}</strong></td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center;" rowspan="${day.punchPairs.length}"><strong>${day.dayName}</strong></td>
                         ` : ''}
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" title="Edit IN time (e.g., 9:30 AM or 09:30)">${formatTime(pair.in)}</td>
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" title="Edit OUT time (e.g., 5:30 PM or 17:30)">${formatTime(pair.out)}</td>
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #dbeafe; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : '—'}</td>
                         ${pairIdx === 0 ? `
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; font-weight: ${isLateDay ? '700' : '400'}; color: ${isLateDay ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; font-weight: ${day.lateMin > 0 ? '700' : '400'}; color: ${day.lateMin > 0 ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem;" rowspan="${day.punchPairs.length}">${day.isMissed ? '❌' : (day.hasMissedPunch ? '⚠️' : '✅')}</td>
                         ` : ''}
                     </tr>
@@ -3306,7 +3321,7 @@
                 <div style="padding: 0.2rem; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 0.2rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 0.2rem;">
                         <div style="font-size: 0.55rem; color: #64748b;">
-                            <strong>Format:</strong> 9:30 AM or 09:30 | <strong>Yellow</strong> = editable
+                            <strong>Format:</strong> 9:30 AM or 09:30 | <strong style="color: #f3f4f6; background: #e0e0e0; padding: 0.1rem 0.3rem; border-radius: 2px;">No Punches (Gray)</strong> | <strong style="color: #dc2626; background: #fee2e2; padding: 0.1rem 0.3rem; border-radius: 2px;">Late (Red)</strong> | <strong style="background: white; padding: 0.1rem 0.3rem; border: 1px solid #e2e8f0; border-radius: 2px;">On-time (White)</strong>
                         </div>
                         <button onclick="saveEmployeeChanges('${emp.id}')" style="padding: 0.2rem 0.6rem; background: #10b981; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: 700; font-size: 0.55rem;">💾 SAVE</button>
                     </div>
