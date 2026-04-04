@@ -3372,30 +3372,6 @@
                 alert(`❌ Error saving changes: ${error.message}`);
             }
         }
-            const empId = parseInt(event.target.dataset.empId);
-            const dayIdx = parseInt(event.target.dataset.dayIdx);
-            const newHours = parseFloat(event.target.textContent) || 0;
-            
-            // Find and update the employee
-            const emp = filteredData.find(e => e.id === empId);
-            if (!emp || !emp.dailyBreakdown) return;
-            
-            // Update the specific day's hours
-            emp.dailyBreakdown[dayIdx].hours = newHours;
-            
-            // Recalculate total hours
-            const totalMinutes = emp.dailyBreakdown.reduce((sum, day) => sum + (parseFloat(day.hours) || 0) * 60, 0);
-            emp.totalMinutes = totalMinutes;
-            emp.hours = (totalMinutes / 60).toFixed(2) + ' hrs';
-            
-            // Update the display card for this employee
-            const card = document.querySelector(`.employee-card[data-id="${empId}"]`);
-            if (card) {
-                updateCardDisplay(emp, card);
-            }
-            
-            console.log(`✏️ Updated hours for ${emp.name}: ${newHours}h on day ${dayIdx + 1}`);
-        }
         
         function updatePunchTime(event, type) {
             const empId = parseInt(event.target.dataset.empId);
