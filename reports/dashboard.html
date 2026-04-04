@@ -427,10 +427,16 @@
                 <h1>Attendance Dashboard</h1>
                 <p class="subtitle">Upload your attendance report (CSV or Excel) to visualize performance</p>
             </div>
-            <label class="btn-upload">
-                <span>Upload Report</span>
-                <input type="file" id="csvFile" accept=".csv,.xlsx,.xls">
-            </label>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <label class="btn-upload">
+                    <span>📋 Upload Employee Form</span>
+                    <input type="file" id="employeeFormFile" accept=".csv,.xlsx,.xls">
+                </label>
+                <label class="btn-upload">
+                    <span>Upload Report</span>
+                    <input type="file" id="csvFile" accept=".csv,.xlsx,.xls">
+                </label>
+            </div>
         </div>
 
         <div id="controlPanel" class="control-panel">
@@ -788,6 +794,84 @@
             }
         }
         
+        // ========== EMPLOYEE FORM STRUCTURE ==========
+        let employeeFormMapping = {};
+        
+        async function loadEmployeeFormMapping() {
+            try {
+                const docRef = await db.collection(TIMESHEET_COLLECTION).doc('employeeFormMapping').get();
+                if (docRef.exists) {
+                    employeeFormMapping = docRef.data();
+                    console.log('✅ Loaded employee form mapping:', employeeFormMapping);
+                } else {
+                    console.log('📋 No employee form mapping found - waiting for upload');
+                }
+            } catch (error) {
+                console.error('❌ Error loading employee form mapping:', error);
+            }
+        }
+        
+        function parseEmployeeFormStructure(data) {
+            if (!data || data.length === 0) {
+                alert('❌ Empty file');
+                return;
+            }
+            
+            const headerRow = data[0] || [];
+            const mapping = {};
+            const headerLower = headerRow.map(h => (h || '').toString().toLowerCase().trim());
+            
+            // Detect columns by looking for key column headers
+            const columnPatterns = {
+                id: ['id', 'emp id', 'employee id', 'code', 'emp code'],
+                name: ['name', 'employee name', 'emp name', 'full name'],
+                dept: ['department', 'dept', 'section', 'division'],
+                shift: ['shift', 'schedule'],
+                phone: ['phone', 'contact', 'mobile'],
+                email: ['email', 'e-mail']
+            };
+            
+            Object.entries(columnPatterns).forEach(([field, patterns]) => {
+                const colIdx = headerLower.findIndex(h => patterns.some(p => h.includes(p)));
+                if (colIdx >= 0) {
+                    mapping[field] = {
+                        index: colIdx,
+                        header: headerRow[colIdx]
+                    };
+                    console.log(`   ✓ Found ${field} at column ${colIdx}: "${headerRow[colIdx]}"`);
+                }
+            });
+            
+            if (Object.keys(mapping).length === 0) {
+                alert('❌ Could not detect any standard columns in the employee form');
+                return;
+            }
+            
+            console.log('📋 Detected Employee Form Columns:');
+            console.log(JSON.stringify(mapping, null, 2));
+            
+            // Show detected columns and allow user to save
+            const confirmMsg = `Detected employee form columns:\n\n${
+                Object.entries(mapping).map(([field, data]) => `${field}: ${data.header}`).join('\n')
+            }\n\nSave this mapping to Firestore?`;
+            
+            if (confirm(confirmMsg)) {
+                saveEmployeeFormMapping(mapping);
+            }
+        }
+        
+        async function saveEmployeeFormMapping(mapping) {
+            try {
+                employeeFormMapping = mapping;
+                await saveToFirestore(TIMESHEET_COLLECTION, 'employeeFormMapping', mapping);
+                console.log('✅ Saved employee form mapping to Firestore');
+                alert('✅ Employee form structure saved! The system will now use these columns when processing data.');
+            } catch (error) {
+                console.error('❌ Error saving employee form mapping:', error);
+                alert('❌ Failed to save employee form mapping');
+            }
+        }
+        
         async function loadMonthData() {
             const monthId = document.getElementById('monthSelector').value;
             if (!monthId) return;
@@ -986,6 +1070,7 @@
             // Load available months from Firebase on page load
             loadAvailableMonths();
             loadShiftDefinitions();  // Load shift definitions
+            loadEmployeeFormMapping();  // Load employee form column mapping
             
             fileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
@@ -1046,6 +1131,47 @@
                     });
                 }
             });
+            
+            // ========== EMPLOYEE FORM FILE UPLOAD ==========
+            const employeeFormInput = document.getElementById('employeeFormFile');
+            
+            if (employeeFormInput) {
+                employeeFormInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    const isExcel = /\.(xlsx?|xls)$/.test(file.name.toLowerCase());
+                    console.log(`📋 Employee Form File Selected: ${file.name}`);
+                    
+                    if (isExcel) {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                            try {
+                                const data = new Uint8Array(ev.target.result);
+                                const workbook = XLSX.read(data, { type: 'array' });
+                                const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, defval: '' });
+                                parseEmployeeFormStructure(sheetData);
+                            } catch (err) {
+                                console.error('❌ Error parsing employee form:', err);
+                                alert('❌ Error parsing employee form. Error: ' + err.message);
+                            }
+                        };
+                        reader.readAsArrayBuffer(file);
+                    } else {
+                        Papa.parse(file, {
+                            header: false,
+                            skipEmptyLines: false,
+                            complete: (results) => {
+                                parseEmployeeFormStructure(results.data);
+                            },
+                            error: (err) => {
+                                console.error('❌ Error parsing employee form CSV:', err);
+                                alert('❌ Error parsing employee form. Error: ' + err.message);
+                            }
+                        });
+                    }
+                });
+            }
         }
 
         function processMultiSheetData(sheets) {
