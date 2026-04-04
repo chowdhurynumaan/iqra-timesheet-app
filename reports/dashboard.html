@@ -3269,14 +3269,17 @@
                 const isLateDay = day.lateMin > 0;
                 const rowStyle = `line-height: 1.2; background-color: ${isLateDay ? '#fee2e2' : 'transparent'}; ${isLateDay ? 'border-left: 3px solid #dc2626;' : ''}`;
                 
-                // If no punch pairs, show a single row for the day
+                // If no punch pairs, show EDITABLE cells for IN/OUT
                 if (!day.punchPairs || day.punchPairs.length === 0) {
                     return `
                         <tr style="${rowStyle}">
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; ${isLateDay ? 'color: #dc2626; font-weight: 700;' : ''}"><strong>${day.date}</strong></td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; ${isLateDay ? 'color: #dc2626; font-weight: 700;' : ''}"><strong>${day.dayName}</strong></td>
-                            <td colspan="3" style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; color: #9ca3af; font-size: 0.6rem;">No punches</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem;">${day.isMissed ? '❌' : '⚠️'}</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-is-new="true" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" placeholder="9:30 AM" title="Click to add IN time (e.g., 9:30 AM or 09:30)">—</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-is-new="true" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" placeholder="5:30 PM" title="Click to add OUT time (e.g., 5:30 PM or 17:30)">—</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #dbeafe; color: #0369a1; font-weight: 600;">—</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; font-weight: ${isLateDay ? '700' : '400'}; color: ${isLateDay ? '#dc2626' : '#64748b'};">—</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem;">❌</td>
                         </tr>
                     `;
                 }
@@ -3288,8 +3291,8 @@
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; ${isLateDay ? 'color: #dc2626; font-weight: 700;' : ''}" rowspan="${day.punchPairs.length}"><strong>${day.date}</strong></td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; ${isLateDay ? 'color: #dc2626; font-weight: 700;' : ''}" rowspan="${day.punchPairs.length}"><strong>${day.dayName}</strong></td>
                         ` : ''}
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" title="Click to edit (e.g., 9:30 AM or 09:30)">${formatTime(pair.in)}</td>
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" title="Click to edit (e.g., 2:30 PM or 14:30)">${formatTime(pair.out)}</td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" title="Edit IN time (e.g., 9:30 AM or 09:30)">${formatTime(pair.in)}</td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" title="Edit OUT time (e.g., 5:30 PM or 17:30)">${formatTime(pair.out)}</td>
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #dbeafe; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : '—'}</td>
                         ${pairIdx === 0 ? `
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; font-weight: ${isLateDay ? '700' : '400'}; color: ${isLateDay ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>
@@ -3300,7 +3303,13 @@
             }).join('');
             
             return `
-                <div style="padding: 0.2rem; background: #f8fafc; border-top: 1px solid #e2e8f0;">
+                <div style="padding: 0.2rem; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 0.2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 0.2rem;">
+                        <div style="font-size: 0.55rem; color: #64748b;">
+                            <strong>Format:</strong> 9:30 AM or 09:30 | <strong>Yellow</strong> = editable
+                        </div>
+                        <button onclick="saveEmployeeChanges('${emp.id}')" style="padding: 0.2rem 0.6rem; background: #10b981; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: 700; font-size: 0.55rem;">💾 SAVE</button>
+                    </div>
                     <!-- DAILY TABLE WITH EDITABLE PUNCH TIMES -->
                     <table style="width: 100%; font-size: 0.6rem; border-collapse: collapse; font-family: monospace; line-height: 1;">
                         <thead>
@@ -3322,7 +3331,47 @@
             `;
         }
         
-        function updateEmployeeMetricsFromEdit(event) {
+        
+        async function saveEmployeeChanges(empId) {
+            const emp = filteredData.find(e => String(e.id) === String(empId));
+            if (!emp) {
+                alert('❌ Employee not found');
+                return;
+            }
+            
+            try {
+                console.log(`💾 Saving changes for ${emp.name}...`);
+                
+                // Update Firestore with the modified employee data
+                const docId = `emp_${emp.id}_${currentMonth}`;
+                await saveToFirestore(TIMESHEET_COLLECTION, docId, emp);
+                
+                console.log(`✅ Saved to Firestore: ${docId}`);
+                
+                // Re-calculate and update card metrics immediately
+                const card = document.querySelector(`.employee-card[data-id="${empId}"]`);
+                if (card) {
+                    updateCardDisplay(emp, card);
+                    
+                    // Re-render the daily breakdown
+                    const breakdownDiv = card.querySelector('.daily-breakdown');
+                    if (breakdownDiv) {
+                        breakdownDiv.innerHTML = renderDailyBreakdown(emp);
+                    }
+                    
+                    // Visual feedback
+                    card.style.borderColor = '#10b981';
+                    setTimeout(() => { card.style.borderColor = '#e2e8f0'; }, 2000);
+                    
+                    alert(`✅ Changes saved for ${emp.name}!\n\nMetrics updated live.`);
+                } else {
+                    alert(`✅ Changes saved for ${emp.name}!`);
+                }
+            } catch (error) {
+                console.error('❌ Error saving employee changes:', error);
+                alert(`❌ Error saving changes: ${error.message}`);
+            }
+        }
             const empId = parseInt(event.target.dataset.empId);
             const dayIdx = parseInt(event.target.dataset.dayIdx);
             const newHours = parseFloat(event.target.textContent) || 0;
@@ -3363,6 +3412,8 @@
                 if (emp?.dailyBreakdown?.[dayIdx]?.punchPairs?.[pairIdx]) {
                     const pair = emp.dailyBreakdown[dayIdx].punchPairs[pairIdx];
                     event.target.textContent = formatTime(type === 'in' ? pair.in : pair.out);
+                } else {
+                    event.target.textContent = '—';
                 }
                 return;
             }
@@ -3371,6 +3422,12 @@
             if (!emp || !emp.dailyBreakdown) return;
             
             const day = emp.dailyBreakdown[dayIdx];
+            
+            // If this is a "No punches" day, create the first punch pair
+            if (!day.punchPairs || day.punchPairs.length === 0) {
+                day.punchPairs = [{ in: null, out: null, pairHours: 0, complete: false }];
+            }
+            
             const pair = day.punchPairs[pairIdx];
             
             if (type === 'in') {
