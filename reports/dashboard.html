@@ -822,13 +822,16 @@
             const mapping = {};
             const headerLower = headerRow.map(h => (h || '').toString().toLowerCase().trim());
             
+            console.log('📋 Employee Form Headers Found:');
+            console.log(headerRow);
+            
             // Detect columns by looking for key column headers
             const columnPatterns = {
-                id: ['id', 'emp id', 'employee id', 'code', 'emp code'],
+                id: ['id', 'emp id', 'employee id', 'code', 'emp code', '#'],
                 name: ['name', 'employee name', 'emp name', 'full name'],
                 dept: ['department', 'dept', 'section', 'division'],
                 shift: ['shift', 'schedule'],
-                phone: ['phone', 'contact', 'mobile'],
+                phone: ['phone', 'contact', 'mobile', 'tel'],
                 email: ['email', 'e-mail']
             };
             
@@ -843,21 +846,26 @@
                 }
             });
             
-            if (Object.keys(mapping).length === 0) {
-                alert('❌ Could not detect any standard columns in the employee form');
-                return;
-            }
-            
-            console.log('📋 Detected Employee Form Columns:');
-            console.log(JSON.stringify(mapping, null, 2));
-            
-            // Show detected columns and allow user to save
-            const confirmMsg = `Detected employee form columns:\n\n${
-                Object.entries(mapping).map(([field, data]) => `${field}: ${data.header}`).join('\n')
-            }\n\nSave this mapping to Firestore?`;
-            
-            if (confirm(confirmMsg)) {
-                saveEmployeeFormMapping(mapping);
+            // If some columns detected, show them
+            if (Object.keys(mapping).length > 0) {
+                console.log('✅ Detected Employee Form Columns:', mapping);
+                
+                // Show detected columns and allow user to save
+                const confirmMsg = `✅ Detected employee form columns:\n\n${
+                    Object.entries(mapping).map(([field, data]) => `• ${field}: "${data.header}"`).join('\n')
+                }\n\nSave this mapping to Firestore?`;
+                
+                if (confirm(confirmMsg)) {
+                    saveEmployeeFormMapping(mapping);
+                } else {
+                    console.log('User cancelled saving the mapping');
+                }
+            } else {
+                // No columns detected - show what was found and ask for manual help
+                const foundHeaders = headerRow.slice(0, 10).join(', ');
+                const msg = `⚠️ Could not automatically detect standard columns.\n\nHeaders found:\n${foundHeaders}\n\nPlease rename your columns to match one of these patterns:\n• ID: id, emp id, employee id, code\n• Name: name, employee name, full name\n• Department: department, dept, section\n• Shift: shift, schedule\n• Phone: phone, contact, mobile\n• Email: email, e-mail\n\nThen re-upload the file.`;
+                alert(msg);
+                console.log('❌ Could not auto-detect columns. Available headers:', headerRow);
             }
         }
         
