@@ -1866,42 +1866,31 @@
             const allCheckboxes = document.querySelectorAll('.employee-checkbox');
             console.log(`DEBUG: Found ${allCheckboxes.length} total checkboxes`);
             
-            const checkedCheckboxes = [];
+            const selectedEmployees = [];
+            
             allCheckboxes.forEach(cb => {
-                console.log(`   Checkbox ID: ${cb.dataset.id}, Checked: ${cb.checked}`);
                 if (cb.checked) {
-                    checkedCheckboxes.push(cb);
+                    const checkboxId = cb.dataset.id;
+                    console.log(`✓ Checkbox checked with ID: ${checkboxId}`);
+                    
+                    // Find matching employee in filteredData
+                    const emp = filteredData.find(e => String(e.id) === String(checkboxId));
+                    if (emp) {
+                        selectedEmployees.push(emp);
+                        console.log(`   ✅ Found employee: ${emp.name} (ID: ${emp.id})`);
+                    } else {
+                        console.warn(`   ❌ No employee found with ID: ${checkboxId}`);
+                        console.log(`   Available IDs in filteredData: ${filteredData.map(e => e.id).join(', ')}`);
+                    }
                 }
             });
             
-            if (checkedCheckboxes.length === 0) {
-                alert('❌ Please select at least one employee to print');
-                console.warn('⚠️ No checkboxes were checked');
-                return;
-            }
-            
-            // Collect selected employee IDs (convert to string for matching)
-            const selectedIds = checkedCheckboxes.map(cb => {
-                const id = cb.dataset.id;
-                console.log(`✓ Selected ID: ${id} (type: ${typeof id})`);
-                return id;
-            });
-            
-            console.log(`Selected IDs: ${JSON.stringify(selectedIds)}`);
-            console.log(`FilteredData: ${JSON.stringify(filteredData.map(e => e.id + ' (' + typeof e.id + ')').slice(0, 5))}`);
-            
-            // Filter data to only selected employees (match as strings)
-            const selectedEmployees = filteredData.filter(emp => {
-                const empId = String(emp.id);
-                return selectedIds.includes(empId);
-            });
-            
-            console.log(`✅ Found ${selectedEmployees.length} matching employees`);
-            
             if (selectedEmployees.length === 0) {
-                alert('❌ No employee data found for selected checkboxes\n\nDebug info logged to console');
+                alert('❌ No employees selected.\n\nPlease check the checkboxes next to the employees you want to print.');
                 return;
             }
+            
+            console.log(`✅ Ready to print ${selectedEmployees.length} employee(s)`);
             
             // Generate print HTML
             let printHTML = `
