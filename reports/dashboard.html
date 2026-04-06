@@ -952,6 +952,68 @@
             }
         }
         
+        // Restore edit history from employee data
+        function restoreEditHistory(employees) {
+            cellEditHistory = {}; // Clear existing history
+            employees.forEach(emp => {
+                if (emp.editHistory) {
+                    Object.assign(cellEditHistory, emp.editHistory);
+                }
+            });
+            console.log(`📝 Restored edit history:`, Object.keys(cellEditHistory).length, 'cells edited');
+        }
+        
+        // Re-display badges for all edited cells
+        function reattachEditBadges() {
+            setTimeout(() => {
+                const allPunchCells = document.querySelectorAll('[data-emp-id][data-day-idx][data-pair-idx][data-type]');
+                allPunchCells.forEach(cell => {
+                    const empId = cell.dataset.empId;
+                    const dayIdx = cell.dataset.dayIdx;
+                    const pairIdx = cell.dataset.pairIdx;
+                    const type = cell.dataset.type;
+                    
+                    const historyKey = `${empId}_${dayIdx}_${pairIdx}_${type}`;
+                    
+                    if (cellEditHistory[historyKey] && cellEditHistory[historyKey].length > 0) {
+                        // Remove old badge if exists
+                        const oldBadge = cell.querySelector('.edit-badge');
+                        if (oldBadge) oldBadge.remove();
+                        
+                        // Create badge
+                        const badge = document.createElement('span');
+                        badge.className = 'edit-badge';
+                        const editCount = cellEditHistory[historyKey].length;
+                        badge.textContent = `EDITED (${editCount})`;
+                        badge.style.cssText = `
+                            position: absolute;
+                            top: -8px;
+                            right: -8px;
+                            background: #ef4444;
+                            color: white;
+                            font-size: 0.5rem;
+                            padding: 2px 4px;
+                            border-radius: 3px;
+                            cursor: pointer;
+                            font-weight: bold;
+                            white-space: nowrap;
+                            z-index: 1000;
+                        `;
+                        
+                        cell.style.position = 'relative';
+                        cell.appendChild(badge);
+                        
+                        // Attach click handler
+                        badge.onclick = (e) => {
+                            e.stopPropagation();
+                            const empName = filteredData.find(e => String(e.id) === String(empId))?.name || 'Unknown';
+                            showEditHistoryTooltip(cell, historyKey, empName, type, dayIdx);
+                        };
+                    }
+                });
+            }, 100);
+        }
+        
         // ========== DISPLAY EMPLOYEE DATA ==========
         function displayEmployeeData(employees) {
             const tableBody = document.getElementById('tableBody');
@@ -966,6 +1028,9 @@
                 tableBody.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #666;">No employee data to display</div>';
                 return;
             }
+            
+            // Restore edit history from employee data
+            restoreEditHistory(employees);
             
             // Sort employees by ID ascending
             employees.sort((a, b) => {
@@ -1078,6 +1143,9 @@
             });
             
             console.log(`📊 Displayed ${employees.length} employees with complete metrics & daily breakdown`);
+            
+            // Restore edit badges after rendering
+            reattachEditBadges();
         }
 
     </script>
@@ -3389,8 +3457,8 @@
                         <tr style="${rowStyle}">
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};"><strong>${day.date}</strong></td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};"><strong>${day.dayName}</strong></td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-is-new="true" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" placeholder="9:30 AM" title="Click to add IN time (e.g., 9:30 AM or 09:30)">—</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-is-new="true" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" placeholder="5:30 PM" title="Click to add OUT time (e.g., 5:30 PM or 17:30)">—</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-type="in" data-is-new="true" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" placeholder="9:30 AM" title="Click to add IN time (e.g., 9:30 AM or 09:30)">—</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-type="out" data-is-new="true" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" placeholder="5:30 PM" title="Click to add OUT time (e.g., 5:30 PM or 17:30)">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" data-hours-cell="true">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">❌</td>
@@ -3405,8 +3473,8 @@
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.date}</strong></td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.dayName}</strong></td>
                         ` : ''}
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" title="Edit IN time (e.g., 9:30 AM or 09:30)">${formatTime(pair.in)}</td>
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" title="Edit OUT time (e.g., 5:30 PM or 17:30)">${formatTime(pair.out)}</td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" data-type="in" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" title="Edit IN time (e.g., 9:30 AM or 09:30)">${formatTime(pair.in)}</td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" data-type="out" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" title="Edit OUT time (e.g., 5:30 PM or 17:30)">${formatTime(pair.out)}</td>
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times" data-hours-cell="true" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : '—'}</td>
                         ${pairIdx === 0 ? `
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; font-weight: ${day.lateMin > 0 ? '700' : '400'}; color: ${day.lateMin > 0 ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>
@@ -3462,6 +3530,9 @@
                     alert('❌ Please select a month first');
                     return;
                 }
+                
+                // Attach edit history to employee object before saving
+                emp.editHistory = cellEditHistory;
                 
                 // Update Firestore with the modified employee data
                 const docId = `emp_${emp.id}_${currentMonth}`;
