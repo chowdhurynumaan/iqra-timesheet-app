@@ -1064,22 +1064,47 @@
                     const dept = String(deptName).trim();
                     const t1in = normalizeTime(inTime1);
                     const t1out = normalizeTime(outTime1);
+                    const t2in = normalizeTime(inTime2);
+                    const t2out = normalizeTime(outTime2);
                     
                     // Skip if no valid times in first block
                     if (!t1in || !t1out) continue;
                     
-                    // Keep compound names like WK/EV, WK/EV/FT as single shifts (means employees work multiple shifts)
-                    newShifts[dept] = {
-                        start: t1in,
-                        end: t1out
-                    };
-                    console.log(`   ✓ Shift: ${dept} = ${t1in} to ${t1out}`);
+                    // Check if this is a compound shift with TWO time blocks (e.g., WK/EV with 8:00-16:00 AND 18:00-20:00)
+                    if (dept.includes('/') && t2in && t2out) {
+                        // Split compound names and create separate entries for each time block
+                        const parts = dept.split('/').map(p => p.trim());
+                        
+                        // Create entries for both time blocks
+                        if (parts.length >= 2) {
+                            // Slot 1: Use first time block  
+                            newShifts[`${dept} - Slot 1`] = {
+                                start: t1in,
+                                end: t1out
+                            };
+                            console.log(`   ✓ Shift: ${dept} - Slot 1 = ${t1in} to ${t1out}`);
+                            
+                            // Slot 2: Use second time block
+                            newShifts[`${dept} - Slot 2`] = {
+                                start: t2in,
+                                end: t2out
+                            };
+                            console.log(`   ✓ Shift: ${dept} - Slot 2 = ${t2in} to ${t2out}`);
+                        }
+                    } else {
+                        // Single shift or compound without second time block
+                        newShifts[dept] = {
+                            start: t1in,
+                            end: t1out
+                        };
+                        console.log(`   ✓ Shift: ${dept} = ${t1in} to ${t1out}`);
+                    }
                 }
                 
                 if (Object.keys(newShifts).length > 0) {
                     console.log(`📋 Extracted ${Object.keys(newShifts).length} shift definitions`);
                     
-                    // Merge with existing shifts (don't overwrite WK/FT/EV if already defined)
+                    // Merge with existing shifts (don't overwrite if already defined)
                     const merged = { ...shiftDefinitions, ...newShifts };
                     
                     await saveToFirestore(TIMESHEET_COLLECTION, 'shiftDefinitions', merged);
