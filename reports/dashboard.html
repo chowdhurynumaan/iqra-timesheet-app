@@ -147,7 +147,8 @@
         @media (max-width: 768px) {
             .header { flex-direction: column; align-items: stretch; gap: 1.5rem; }
             .header-left { margin-bottom: 0.5rem; }
-            .header-right { flex-direction: column; align-items: stretch; }
+            .header-right { flex-direction: column; align-items: stretch; gap: 1rem; }
+            #headerButtonsContainer { flex-direction: column !important; }
             .button-group { flex-direction: column; }
             .btn-upload, .btn-export { width: 100%; justify-content: center; }
             .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
@@ -444,21 +445,27 @@
                 <p class="subtitle">Upload your attendance report (CSV or Excel) to visualize performance</p>
             </div>
             <div class="header-right">
-                <div class="button-group">
-                    <label class="btn-upload">
-                        <span>📋 Upload Employee Form</span>
-                        <input type="file" id="employeeFormFile" accept=".csv,.xlsx,.xls">
-                    </label>
-                    <label class="btn-upload">
-                        <span>📊 Upload Report</span>
-                        <input type="file" id="csvFile" accept=".csv,.xlsx,.xls">
-                    </label>
+                <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;" onclick="toggleHeaderButtons()">
+                    <span id="headerCollapseIcon" style="font-size: 1.2rem; transition: transform 0.2s;">▼</span>
+                    <label style="margin: 0; cursor: pointer; font-weight: 600; color: #475569;">Tools</label>
                 </div>
-                <div class="button-group">
-                    <button class="btn-export" onclick="exportToCSV()">📥 Export CSV</button>
-                    <button class="btn-export" onclick="exportToExcel()">📑 Export Excel</button>
-                    <button class="btn-export" onclick="saveReportToFirebase()">☁️ Save Cloud</button>
-                    <button class="btn-export" onclick="printSelected()" style="background: #059669;">🖨️ Print</button>
+                <div id="headerButtonsContainer" style="display: flex; gap: 2rem; align-items: flex-end; flex-wrap: wrap; transition: all 0.2s;">
+                    <div class="button-group">
+                        <label class="btn-upload">
+                            <span>📋 Upload Employee Form</span>
+                            <input type="file" id="employeeFormFile" accept=".csv,.xlsx,.xls">
+                        </label>
+                        <label class="btn-upload">
+                            <span>📊 Upload Report</span>
+                            <input type="file" id="csvFile" accept=".csv,.xlsx,.xls">
+                        </label>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn-export" onclick="exportToCSV()">📥 Export CSV</button>
+                        <button class="btn-export" onclick="exportToExcel()">📑 Export Excel</button>
+                        <button class="btn-export" onclick="saveReportToFirebase()">☁️ Save Cloud</button>
+                        <button class="btn-export" onclick="printSelected()" style="background: #059669;">🖨️ Print</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -775,6 +782,19 @@
             } else {
                 editor.style.display = 'none';
                 icon.style.transform = 'rotate(0deg)';
+            }
+        }
+        
+        function toggleHeaderButtons() {
+            const container = document.getElementById('headerButtonsContainer');
+            const icon = document.getElementById('headerCollapseIcon');
+            
+            if (container.style.display === 'none' || container.style.display === '') {
+                container.style.display = 'flex';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                container.style.display = 'none';
+                icon.style.transform = 'rotate(180deg)';
             }
         }
         
