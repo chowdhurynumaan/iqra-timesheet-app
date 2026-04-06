@@ -1384,31 +1384,38 @@
                 }
             }
             
-            // Fallback: Try to detect from dates in the data itself (YYYY-MM-DD format)
+            // Fallback: Try to detect month/year from dates in the data (YYYY-MM-DD format)
+            let detectedMonth = null;
+            let detectedYear = null;
+            
             for (let i = 0; i < Math.min(100, data.length); i++) {
                 const row = data[i];
                 for (let j = 0; j < Math.min(20, row.length); j++) {
                     const cell = (row[j] || '').toString().trim();
                     const dateMatchISO = cell.match(/(\d{4})-(\d{2})-(\d{2})/);
-                    if (dateMatchISO && !dateRange.start) {
-                        dateRange.start = new Date(dateMatchISO[1], parseInt(dateMatchISO[2]) - 1, parseInt(dateMatchISO[3]));
-                        console.log(`📅 Found start date from data: ${dateRange.start.toLocaleDateString()}`);
-                    } else if (dateMatchISO && dateRange.start) {
-                        const potentialEnd = new Date(dateMatchISO[1], parseInt(dateMatchISO[2]) - 1, parseInt(dateMatchISO[3]));
-                        dateRange.end = potentialEnd;
+                    if (dateMatchISO) {
+                        detectedYear = parseInt(dateMatchISO[1]);
+                        detectedMonth = parseInt(dateMatchISO[2]);
+                        console.log(`📅 Found date in data: ${cell} -> Year: ${detectedYear}, Month: ${detectedMonth}`);
+                        break;
                     }
                 }
+                if (detectedYear && detectedMonth) break;
             }
             
-            // If we found dates, calculate the range
-            if (dateRange.start && dateRange.end) {
-                dateRange.actualDays = Math.floor((dateRange.end - dateRange.start) / (1000 * 60 * 60 * 24)) + 1;
-                console.log(`📅 Date Range (detected from data): ${dateRange.start.toLocaleDateString()} to ${dateRange.end.toLocaleDateString()} (${dateRange.actualDays} days)`);
-            } else {
-                // Fallback to a reasonable default based on month
-                dateRange.actualDays = 31;
-                console.log(`📅 Date Range: Using default 31 days`);
+            // If we found a month, calculate the correct number of days in that month
+            if (detectedYear && detectedMonth) {
+                dateRange.start = new Date(detectedYear, detectedMonth - 1, 1);
+                // Get last day of the month
+                dateRange.end = new Date(detectedYear, detectedMonth, 0);
+                dateRange.actualDays = dateRange.end.getDate();
+                console.log(`📅 Date Range (from detected month): ${dateRange.start.toLocaleDateString()} to ${dateRange.end.toLocaleDateString()} (${dateRange.actualDays} days in ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][detectedMonth-1]} ${detectedYear})`);
+                return;
             }
+            
+            // Final fallback to 31 days
+            dateRange.actualDays = 31;
+            console.log(`📅 Date Range: Using default 31 days`);
         }
 
         function findColumnByHeader(row, searchTerms) {
