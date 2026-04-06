@@ -3653,9 +3653,11 @@
                     const hoursCell = dayRows[0].querySelector('[data-hours-cell="true"]');
                     if (!hoursCell) return;
                     
-                    // Parse both times to attempt live calculation
+                    // Parse both times from the input cells (user is typing here)
                     const inTime = parseTime(inCell.textContent.trim());
                     const outTime = parseTime(outCell.textContent.trim());
+                    
+                    console.log(`DEBUG Live calc: in="${inCell.textContent}" → ${inTime}, out="${outCell.textContent}" → ${outTime}`);
                     
                     // If both times are valid, show live calculation
                     if (inTime && outTime && inTime !== '—' && outTime !== '—') {
@@ -3664,10 +3666,14 @@
                         const inMinutes = inParts[0] * 60 + inParts[1];
                         const outMinutes = outParts[0] * 60 + outParts[1];
                         
+                        console.log(`DEBUG: inMinutes=${inMinutes}, outMinutes=${outMinutes}`);
+                        
                         let diffMinutes = outMinutes - inMinutes;
                         if (diffMinutes < 0) diffMinutes += 24 * 60;
                         
                         const hours = (diffMinutes / 60).toFixed(2);
+                        console.log(`DEBUG: diffMinutes=${diffMinutes}, hours=${hours}`);
+                        
                         hoursCell.textContent = hours;
                         hoursCell.style.background = '#dbeafe';
                         hoursCell.style.fontWeight = '700';
