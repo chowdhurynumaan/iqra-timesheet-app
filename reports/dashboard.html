@@ -1210,8 +1210,18 @@
                         .get();
                     
                     rawData = [];
+                    const seenIds = new Set(); // Track unique employee IDs
+                    
                     empSnapshot.forEach(doc => {
                         const empData = doc.data();
+                        
+                        // Skip duplicates (keep first occurrence)
+                        if (seenIds.has(empData.id)) {
+                            console.warn(`⚠️ Duplicate employee found: ${empData.name} (ID ${empData.id}), skipping duplicate`);
+                            return;
+                        }
+                        seenIds.add(empData.id);
+                        
                         // Ensure shift property exists, default to 'WK' if missing
                         if (!empData.shift) {
                             empData.shift = 'WK';
@@ -1226,6 +1236,8 @@
                             shift: emp.shift || 'WK'
                         }));
                         console.warn(`⚠️ No employees found in ${EMPLOYEES_COLLECTION}, using month document data`);
+                    } else if (seenIds.size < empSnapshot.docs.length) {
+                        console.warn(`⚠️ Removed ${empSnapshot.docs.length - seenIds.size} duplicate employee records`);
                     }
                     
                     filteredData = [...rawData];
