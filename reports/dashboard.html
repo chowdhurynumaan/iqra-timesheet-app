@@ -28,7 +28,7 @@
         .subtitle { font-size: 1rem; color: #64748b; }
         
         /* Button Styles */
-        .btn-upload { background: #2563eb; color: white; border: none; padding: 0.875rem 1.75rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 0.75rem; transition: all 0.2s; font-size: 0.95rem; }
+        .btn-upload { background: #2563eb; color: white; border: none; padding: 0.65rem 1.25rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s; font-size: 0.85rem; }
         .btn-upload:hover { background: #1d4ed8; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
         .btn-upload input { display: none; }
         
@@ -38,7 +38,7 @@
         .control-section label { font-size: 0.75rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; }
         .control-section select, .control-section input { padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 1rem; transition: all 0.2s; }
         .control-section select:focus, .control-section input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); outline: none; }
-        .btn-filter, .btn-export { background: #2563eb; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: all 0.2s; white-space: nowrap; }
+        .btn-filter, .btn-export { background: #2563eb; color: white; border: none; padding: 0.65rem 1.25rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: all 0.2s; white-space: nowrap; font-size: 0.85rem; }
         .btn-filter:hover, .btn-export:hover { background: #1d4ed8; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
         .btn-export { background: #7c3aed; }
         .btn-export:hover { background: #6d28d9; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
@@ -446,10 +446,10 @@
             </div>
             <div class="header-right">
                 <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;" onclick="toggleHeaderButtons()">
-                    <span id="headerCollapseIcon" style="font-size: 1.2rem; transition: transform 0.2s;">▼</span>
-                    <label style="margin: 0; cursor: pointer; font-weight: 600; color: #475569;">Tools</label>
+                    <span id="headerCollapseIcon" style="font-size: 0.9rem; transition: transform 0.3s; transform: rotate(180deg);">▼</span>
+                    <label style="margin: 0; cursor: pointer; font-weight: 500; color: #475569; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">Tools</label>
                 </div>
-                <div id="headerButtonsContainer" style="display: flex; gap: 2rem; align-items: flex-end; flex-wrap: wrap; transition: all 0.2s;">
+                <div id="headerButtonsContainer" style="display: none; gap: 2rem; align-items: flex-end; flex-wrap: wrap; transition: all 0.2s; margin-top: 1rem;">
                     <div class="button-group">
                         <label class="btn-upload">
                             <span>📋 Upload Employee Form</span>
