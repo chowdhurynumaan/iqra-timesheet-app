@@ -480,12 +480,6 @@
                 <div id="deptShiftEditor" style="display: none; gap: 1rem; flex-wrap: wrap; align-items: flex-end; margin-top: 1rem;">
                     <!-- Shifts will be populated dynamically -->
                 </div>
-                <div style="margin-top: 1rem; display: none;" id="deptFilterSection">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.85rem;">Department:</label>
-                    <div id="deptFilter" style="display: flex; flex-wrap: wrap; gap: 1rem;">
-                        <!-- Radio buttons will be populated dynamically -->
-                    </div>
-                </div>
             </div>
             
             <!-- Analytics Section -->
@@ -527,6 +521,14 @@
                 <select id="monthSelector" onchange="loadMonthData()" style="padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 1rem; transition: all 0.2s;">
                     <option value="">Loading months...</option>
                 </select>
+            </div>
+        </div>
+        
+        <!-- Department Filter -->
+        <div id="deptFilterContainer" style="background: white; border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; display: none;">
+            <label style="display: block; margin-bottom: 1rem; font-weight: 600; font-size: 0.85rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">🏢 Department:</label>
+            <div id="deptFilter" style="display: flex; flex-wrap: wrap; gap: 1rem;">
+                <!-- Radio buttons will be populated dynamically -->
             </div>
         </div>
 
@@ -785,16 +787,13 @@
         
         function toggleShiftSettings() {
             const editor = document.getElementById('deptShiftEditor');
-            const filterSection = document.getElementById('deptFilterSection');
             const icon = document.getElementById('shiftCollapseIcon');
             
             if (editor.style.display === 'none' || editor.style.display === '') {
                 editor.style.display = 'grid';
-                if (filterSection) filterSection.style.display = 'block';
                 icon.style.transform = 'rotate(90deg)';
             } else {
                 editor.style.display = 'none';
-                if (filterSection) filterSection.style.display = 'none';
                 icon.style.transform = 'rotate(0deg)';
             }
         }
@@ -2327,9 +2326,9 @@
             });
             console.log(`✅ DEBUG: Department radio buttons rendered. Total options: ${deptContainer.children.length} (1 "All" + ${sortedDepts.length} departments)`);
             
-            // Show the department filter section
-            const deptFilterSection = document.getElementById('deptFilterSection');
-            if (deptFilterSection) deptFilterSection.style.display = 'block';
+            // Show the department filter container
+            const deptFilterContainer = document.getElementById('deptFilterContainer');
+            if (deptFilterContainer) deptFilterContainer.style.display = 'block';
             
             // Add event listeners to all radio buttons
             document.querySelectorAll('input[name="department"]').forEach(radio => {
