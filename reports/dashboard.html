@@ -3301,6 +3301,12 @@
             }).join('');
             
             document.getElementById('tableBody').innerHTML = cards;
+            
+            // Attach real-time edit listeners to all employee cards
+            const allCards = document.querySelectorAll('.employee-card');
+            allCards.forEach(card => {
+                attachPunchEditListeners(card);
+            });
         }
         
         // ========== TIME FORMAT HELPERS ==========
@@ -3578,7 +3584,7 @@
             emp.hours = (totalMinutes / 60).toFixed(2) + ' hrs';
             emp.lateMin = Math.round(totalLateMinutes);
             
-            // Update display
+            // Update display instantly
             const card = document.querySelector(`.employee-card[data-id="${empId}"]`);
             if (card) {
                 updateCardDisplay(emp, card);
@@ -3586,10 +3592,48 @@
                 const breakdownDiv = card.querySelector('.daily-breakdown');
                 if (breakdownDiv) {
                     breakdownDiv.innerHTML = renderDailyBreakdown(emp);
+                    // Re-attach event listeners to the new cells
+                    attachPunchEditListeners(card);
                 }
             }
             
             console.log(`✅ Updated ${type} time for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newTime}, Late: ${pairIdx === 0 ? day.lateMin : 'N/A'} min`);
+        }
+        
+        // Attach event listeners for real-time editing
+        function attachPunchEditListeners(card) {
+            const punchCells = card.querySelectorAll('[contenteditable="true"]');
+            punchCells.forEach(cell => {
+                // Remove old listeners by cloning
+                const newCell = cell.cloneNode(true);
+                cell.parentNode.replaceChild(newCell, cell);
+                
+                // Add input listener for instant updates
+                newCell.addEventListener('input', debounce((event) => {
+                    // Quick validation as user types
+                    const userInput = event.target.textContent.trim();
+                    if (userInput && userInput !== '—' && userInput.length > 0) {
+                        // Only call full update if it looks like a valid time format
+                        const type = event.target.classList.contains('editable-punch-in') ? 'in' : 'out';
+                        updatePunchTime(event, type);
+                    }
+                }, 300));
+                
+                // Also keep blur for final validation
+                newCell.addEventListener('blur', (event) => {
+                    const type = event.target.classList.contains('editable-punch-in') ? 'in' : 'out';
+                    updatePunchTime(event, type);
+                });
+            });
+        }
+        
+        // Simple debounce function to avoid too many updates
+        function debounce(func, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => func(...args), delay);
+            };
         }
         
         
