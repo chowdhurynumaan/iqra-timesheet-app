@@ -766,6 +766,7 @@
                         id: doc.id,
                         data: doc.data()
                     });
+                });
                 
                 // Sort by year and month (descending - newest first)
                 uploadedMonths.sort((a, b) => {
@@ -1709,7 +1710,8 @@ File Type:', isExcel ? 'Excel' : 'CSV');
                             // Try multiple parsing methods to handle different formats
                             if (cellContent) {
                                 // Method 1: Split by newlines or line breaks
-                                const lines = cellContent.split(/[
+                                const lines = cellContent.split(/[
+
 ]+/);
                                 lines.forEach(line => {
                                     const matches = line.match(/(\d{1,2}):(\d{2})/g);
@@ -3264,7 +3266,8 @@ Detected Title:', titleCell);
                                     hasMissedPunch: false
                                 };
                                 
-                                const times = cellContent.split(/[
+                                const times = cellContent.split(/[
+
 ]+/).filter(t => t.trim() && /^\d{2}:\d{2}/.test(t.trim()));
                                 
                                 if (times.length === 0) {

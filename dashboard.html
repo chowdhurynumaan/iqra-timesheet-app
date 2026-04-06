@@ -765,7 +765,10 @@
                     uploadedMonths.push({
                         id: doc.id,
                         data: doc.data()
-                    });`n                });`n`n                // Sort by year and month (descending - newest first)
+                    });
+                });
+                
+                // Sort by year and month (descending - newest first)
                 uploadedMonths.sort((a, b) => {
                     const [aYear, aMonth] = a.id.split('_').map(Number);
                     const [bYear, bMonth] = b.id.split('_').map(Number);
@@ -1279,11 +1282,11 @@ Then re-upload the file.`;
                 }
                 
                 const isExcel = /\.(xlsx?|xls)$/.test(file.name.toLowerCase());
-                
-                console.log('file upload detected');
+                console.log('File uploaded: ' + file.name);
 
 
-                if (isExcel) {
+File Type:', isExcel ? 'Excel' : 'CSV');
+
                 if (isExcel) {
                     const reader = new FileReader();
                     reader.onload = (ev) => {
