@@ -3629,12 +3629,35 @@
                 updateCardDisplay(emp, card);
                 
                 // Update the hours cell in the table immediately
+                console.log(`   🔍 Looking for hours cell - dayIdx=${dayIdx}, pairIdx=${pairIdx}`);
                 const breakdownDiv = card.querySelector('.daily-breakdown');
+                console.log(`   ➡️ Breakdown div found: ${breakdownDiv ? 'YES' : 'NO'}`);
+                
                 if (breakdownDiv) {
-                    const hoursCell = breakdownDiv.querySelector(`[data-hours-cell="true"][data-day-idx="${dayIdx}"][data-pair-idx="${pairIdx}"]`);
+                    // First, check what elements exist
+                    const allTds = breakdownDiv.querySelectorAll('td');
+                    console.log(`   ➡️ Total TD elements in breakdown: ${allTds.length}`);
+                    
+                    const hoursCells = breakdownDiv.querySelectorAll('[data-hours-cell="true"]');
+                    console.log(`   ➡️ Hours cells with data-hours-cell="true": ${hoursCells.length}`);
+                    
+                    // Try the selector
+                    const selector = `[data-hours-cell="true"][data-day-idx="${dayIdx}"][data-pair-idx="${pairIdx}"]`;
+                    console.log(`   ➡️ Using selector: ${selector}`);
+                    const hoursCell = breakdownDiv.querySelector(selector);
+                    console.log(`   ➡️ Hours cell found: ${hoursCell ? 'YES' : 'NO'}`);
+                    
                     if (hoursCell) {
                         hoursCell.textContent = parseFloat(pair.pairHours).toFixed(2);
                         console.log(`   ✏️ Updated hours cell for day ${dayIdx}, pair ${pairIdx} to ${pair.pairHours}`);
+                    } else {
+                        // If not found, try logging the first few cells to see what attributes they have
+                        console.log(`   🔎 Sample hours cell attributes:`);
+                        hoursCells.forEach((cell, idx) => {
+                            if (idx < 3) {
+                                console.log(`      Cell ${idx}: data-day-idx="${cell.dataset.dayIdx}" data-pair-idx="${cell.dataset.pairIdx}"`);
+                            }
+                        });
                     }
                 }
             }
