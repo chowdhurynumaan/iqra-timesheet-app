@@ -3192,45 +3192,71 @@
                 const shifts = dept.split('/').map(s => s.trim());
                 const shiftTimes = {};
                 
+                // Define default shift times if not loaded yet
+                const defaultTimes = {
+                    'WK': 570,   // 09:30
+                    'FT': 480,   // 08:00
+                    'EV': 1080   // 18:00
+                };
+                
                 for (const shift of shifts) {
-                    // Find this shift in shiftDefinitions
-                    const matchingShift = Object.keys(shiftDefinitions).find(
-                        key => !key.includes('Slot') && key === shift
-                    );
+                    // Try to find in shiftDefinitions first
+                    let timeInMinutes = null;
                     
-                    if (matchingShift && shiftDefinitions[matchingShift]) {
-                        const timeParts = shiftDefinitions[matchingShift].start.split(':').map(Number);
-                        const startInMinutes = timeParts[0] * 60 + (timeParts[1] || 0);
-                        shiftTimes[shift] = startInMinutes;
+                    if (shiftDefinitions && Object.keys(shiftDefinitions).length > 0) {
+                        const matchingShift = Object.keys(shiftDefinitions).find(
+                            key => !key.includes('Slot') && key === shift
+                        );
+                        
+                        if (matchingShift && shiftDefinitions[matchingShift]) {
+                            const timeParts = shiftDefinitions[matchingShift].start.split(':').map(Number);
+                            timeInMinutes = timeParts[0] * 60 + (timeParts[1] || 0);
+                        }
                     }
+                    
+                    // Fallback to defaults if not found
+                    if (timeInMinutes === null) {
+                        timeInMinutes = defaultTimes[shift] || 540;
+                    }
+                    
+                    shiftTimes[shift] = timeInMinutes;
                 }
                 
                 // Determine which shift was likely worked based on actual punch time
                 // Person working EV typically comes between 17:00-18:30 (1020-1110 min)
                 // Person working WK typically comes between 08:00-10:00 (480-600 min)
-                // Use midpoint: if punch is before 12:00 (720 min), assume WK; otherwise EV
+                // Use midpoint between earliest and latest shift
                 const timeValues = Object.values(shiftTimes);
                 if (timeValues.length > 0) {
-                    const avgMidpoint = (Math.min(...timeValues) + Math.max(...timeValues)) / 2;
+                    const minTime = Math.min(...timeValues);
+                    const maxTime = Math.max(...timeValues);
+                    const avgMidpoint = (minTime + maxTime) / 2;
+                    
                     if (actualStart < avgMidpoint) {
                         // Likely early shift - check against minimum (earliest) shift start
-                        return Math.min(...timeValues);
+                        return minTime;
                     } else {
                         // Likely evening shift - check against maximum (latest) shift start
-                        return Math.max(...timeValues);
+                        return maxTime;
                     }
                 }
                 
                 return 540; // Fallback
             } else {
                 // Single shift: use its specific time
-                if (shiftDefinitions[dept]) {
+                const defaultTimes = {
+                    'WK': 570,   // 09:30
+                    'FT': 480,   // 08:00
+                    'EV': 1080   // 18:00
+                };
+                
+                if (shiftDefinitions && shiftDefinitions[dept]) {
                     const timeParts = shiftDefinitions[dept].start.split(':').map(Number);
                     return timeParts[0] * 60 + (timeParts[1] || 0);
                 }
                 
-                // Fallback: check dept name for EV hint
-                return dept.toUpperCase().includes('EV') ? 1080 : 540;
+                // Fallback: check built-in defaults
+                return defaultTimes[dept] || (dept.toUpperCase().includes('EV') ? 1080 : 540);
             }
         }
         
