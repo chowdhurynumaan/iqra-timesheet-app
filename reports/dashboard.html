@@ -3307,7 +3307,16 @@
                 `;
             }).join('');
             
+            // DEBUG: Check what data-ids are in the HTML string before inserting
+            const dataIdMatches = cards.match(/data-id="([^"]+)"/g);
+            console.log('DEBUG: data-id values in HTML string before insertion:', dataIdMatches ? dataIdMatches.slice(0, 5) : 'NONE');
+            
             document.getElementById('tableBody').innerHTML = cards;
+            
+            // DEBUG: Check what data-ids are AFTER insertion
+            const insertedCards = document.querySelectorAll('.employee-card');
+            const insertedIds = Array.from(insertedCards).slice(0, 5).map(c => c.dataset.id);
+            console.log('DEBUG: data-id values in DOM after insertion:', insertedIds);
             
             // Attach real-time edit listeners to all employee cards
             const allCards = document.querySelectorAll('.employee-card');
