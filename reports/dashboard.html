@@ -1290,7 +1290,10 @@ Then re-upload the file.`;
                             allSheetData = {};
                             currentWorkbook.SheetNames.forEach(sheetName => {
                                 const sheet = currentWorkbook.Sheets[sheetName];
-                                allSheetData[sheetName] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });`r`n                            });`r`n`r`n                            processMultiSheetData(allSheetData);
+                                allSheetData[sheetName] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                            });
+
+                            processMultiSheetData(allSheetData);
                         } catch (err) {
                             console.error('âŒ Error parsing Excel:', err);
                             alert('âŒ Error parsing Excel file. Please ensure it\'s valid. Error: ' + err.message);
@@ -1347,7 +1350,10 @@ Then re-upload the file.`;
                             allSheetData = {};
                             currentWorkbook.SheetNames.forEach(sheetName => {
                                 const sheet = currentWorkbook.Sheets[sheetName];
-                                allSheetData[sheetName] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });`r`n                            });`r`n`r`n                            processMultiSheetData(allSheetData);
+                                allSheetData[sheetName] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                            });
+
+                            processMultiSheetData(allSheetData);
                         } catch (err) {
                             console.error('âŒ Error parsing Excel:', err);
                             alert('âŒ Error parsing Excel file. Please ensure it\'s valid. Error: ' + err.message);
