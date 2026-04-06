@@ -3386,7 +3386,6 @@
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-is-new="true" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" placeholder="9:30 AM" title="Click to add IN time (e.g., 9:30 AM or 09:30)">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-is-new="true" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" placeholder="5:30 PM" title="Click to add OUT time (e.g., 5:30 PM or 17:30)">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" data-hours-cell="true">—</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};"><button onclick="calculateHoursForDay(document.querySelector('.employee-card[data-id=\\'${emp.id}\\']'), ${emp.id}, ${dayIdx})ata-id=\\'${emp.id}\\']'), ${emp.id}, ${dayIdx})" style="padding: 0.15rem 0.3rem; background: #f59e0b; color: white; border: none; border-radius: 2px; cursor: pointer; font-weight: 600; font-size: 0.55rem;">⚡ Calc</button></td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">❌</td>
                         </tr>
@@ -3404,7 +3403,6 @@
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" title="Edit OUT time (e.g., 5:30 PM or 17:30)">${formatTime(pair.out)}</td>
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times" data-hours-cell="true">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : '—'}</td>
                         ${pairIdx === 0 ? `
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><button class="calc-hours-btn" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" style="padding: 0.15rem 0.3rem; background: #f59e0b; color: white; border: none; border-radius: 2px; cursor: pointer; font-weight: 600; font-size: 0.55rem;">⚡ Calc</button></td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; font-weight: ${day.lateMin > 0 ? '700' : '400'}; color: ${day.lateMin > 0 ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">${day.isMissed ? '❌' : (day.hasMissedPunch ? '⚠️' : '✅')}</td>
                         ` : ''}
@@ -3613,112 +3611,21 @@
         function attachPunchEditListeners(card) {
             // Keep blur for final validation when they click away
             const punchCells = card.querySelectorAll('[contenteditable="true"]');
+            console.log(`🔗 Attaching blur listeners to ${punchCells.length} punch cells`);
+            
             punchCells.forEach(cell => {
                 // Remove old listeners by cloning
                 const newCell = cell.cloneNode(true);
                 cell.parentNode.replaceChild(newCell, cell);
                 
                 newCell.addEventListener('blur', (event) => {
+                    const empId = parseInt(event.target.dataset.empId);
+                    const dayIdx = parseInt(event.target.dataset.dayIdx);
                     const type = event.target.classList.contains('editable-punch-in') ? 'in' : 'out';
+                    console.log(`📝 Punch cell blurred: empId=${empId}, dayIdx=${dayIdx}, type=${type}`);
                     updatePunchTime(event, type);
                 });
             });
-        }
-        
-        function calculateHoursForDay(card, empId, dayIdx) {
-            console.log(`\n⚡ BUTTON CLICKED - calculateHoursForDay called`);
-            console.log(`   empId=${empId}, dayIdx=${dayIdx}, card=${card ? 'found' : 'NOT FOUND'}`);
-            
-            if (!card) {
-                console.error(`❌ Card element not found!`);
-                return;
-            }
-            
-            const table = card.querySelector('table');
-            if (!table) {
-                console.error(`❌ Table not found in card`);
-                return;
-            }
-            
-            const tbody = table.querySelector('tbody');
-            if (!tbody) {
-                console.error(`❌ Tbody not found in table`);
-                return;
-            }
-            
-            const allRows = Array.from(tbody.querySelectorAll('tr'));
-            console.log(`   Found ${allRows.length} rows in tbody`);
-            
-            // Find all rows with this dayIdx
-            const dayRows = allRows.filter(r => {
-                const cell = r.querySelector(`[data-day-idx="${dayIdx}"]`);
-                return cell !== null;
-            });
-            
-            console.log(`   Found ${dayRows.length} rows with dayIdx=${dayIdx}`);
-            
-            if (dayRows.length === 0) {
-                console.error(`❌ No rows found for dayIdx=${dayIdx}`);
-                return;
-            }
-            
-            // Look through all day rows to find IN and OUT times
-            let inTime = null, outTime = null;
-            dayRows.forEach(r => {
-                const inCell = r.querySelector('.editable-punch-in');
-                const outCell = r.querySelector('.editable-punch-out');
-                if (inCell && inCell.textContent.trim() !== '—') inTime = inCell.textContent.trim();
-                if (outCell && outCell.textContent.trim() !== '—') outTime = outCell.textContent.trim();
-            });
-            
-            const hoursCell = dayRows[0].querySelector('[data-hours-cell="true"]');
-            if (!hoursCell) {
-                console.error(`❌ Hours cell not found`);
-                return;
-            }
-            
-            console.log(`📊 CALCULATING HOURS FOR EMPLOYEE ${empId}, DAY ${dayIdx + 1}`);
-            console.log(`   IN: '${inTime}'`);
-            console.log(`   OUT: '${outTime}'`);
-            
-            // Parse and calculate
-            if (inTime && outTime) {
-                const inParsed = parseTime(inTime);
-                const outParsed = parseTime(outTime);
-                
-                console.log(`   ➜ IN parsed to: '${inParsed}'`);
-                console.log(`   ➜ OUT parsed to: '${outParsed}'`);
-                
-                if (inParsed && outParsed) {
-                    const [inH, inM] = inParsed.split(':').map(Number);
-                    const [outH, outM] = outParsed.split(':').map(Number);
-                    const inMinutes = inH * 60 + inM;
-                    const outMinutes = outH * 60 + outM;
-                    
-                    console.log(`   ➜ IN minutes: ${inH}h ${inM}m = ${inMinutes} minutes`);
-                    console.log(`   ➜ OUT minutes: ${outH}h ${outM}m = ${outMinutes} minutes`);
-                    
-                    let diffMinutes = outMinutes - inMinutes;
-                    console.log(`   ➜ Diff: ${outMinutes} - ${inMinutes} = ${diffMinutes} minutes`);
-                    
-                    if (diffMinutes < 0) {
-                        diffMinutes += 24 * 60;
-                        console.log(`   ➜ Negative! Adding 24 hours: ${diffMinutes} minutes (overnight shift)`);
-                    }
-                    
-                    const calculated = (diffMinutes / 60).toFixed(2);
-                    console.log(`   ✅ RESULT: ${diffMinutes} min / 60 = ${calculated} hours`);
-                    
-                    hoursCell.textContent = calculated;
-                    hoursCell.style.color = '#0369a1';
-                    hoursCell.style.fontWeight = '700';
-                } else {
-                    console.log(`   ❌ Failed to parse times`);
-                }
-            } else {
-                console.log(`   ❌ Missing IN or OUT time`);
-                hoursCell.textContent = '—';
-            }
         }
         
         function updateCardDisplay(emp, card) {
