@@ -3615,6 +3615,12 @@
             
             // Update display instantly
             const card = document.querySelector(`.employee-card[data-id="${String(empId)}"]`);
+            if (!card) {
+                const allCards = document.querySelectorAll(`.employee-card`);
+                const cardIds = Array.from(allCards).map(c => c.dataset.id);
+                console.log(`   ❌ Card not found. Looking for data-id="${String(empId)}"`)
+                console.log(`   Available cards (${allCards.length}):`, cardIds);
+            }
             console.log(`   Card found: ${card ? 'YES' : 'NO'}`);
             
             if (card) {
