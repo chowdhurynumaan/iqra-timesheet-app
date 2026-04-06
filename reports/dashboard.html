@@ -327,7 +327,6 @@
             .daily-breakdown tbody tr:nth-child(even) { 
                 background: #fafbfc !important;
             }
-
             /* Department Header Page */
             .dept-header-page {
                 page-break-after: always !important;
@@ -340,7 +339,6 @@
                 background: white !important;
                 page-break-inside: avoid !important;
             }
-
             .dept-header-title {
                 font-size: 72pt !important;
                 font-weight: 700 !important;
@@ -354,7 +352,6 @@
                 font-weight: 700 !important;
                 margin-bottom: 0.3in !important;
             }
-
             /* Employee blocks */
             .table-section {
                 width: 100% !important;
@@ -366,7 +363,6 @@
                 padding: 0.25in !important;
                 margin: 0 !important;
             }
-
             .employee-summary { 
                 display: grid !important;
                 grid-template-columns: 2fr 1fr 1fr 1fr !important;
@@ -385,11 +381,9 @@
             .employee-summary div:first-child {
                 text-align: left !important;
             }
-
             .detail-content {
                 width: 100% !important;
             }
-
             .detail-table { 
                 width: 100% !important;
                 font-size: 22pt !important;
@@ -409,7 +403,6 @@
                 border: 2pt solid #000 !important;
                 text-align: center !important;
             }
-
             .detail-table td { 
                 font-size: 22pt !important;
                 padding: 0.15in !important;
@@ -423,7 +416,6 @@
                 font-weight: 600 !important;
                 width: 25% !important;
             }
-
             .detail-summary { 
                 display: grid !important; 
                 grid-template-columns: repeat(4, 1fr) !important; 
@@ -470,7 +462,6 @@
                 </label>
             </div>
         </div>
-
         <!-- Top Control Bar: Month + Department Radios -->
         <div id="controlPanel" class="control-panel">
             <div class="control-section">
@@ -479,16 +470,13 @@
                     <option value="">Loading months...</option>
                 </select>
             </div>
-
             <!-- Department Selection as Radio Buttons -->
             <div class="dept-radios" id="deptRadiosContainer">
                 <label><input type="radio" name="dept" value="" checked onchange="filterByDept('')"> All</label>
             </div>
-
             <!-- Hamburger Menu Button -->
             <button class="hamburger-btn" onclick="toggleSidebar()">â˜°</button>
         </div>
-
         <!-- Sidebar Menu (Hidden by default) -->
         <div class="menu-overlay" id="menuOverlay" onclick="toggleSidebar()"></div>
         <div class="sidebar-menu" id="sidebarMenu">
@@ -509,7 +497,6 @@
                         <input type="file" id="csvFile" accept=".csv,.xlsx,.xls" style="display: none;">
                     </label>
                 </div>
-
                 <!-- Shift Settings -->
                 <div class="sidebar-section">
                     <div class="sidebar-section-title">â° Shift Settings</div>
@@ -535,7 +522,6 @@
                     </div>
                     <button class="sidebar-btn green" onclick="saveShiftDefinitions()">Save Shifts</button>
                 </div>
-
                 <!-- Data Source -->
                 <div class="sidebar-section">
                     <div class="sidebar-section-title">ðŸ“‹ Data Source</div>
@@ -543,7 +529,6 @@
                         <option value="auto">Auto-Detect (Recommended)</option>
                     </select>
                 </div>
-
                 <!-- Date Range Filter -->
                 <div class="sidebar-section">
                     <div class="sidebar-section-title">ðŸ“… Date Range</div>
@@ -551,7 +536,6 @@
                     <input type="date" id="endDate" style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 0.95rem; margin-bottom: 0.75rem;">
                     <button class="sidebar-btn primary" onclick="filterByDateRange()">Apply Filter</button>
                 </div>
-
                 <!-- Export Options -->
                 <div class="sidebar-section">
                     <div class="sidebar-section-title">ðŸ’¾ Export</div>
@@ -562,7 +546,6 @@
                 </div>
             </div>
         </div>
-
         <div id="statsGrid" class="stats-grid" style="display: none;">
             <div class="stat-card primary">
                 <div class="stat-label">Total Employees</div>
@@ -581,7 +564,6 @@
                 <div class="stat-value" id="statAvg">0%</div>
             </div>
         </div>
-
         <div class="charts-section" id="chartSection" style="display: none;">
             <div class="chart-card" id="lateChartWrapper">
                 <div class="chart-title">â° Top 15 Late Arrivals</div>
@@ -589,14 +571,12 @@
                     <canvas id="lateChart"></canvas>
                 </div>
             </div>
-
             <div class="chart-card" id="deptChartWrapper">
                 <div class="chart-title">ðŸ“ˆ Attendance by Department</div>
                 <div class="chart-container">
                     <canvas id="deptChart"></canvas>
                 </div>
             </div>
-
             <div class="chart-card" id="deptLateChartWrapper">
                 <div class="chart-title">â±ï¸ Late Minutes by Department</div>
                 <div class="chart-container">
@@ -604,7 +584,6 @@
                 </div>
             </div>
         </div>
-
         <div class="employees-section">
             <div class="section-title">ðŸ‘¤ Employee Performance Cards</div>
             <input type="text" id="searchBox" placeholder="ðŸ” Search name or ID..." class="search-box" style="margin-bottom: 1.5rem; max-width: 500px;">
@@ -612,13 +591,11 @@
                 <div style="text-align: center; color: #94a3b8; font-style: italic; padding: 3rem 1.5rem; grid-column: 1/-1;">No data uploaded yet.</div>
             </div>
         </div>
-
         <div id="noData" class="no-data hidden">
             <h3>No data to display</h3>
             <p>Upload an attendance file to get started</p>
         </div>
     </div>
-
     <script>
         // ========== FIREBASE CONFIGURATION ==========
         const firebaseConfig = {
@@ -630,7 +607,6 @@
             appId: "1:855206153422:web:2a1366b2e7825304c3d49f",
             measurementId: "G-7YCKESJB8T"
         };
-
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -671,8 +647,7 @@
             try {
                 const cleanData = cleanUndefined(data);
                 await db.collection(collectionPath).doc(docId).set(cleanData, { merge: true });
-                console.log(`âœ… Saved to Firestore: ${collectionPath}/${docId}`);
-                return true;
+                console.log(`âœ… Saved to Firestore: ${collectionPath}/${docId}`);\n                return true;
             } catch (error) {
                 console.error('âŒ Firestore save error:', error);
                 return false;
@@ -683,8 +658,7 @@
             try {
                 const doc = await db.collection(collectionPath).doc(docId).get();
                 if (doc.exists) {
-                    console.log(`âœ… Loaded from Firestore: ${collectionPath}/${docId}`);
-                    return doc.data();
+                    console.log(`âœ… Loaded from Firestore: ${collectionPath}/${docId}`);\n                    return doc.data();
                 }
                 return null;
             } catch (error) {
@@ -696,8 +670,7 @@
         async function deleteFromFirestore(collectionPath, docId) {
             try {
                 await db.collection(collectionPath).doc(docId).delete();
-                console.log(`âœ… Deleted from Firestore: ${collectionPath}/${docId}`);
-                return true;
+                console.log(`âœ… Deleted from Firestore: ${collectionPath}/${docId}`);\n                return true;
             } catch (error) {
                 console.error('âŒ Firestore delete error:', error);
                 return false;
@@ -706,8 +679,7 @@
         
         // ========== ATTENDANCE DATA PERSISTENCE ==========
         async function saveAttendanceReport(employees, timestamp) {
-            const reportId = `report_${Date.now()}`;
-            const reportData = {
+            const reportId = `report_${Date.now()}`;\n            const reportData = {
                 reportId,
                 timestamp: new Date(),
                 totalEmployees: employees.length,
@@ -717,26 +689,22 @@
             };
             
             // Save to timesheet_app/reports/{reportId}
-            return saveToFirestore(`${TIMESHEET_COLLECTION}/reports`, reportId, reportData);
-        }
+            return saveToFirestore(`${TIMESHEET_COLLECTION}/reports`, reportId, reportData);\n        }
         
         async function saveEmployeeRecord(employee) {
-            const empId = `emp_${employee.id}`;
-            const empData = {
+            const empId = `emp_${employee.id}`;\n            const empData = {
                 ...employee,
                 lastUpdated: new Date(),
                 appId: TIMESHEET_APP_ID
             };
             
             // Save to timesheet_app/data/employees/{empId}
-            return saveToFirestore(`${TIMESHEET_COLLECTION}/employees`, empId, empData);
-        }
+            return saveToFirestore(`${TIMESHEET_COLLECTION}/employees`, empId, empData);\n        }
         
         async function loadPreviousReports(limit = 10) {
             try {
                 const snapshot = await db
-                    .collection(`${TIMESHEET_COLLECTION}/reports`)
-                    .orderBy('timestamp', 'desc')
+                    .collection(`${TIMESHEET_COLLECTION}/reports`)\n                    .orderBy('timestamp', 'desc')
                     .limit(limit)
                     .get();
                 
@@ -745,14 +713,12 @@
                     reports.push(doc.data());
                 });
                 
-                console.log(`âœ… Loaded ${reports.length} previous reports from Firestore`);
-                return reports;
+                console.log(`âœ… Loaded ${reports.length} previous reports from Firestore`);\n                return reports;
             } catch (error) {
                 console.error('âŒ Error loading reports:', error);
                 return [];
             }
         }
-
         // ========== MONTH SELECTOR ==========
         let uploadedMonths = [];
         
@@ -776,16 +742,14 @@
                     return bMonth - aMonth;
                 });
                 
-                console.log(`ðŸ“… Found ${uploadedMonths.length} uploaded months:`, uploadedMonths.map(m => m.id));
-                populateMonthDropdown();
+                console.log(`ðŸ“… Found ${uploadedMonths.length} uploaded months:`, uploadedMonths.map(m => m.id));\n                populateMonthDropdown();
                 
                 // Auto-load latest month by default
                 if (uploadedMonths.length > 0) {
                     const latestMonth = uploadedMonths[0]; // First in array is latest (sorted descending by year/month)
                     document.getElementById('monthSelector').value = latestMonth.id;
                     loadMonthData();
-                    console.log(`ðŸ“… Auto-loading latest month: ${latestMonth.id}`);
-                }
+                    console.log(`ðŸ“… Auto-loading latest month: ${latestMonth.id}`);\n                }
             } catch (error) {
                 console.error('âŒ Error loading available months:', error);
             }
@@ -798,8 +762,7 @@
             uploadedMonths.forEach(month => {
                 const [year, monthNum] = month.id.split('_').map(Number);
                 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                const displayText = `${monthNames[monthNum - 1]} ${year}`;
-                
+                const displayText = `${monthNames[monthNum - 1]} ${year}`;\n                
                 const option = document.createElement('option');
                 option.value = month.id;
                 option.textContent = displayText;
@@ -904,18 +867,14 @@
                         index: colIdx,
                         header: headerRow[colIdx]
                     };
-                    console.log(`   âœ“ Found ${field} at column ${colIdx}: "${headerRow[colIdx]}"`);
-                }
+                    console.log(`   âœ“ Found ${field} at column ${colIdx}: "${headerRow[colIdx]}"`);\n                }
             });
             
             // If some columns detected, show them
             if (Object.keys(mapping).length > 0) {
                 console.log('âœ… Detected Employee Form Columns:', mapping);
                 
-                // Show detected columns and allow user to save
-                const confirmMsg = `✅ Detected employee form columns:
-${Object.entries(mapping).map(([field, data]) => `• ${field}: "${data.header}"`).join('
-')}
+                // Show detected columns and allow user to save\n                const confirmMsg = `✅ Detected employee form columns:\n${Object.entries(mapping).map(([field, data]) => `• ${field}: "${data.header}"`).join('\n')}
 Save this mapping to Firestore?`;
                 
                 if (confirm(confirmMsg)) {
@@ -925,20 +884,7 @@ Save this mapping to Firestore?`;
                 }
             } else {
                 // No columns detected - show what was found and ask for manual help
-                const foundHeaders = headerRow.slice(0, 10).join(', ');
-                const msg = `âš ï¸ Could not automatically detect standard columns.
-
-Headers found:
-${foundHeaders}
-
-Please rename your columns to match one of these patterns:
-â€¢ ID: id, emp id, employee id, code
-â€¢ Name: name, employee name, full name
-â€¢ Department: department, dept, section
-â€¢ Shift: shift, schedule
-â€¢ Phone: phone, contact, mobile
-â€¢ Email: email, e-mail
-
+                const foundHeaders = headerRow.slice(0, 10).join(', ');\n                const msg = `âš ï¸ Could not automatically detect standard columns.\n\nHeaders found:\n${foundHeaders}\n\nPlease rename your columns to match one of these patterns:\nâ€¢ ID: id, emp id, employee id, code\nâ€¢ Name: name, employee name, full name\nâ€¢ Department: department, dept, section\nâ€¢ Shift: shift, schedule\nâ€¢ Phone: phone, contact, mobile\nâ€¢ Email: email, e-mail\n
 Then re-upload the file.`;
                 alert(msg);
                 console.log('âŒ Could not auto-detect columns. Available headers:', headerRow);
@@ -989,8 +935,7 @@ Then re-upload the file.`;
                             ...emp,
                             shift: emp.shift || 'WK'
                         }));
-                        console.warn(`âš ï¸ No employees found in ${EMPLOYEES_COLLECTION}, using month document data`);
-                    }
+                        console.warn(`âš ï¸ No employees found in ${EMPLOYEES_COLLECTION}, using month document data`);\n                    }
                     
                     filteredData = [...rawData];
                     
@@ -1021,9 +966,7 @@ Then re-upload the file.`;
                         }
                     });
                     
-                    console.log(`âœ… Loaded ${rawData.length} employees from ${monthId}`);
-                    console.log(`ðŸ“… Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);
-                    
+                    console.log(`âœ… Loaded ${rawData.length} employees from ${monthId}`);\n                    console.log(`ðŸ“… Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);\n                    
                     // Show data panels
                     document.getElementById('statsGrid').style.display = 'grid';
                     document.getElementById('chartSection').style.display = 'grid';
@@ -1034,8 +977,7 @@ Then re-upload the file.`;
                     // Display employee data in the table (with daily breakdown)
                     displayEmployeeData(rawData);
                 } else {
-                    console.warn(`âš ï¸ No data found for month: ${monthId}`);
-                }
+                    console.warn(`âš ï¸ No data found for month: ${monthId}`);\n                }
             } catch (error) {
                 console.error('âŒ Error loading month data:', error);
             }
@@ -1049,8 +991,7 @@ Then re-upload the file.`;
                     Object.assign(cellEditHistory, emp.editHistory);
                 }
             });
-            console.log(`ðŸ“ Restored edit history:`, Object.keys(cellEditHistory).length, 'cells edited');
-        }
+            console.log(`ðŸ“ Restored edit history:`, Object.keys(cellEditHistory).length, 'cells edited');\n        }
         
         // Re-display badges for all edited cells
         function reattachEditBadges() {
@@ -1062,8 +1003,7 @@ Then re-upload the file.`;
                     const pairIdx = cell.dataset.pairIdx;
                     const type = cell.dataset.type;
                     
-                    const historyKey = `${empId}_${dayIdx}_${pairIdx}_${type}`;
-                    
+                    const historyKey = `${empId}_${dayIdx}_${pairIdx}_${type}`;\n                    
                     if (cellEditHistory[historyKey] && cellEditHistory[historyKey].length > 0) {
                         // Remove old badge if exists
                         const oldBadge = cell.querySelector('.edit-badge');
@@ -1073,25 +1013,8 @@ Then re-upload the file.`;
                         const badge = document.createElement('span');
                         badge.className = 'edit-badge';
                         const editCount = cellEditHistory[historyKey].length;
-                        badge.textContent = '\u270e';
-                        badge.title = `Edited ${editCount} time${editCount > 1 ? 's' : ''} - Click to view history`;
-                        badge.style.cssText = `
-                            position: absolute;
-                            top: 1px;
-                            right: 2px;
-                            background: transparent;
-                            color: #8b5cf6;
-                            font-size: 0.7rem;
-                            padding: 0;
-                            border-radius: 50%;
-                            cursor: help;
-                            font-weight: bold;
-                            white-space: nowrap;
-                            z-index: 500;
-                            opacity: 0.7;
-                            transition: all 0.2s ease;
-                        `;
-                        
+                        badge.textContent = '\u270e';\n                        badge.title = `Edited ${editCount} time${editCount > 1 ? 's' : ''} - Click to view history`;\n                        badge.style.cssText = `\n                            position: absolute;\n                            top: 1px;\n                            right: 2px;\n                            background: transparent;\n                            color: #8b5cf6;\n                            font-size: 0.7rem;\n                            padding: 0;\n                            border-radius: 50%;\n                            cursor: help;\n                            font-weight: bold;\n                            white-space: nowrap;\n                            z-index: 500;\n                            opacity: 0.7;\n                            transition: all 0.2s ease;
+                        `;\n                        
                         // Hover effect
                         badge.onmouseover = () => { badge.style.opacity = '1'; badge.style.color = '#a78bfa'; };
                         badge.onmouseout = () => { badge.style.opacity = '0.7'; badge.style.color = '#8b5cf6'; };
@@ -1181,70 +1104,21 @@ Then re-upload the file.`;
                 // Build daily breakdown HTML if available
                 let dailyBreakdownHtml = '';
                 if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
-                    dailyBreakdownHtml = `<div class="daily-breakdown">${renderDailyBreakdown(emp)}</div>`;
-                }
+                    dailyBreakdownHtml = `<div class="daily-breakdown">${renderDailyBreakdown(emp)}</div>`;\n                }
                 
                 // Create card with metrics AND daily breakdown
                 const card = document.createElement('div');
                 card.className = 'employee-card';
                 card.setAttribute('data-tier', tier);
-                card.setAttribute('data-id', emp.id);
-                card.innerHTML = `
-                    <div class="employee-header">
-                        <input type="checkbox" class="employee-checkbox" data-id="${emp.id}" style="margin-right: 0.75rem; width: 20px; height: 20px; cursor: pointer; flex-shrink: 0;">
-                        <div class="employee-info">
-                            <div class="employee-name">${name}</div>
-                            <div class="employee-meta">
-                                <span class="employee-dept">${id}</span>
-                                <span class="employee-dept" style="background: #dbeafe; color: #0369a1;">${dept}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="visual-metrics">
-                        <div class="metrics-line">
-                            <div class="metric-card rate-card">
-                                <div class="metric-card-title">Attendance</div>
-                                <div class="metric-card-value">${attendancePercent.toFixed(0)}%</div>
-                            </div>
-                            <div class="metric-card punctuality-card">
-                                <div class="metric-card-title">Punctuality</div>
-                                <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
-                            </div>
-                            <div class="metric-card hours-card">
-                                <div class="metric-card-title">Hours</div>
-                                <div class="metric-card-value">${hoursNum.toFixed(2)}</div>
-                                <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>
-                                <div class="metric-card-sub">hrs</div>
-                            </div>
-                            <div class="metric-card late-card">
-                                <div class="metric-card-title">Late Min</div>
-                                <div class="metric-card-value">${lateMin}</div>
-                                <div class="metric-card-sub">min</div>
-                            </div>
-                            <div class="metric-card absence-card">
-                                <div class="metric-card-title">Absences</div>
-                                <div class="metric-card-value">${absences}</div>
-                                <div class="metric-card-sub">days</div>
-                            </div>
-                            <div class="metric-card worked-card">
-                                <div class="metric-card-title">Worked</div>
-                                <div class="metric-card-value">${daysWorked}</div>
-                                <div class="metric-card-sub">days</div>
-                            </div>
-                        </div>
-                    </div>
-                    ${dailyBreakdownHtml}
-                `;
-                
+                card.setAttribute('data-id', emp.id);\n                card.innerHTML = `\n                    <div class="employee-header">\n                        <input type="checkbox" class="employee-checkbox" data-id="${emp.id}" style="margin-right: 0.75rem; width: 20px; height: 20px; cursor: pointer; flex-shrink: 0;">\n                        <div class="employee-info">\n                            <div class="employee-name">${name}</div>\n                            <div class="employee-meta">\n                                <span class="employee-dept">${id}</span>\n                                <span class="employee-dept" style="background: #dbeafe; color: #0369a1;">${dept}</span>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="visual-metrics">\n                        <div class="metrics-line">\n                            <div class="metric-card rate-card">\n                                <div class="metric-card-title">Attendance</div>\n                                <div class="metric-card-value">${attendancePercent.toFixed(0)}%</div>\n                            </div>\n                            <div class="metric-card punctuality-card">\n                                <div class="metric-card-title">Punctuality</div>\n                                <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>\n                            </div>\n                            <div class="metric-card hours-card">\n                                <div class="metric-card-title">Hours</div>\n                                <div class="metric-card-value">${hoursNum.toFixed(2)}</div>\n                                <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>\n                                <div class="metric-card-sub">hrs</div>\n                            </div>\n                            <div class="metric-card late-card">\n                                <div class="metric-card-title">Late Min</div>\n                                <div class="metric-card-value">${lateMin}</div>\n                                <div class="metric-card-sub">min</div>\n                            </div>\n                            <div class="metric-card absence-card">\n                                <div class="metric-card-title">Absences</div>\n                                <div class="metric-card-value">${absences}</div>\n                                <div class="metric-card-sub">days</div>\n                            </div>\n                            <div class="metric-card worked-card">\n                                <div class="metric-card-title">Worked</div>\n                                <div class="metric-card-value">${daysWorked}</div>\n                                <div class="metric-card-sub">days</div>\n                            </div>\n                        </div>\n                    </div>\n                    ${dailyBreakdownHtml}
+                `;\n                
                 tableBody.appendChild(card);
             });
             
-            console.log(`ðŸ“Š Displayed ${employees.length} employees with complete metrics & daily breakdown`);
-            
+            console.log(`ðŸ“Š Displayed ${employees.length} employees with complete metrics & daily breakdown`);\n            
             // Restore edit badges after rendering
             reattachEditBadges();
         }
-
     </script>
     <script>
         const fileInput = document.getElementById('csvFile');
@@ -1258,7 +1132,6 @@ Then re-upload the file.`;
         let allSheetData = {};
         let dateRange = { start: null, end: null, actualDays: 0 };
         let cellEditHistory = {}; // Tracks edit history: key = "empId_dayIdx_pairIdx_type", value = array of edits
-
         // Safety check for file input existence
         if (!fileInput) {
             console.error('âŒ File input element not found! Check HTML structure.');
@@ -1280,7 +1153,6 @@ Then re-upload the file.`;
                 const isExcel = /\.(xlsx?|xls)$/.test(file.name.toLowerCase());
                 
                 console.log('Upload');
-
                 if (isExcel) {
                     const reader = new FileReader();
                     reader.onload = (ev) => {
@@ -1295,7 +1167,6 @@ Then re-upload the file.`;
                                 const sheet = currentWorkbook.Sheets[sheetName];
                                 allSheetData[sheetName] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
                             });
-
                             processMultiSheetData(allSheetData);
                         } catch (err) {
                             console.error('âŒ Error parsing Excel:', err);
@@ -1340,7 +1211,6 @@ Then re-upload the file.`;
                     
                     const isExcel = /\.(xlsx?|xls)$/.test(file.name.toLowerCase());
                 console.log('📥 FILE UPLOAD DETECTED - File: ' + file.name + ', Type: ' + (isExcel ? 'Excel' : 'CSV'));
-
                 if (isExcel) {
                     const reader = new FileReader();
                     reader.onload = (ev) => {
@@ -1355,7 +1225,6 @@ Then re-upload the file.`;
                                 const sheet = currentWorkbook.Sheets[sheetName];
                                 allSheetData[sheetName] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
                             });
-
                             processMultiSheetData(allSheetData);
                         } catch (err) {
                             console.error('âŒ Error parsing Excel:', err);
@@ -1399,8 +1268,7 @@ Then re-upload the file.`;
                     if (!file) return;
                     
                     const isExcel = /\.(xlsx?|xls)$/.test(file.name.toLowerCase());
-                    console.log(`ðŸ“‹ Employee Form File Selected: ${file.name}`);
-                    
+                    console.log(`ðŸ“‹ Employee Form File Selected: ${file.name}`);\n                    
                     if (isExcel) {
                         const reader = new FileReader();
                         reader.onload = (ev) => {
@@ -1431,7 +1299,6 @@ Then re-upload the file.`;
                 });
             }
         }
-
         function processMultiSheetData(sheets) {
             // Detect best sheet with prioritization
             const sheetPriority = ['Attend. Logs', 'Attendance summary', 'Abnormal', 'Schedu. information sheet'];
@@ -1443,8 +1310,7 @@ Then re-upload the file.`;
                     const data = sheets[priorityName];
                     const result = parseSheet(data, priorityName);
                     if (result.employees.length > 0 && priority < bestResult.priority) {
-                        console.log(`âœ“ Priority sheet "${priorityName}" found with ${result.employees.length} employees`);
-                        bestResult = { ...result, priority };
+                        console.log(`âœ“ Priority sheet "${priorityName}" found with ${result.employees.length} employees`);\n                        bestResult = { ...result, priority };
                     }
                 }
             });
@@ -1455,25 +1321,19 @@ Then re-upload the file.`;
                 Object.keys(sheets).forEach(sheetName => {
                     const data = sheets[sheetName];
                     const result = parseSheet(data, sheetName);
-                    console.log(`   "${sheetName}": ${result.employees.length} employees`);
-                    if (result.employees.length > bestResult.employees.length) {
+                    console.log(`   "${sheetName}": ${result.employees.length} employees`);\n                    if (result.employees.length > bestResult.employees.length) {
                         bestResult = result;
                     }
                 });
             }
-
             if (bestResult.employees.length === 0) {
                 alert('âŒ Could not detect employee data. Please ensure the file format is valid.');
                 return;
             }
-
             rawData = bestResult.employees;
             filteredData = [...rawData];
-            
-            console.log(`
-âœ… DATA LOADED FROM: ${bestResult.source}`);
-            console.log(`ðŸ“Š Total Employees: ${rawData.length}, Days: ${dateRange.actualDays}`);
-            
+            \n            console.log(`
+âœ… DATA LOADED FROM: ${bestResult.source}`);\n            console.log(`ðŸ“Š Total Employees: ${rawData.length}, Days: ${dateRange.actualDays}`);\n            
             // Parse individual employee sheets for enhanced lateness data
             parseIndividualSheets(sheets, rawData);
             
@@ -1486,14 +1346,11 @@ Then re-upload the file.`;
             document.getElementById('chartSection').classList.remove('hidden');
             document.getElementById('controlPanel').classList.remove('hidden');
         }
-
         function parseSheet(data, sheetName) {
             const titleCell = (data[0]?.[0] || '').toString().toLowerCase();
             let employees = [];
-
             // Detect date range from data
             detectDateRange(data);
-
             if (titleCell.includes('attend. logs')) {
                 employees = parseAttendanceLogs(data);
             } else if (titleCell.includes('attendance summary')) {
@@ -1505,10 +1362,8 @@ Then re-upload the file.`;
             } else if (titleCell.includes('attend. report')) {
                 employees = parseAttendReport(data);
             }
-
             return { employees, source: sheetName };
         }
-
         function parseIndividualSheets(sheets, employees) {
             // Parse individual employee sheets (numbered like '1,2,3', '4,5,6', etc.)
             // These sheets typically contain detailed punch in/out data per employee per day
@@ -1521,8 +1376,7 @@ Then re-upload the file.`;
                 return;
             }
             
-            console.log(`ðŸ” Parsing ${individualSheetNames.length} individual employee sheets for lateness data`);
-            
+            console.log(`ðŸ” Parsing ${individualSheetNames.length} individual employee sheets for lateness data`);\n            
             individualSheetNames.forEach(sheetName => {
                 const data = sheets[sheetName];
                 if (!data || data.length < 3) return;
@@ -1594,7 +1448,6 @@ Then re-upload the file.`;
             
             console.log('âœ… Individual sheet lateness data merged');
         }
-
         function detectDateRange(data) {
             // Try to find date range in first few rows
             for (let i = 0; i < Math.min(5, data.length); i++) {
@@ -1606,8 +1459,7 @@ Then re-upload the file.`;
                         dateRange.start = new Date(dateMatch[3], parseInt(dateMatch[1]) - 1, parseInt(dateMatch[2]));
                         dateRange.end = new Date(dateMatch[6], parseInt(dateMatch[4]) - 1, parseInt(dateMatch[5]));
                         dateRange.actualDays = Math.floor((dateRange.end - dateRange.start) / (1000 * 60 * 60 * 24)) + 1;
-                        console.log(`ðŸ“… Date Range (from header): ${dateRange.start.toLocaleDateString()} to ${dateRange.end.toLocaleDateString()} (${dateRange.actualDays} days)`);
-                        return;
+                        console.log(`ðŸ“… Date Range (from header): ${dateRange.start.toLocaleDateString()} to ${dateRange.end.toLocaleDateString()} (${dateRange.actualDays} days)`);\n                        return;
                     }
                 }
             }
@@ -1632,38 +1484,30 @@ Then re-upload the file.`;
                 if (foundDates.length > 5) break;
             }
             
-            console.log(`ðŸ“… Found dates: ${foundDates.join(', ')}`);
-            
+            console.log(`ðŸ“… Found dates: ${foundDates.join(', ')}`);\n            
             // If we found a month, calculate the correct number of days in that month
             if (detectedYear && detectedMonth) {
                 dateRange.start = new Date(detectedYear, detectedMonth - 1, 1);
                 // Get last day of the month
                 dateRange.end = new Date(detectedYear, detectedMonth, 0);
                 dateRange.actualDays = dateRange.end.getDate();
-                console.log(`ðŸ“… Detected Month/Year: ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][detectedMonth-1]} ${detectedYear} â†’ ${dateRange.actualDays} days`);
-                console.log(`ðŸ“… dateRange.actualDays = ${dateRange.actualDays} (should be 31 for March)`);
-                return;
+                console.log(`ðŸ“… Detected Month/Year: ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][detectedMonth-1]} ${detectedYear} â†’ ${dateRange.actualDays} days`);\n                console.log(`ðŸ“… dateRange.actualDays = ${dateRange.actualDays} (should be 31 for March)`);\n                return;
             }
             
             // Final fallback to 31 days
             dateRange.actualDays = 31;
-            console.log(`ðŸ“… Date Range: Using default 31 days`);
-        }
-
+            console.log(`ðŸ“… Date Range: Using default 31 days`);\n        }
         function findColumnByHeader(row, searchTerms) {
             // Find column index by searching for header text
             if (!row) return -1;
             for (let j = 0; j < row.length; j++) {
                 const cell = (row[j] || '').toString().toLowerCase().trim();
                 if (searchTerms.some(term => cell.includes(term))) {
-                    console.log(`    Found column for "${searchTerms.join('|')}" at index ${j}: "${row[j]}"`);
-                    return j;
+                    console.log(`    Found column for "${searchTerms.join('|')}" at index ${j}: "${row[j]}"`);\n                    return j;
                 }
             }
-            console.log(`    Column not found for: "${searchTerms.join('|')}"`);
-            return -1;
+            console.log(`    Column not found for: "${searchTerms.join('|')}"`);\n            return -1;
         }
-
         function parseAttendanceLogs(data) {
             console.log('ðŸ” Parsing Attendance Logs - Extracting IN/OUT times from Attend. Logs sheet');
             const employees = [];
@@ -1706,8 +1550,7 @@ Then re-upload the file.`;
                             // Try multiple parsing methods to handle different formats
                             if (cellContent) {
                                 // Method 1: Split by newlines or line breaks
-                                const lines = cellContent.split(/[
-\r]+/);
+                                const lines = cellContent.split(/[\n\r]+/);
                                 lines.forEach(line => {
                                     const matches = line.match(/(\d{1,2}):(\d{2})/g);
                                     if (matches) {
@@ -1865,8 +1708,7 @@ Then re-upload the file.`;
                             totalMinutes
                         });
                         
-                        console.log(`  âœ“ Parsed: ${name} (ID: ${id}, Dept: ${dept}, Days: ${daysWorked})`);
-                    }
+                        console.log(`  âœ“ Parsed: ${name} (ID: ${id}, Dept: ${dept}, Days: ${daysWorked})`);\n                    }
                     
                     i += 4;
                     continue;
@@ -1874,10 +1716,8 @@ Then re-upload the file.`;
                 i++;
             }
             
-            console.log(`  Total parsed: ${employees.length} employees`);
-            return employees;
+            console.log(`  Total parsed: ${employees.length} employees`);\n            return employees;
         }
-
         function parseAttendanceSummary(data) {
             console.log('ðŸ” Parsing Attendance Summary');
             const employees = [];
@@ -1913,8 +1753,7 @@ Then re-upload the file.`;
                 const found_actual = findColumnByHeader(subHeaderData, ['actual']);
                 if (found_actual >= 0) colHoursActual = found_actual;
                 
-                console.log(`  Using columns: ID=${colId}, Name=${colName}, Dept=${colDept}, HoursActual=${colHoursActual}, LateMin=${colLateMin}, Absences=${colAbsences}`);
-            }
+                console.log(`  Using columns: ID=${colId}, Name=${colName}, Dept=${colDept}, HoursActual=${colHoursActual}, LateMin=${colLateMin}, Absences=${colAbsences}`);\n            }
             
             // Parse employee rows starting from row 4 (index 4)
             for (let i = 4; i < data.length; i++) {
@@ -1952,13 +1791,10 @@ Then re-upload the file.`;
                     absences,
                     dailyBreakdown: null
                 });
-                console.log(`  âœ“ Parsed: ${name} (ID: ${id}, Dept: ${dept}, Hours: ${hours}, Late: ${lateMin}, Absences: ${absences})`);
-            }
+                console.log(`  âœ“ Parsed: ${name} (ID: ${id}, Dept: ${dept}, Hours: ${hours}, Late: ${lateMin}, Absences: ${absences})`);\n            }
             
-            console.log(`  Total parsed: ${employees.length} employees`);
-            return employees;
+            console.log(`  Total parsed: ${employees.length} employees`);\n            return employees;
         }
-
         function parseAbnormal(data) {
             console.log('ðŸ” Parsing Abnormal Records');
             const empMap = {};
@@ -2000,7 +1836,6 @@ Then re-upload the file.`;
             
             return employees;
         }
-
         function parseScheduleInfo(data) {
             console.log('ðŸ” Parsing Schedule Information');
             const employees = [];
@@ -2028,7 +1863,6 @@ Then re-upload the file.`;
             
             return employees;
         }
-
         function parseAttendReport(data) {
             console.log('ðŸ” Parsing Attendance Report');
             const employees = [];
@@ -2076,7 +1910,6 @@ Then re-upload the file.`;
             
             return employees;
         }
-
         // ========== HAMBURGER MENU FUNCTIONS ==========
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebarMenu');
@@ -2122,8 +1955,7 @@ Then re-upload the file.`;
                 radio.value = dept;
                 radio.onchange = () => filterByDept(dept);
                 label.appendChild(radio);
-                label.appendChild(document.createTextNode(` ${dept}`));
-                deptRadiosContainer.appendChild(label);
+                label.appendChild(document.createTextNode(` ${dept}`));\n                deptRadiosContainer.appendChild(label);
             });
             console.log('✅ Department radios initialized');
             
@@ -2135,7 +1967,6 @@ Then re-upload the file.`;
                 document.getElementById('endDate').value = dateRange.end.toISOString().split('T')[0];
             }
         }
-
         function filterByDateRange() {
             const startDate = new Date(document.getElementById('startDate').value);
             const endDate = new Date(document.getElementById('endDate').value);
@@ -2153,17 +1984,13 @@ Then re-upload the file.`;
             
             renderDashboard(filteredData);
         }
-
         function exportToCSV() {
             let csv = 'ID,Name,Department,Total Hours,Late Minutes,Absences\
 ';
-            filteredData.forEach(emp => {
-                csv += `"${emp.id}","${emp.name}","${emp.dept}","${emp.hours}","${emp.lateMin}","${emp.absences}"\
-`;
-            });
+            filteredData.forEach(emp => {\n                csv += `"${emp.id}","${emp.name}","${emp.dept}","${emp.hours}","${emp.lateMin}","${emp.absences}"\
+`;\n            });
             downloadFile(csv, 'attendance_report.csv', 'text/csv');
         }
-
         function exportToExcel() {
             const sheetData = filteredData.map(emp => ({
                 'ID': emp.id,
@@ -2179,15 +2006,12 @@ Then re-upload the file.`;
             XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
             XLSX.writeFile(wb, 'attendance_report.xlsx');
         }
-
         function printSelected() {
             // Get only CHECKED employee-checkbox elements using CSS selector
             const checkedCheckboxes = document.querySelectorAll('.employee-checkbox:checked');
-            console.log(`DEBUG: Found ${checkedCheckboxes.length} CHECKED checkboxes`);
-            
+            console.log(`DEBUG: Found ${checkedCheckboxes.length} CHECKED checkboxes`);\n            
             if (checkedCheckboxes.length === 0) {
                 alert('âŒ No employees selected.
-
 Please check the checkboxes next to the employees you want to print.');
                 return;
             }
@@ -2196,20 +2020,16 @@ Please check the checkboxes next to the employees you want to print.');
             
             checkedCheckboxes.forEach(cb => {
                 const checkboxId = cb.dataset.id;
-                console.log(`âœ“ Processing checked box with ID: ${checkboxId}`);
-                
+                console.log(`âœ“ Processing checked box with ID: ${checkboxId}`);\n                
                 // Find matching employee in filteredData
                 const emp = filteredData.find(e => String(e.id) === String(checkboxId));
                 if (emp) {
                     selectedEmployees.push(emp);
-                    console.log(`   âœ… Added employee: ${emp.name} (ID: ${emp.id}) - Dept: ${emp.dept}`);
-                } else {
-                    console.warn(`   âŒ Employee not found with ID: ${checkboxId}`);
-                }
+                    console.log(`   âœ… Added employee: ${emp.name} (ID: ${emp.id}) - Dept: ${emp.dept}`);\n                } else {
+                    console.warn(`   âŒ Employee not found with ID: ${checkboxId}`);\n                }
             });
             
-            console.log(`âœ… Ready to print ${selectedEmployees.length} employee(s):`, selectedEmployees.map(e => e.name).join(', '));
-            
+            console.log(`âœ… Ready to print ${selectedEmployees.length} employee(s):`, selectedEmployees.map(e => e.name).join(', '));\n            
             // Group employees by department
             const byDept = {};
             selectedEmployees.forEach(emp => {
@@ -2221,184 +2041,20 @@ Please check the checkboxes next to the employees you want to print.');
             // Sort departments alphabetically
             const deptList = Object.keys(byDept).sort();
             
-            console.log(`ðŸ“Š Department Grouping:`);
-            deptList.forEach(dept => {
-                console.log(`   ${dept}: ${byDept[dept].length} employees`);
-            });
+            console.log(`ðŸ“Š Department Grouping:`);\n            deptList.forEach(dept => {
+                console.log(`   ${dept}: ${byDept[dept].length} employees`);\n            });
             
-            // Generate print HTML - LANDSCAPE, 2 CARDS PER PAGE, GROUPED BY DEPT
-            let printHTML = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Attendance Report - ${new Date().toLocaleDateString()}</title>
-                <style>
-                    @page { size: A4 landscape; margin: 15px; }
-                    * { box-sizing: border-box; }
-                    html { 
-                        height: 100%; 
-                    }
-                    body { 
-                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
-                        margin: 0; 
-                        padding: 0; 
-                        background: white; 
-                        height: 100%;
-                    }
-                    .dept-header-page {
-                        page-break-after: always;
-                        width: 100%;
-                        height: 100vh;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        text-align: center;
-                        border-bottom: 3px solid #1e293b;
-                    }
-                    .dept-header-page h1 {
-                        font-size: 48px;
-                        color: #1e293b;
-                        margin: 0;
-                        text-transform: uppercase;
-                        letter-spacing: 2px;
-                    }
-                    .dept-header-page p {
-                        font-size: 18px;
-                        color: #64748b;
-                        margin: 20px 0 0 0;
-                    }
-                    .cards-page {
-                        page-break-after: always;
-                        display: grid;
-                        grid-template-columns: 1fr 1fr;
-                        gap: 10px;
-                        padding: 10px;
-                        width: 100%;
-                        height: 100%;
-                        min-height: 100vh;
-                        break-inside: avoid;
-                    }
-                    .employee-card {
-                        border: 1px solid #e2e8f0;
-                        border-radius: 6px;
-                        overflow: hidden;
-                        background: white;
-                        display: flex;
-                        flex-direction: column;
-                        break-inside: avoid;
-                    }
-                    .employee-title { 
-                        background: #f1f5f9; 
-                        padding: 8px; 
-                        border-bottom: 2px solid #cbd5e1; 
-                        flex-shrink: 0;
-                    }
-                    .employee-title h2 { 
-                        margin: 0; 
-                        font-size: 13px; 
-                        color: #1e293b; 
-                    }
-                    .employee-title p { 
-                        margin: 1px 0 0 0; 
-                        font-size: 10px; 
-                        color: #64748b; 
-                    }
-                    .metrics { 
-                        display: grid; 
-                        grid-template-columns: repeat(6, 1fr); 
-                        gap: 4px; 
-                        padding: 8px; 
-                        background: #fafbfc; 
-                        border-bottom: 1px solid #e2e8f0; 
-                        flex-shrink: 0;
-                    }
-                    .metric { 
-                        text-align: center; 
-                        font-size: 9px;
-                    }
-                    .metric-title { 
-                        font-size: 8px; 
-                        font-weight: 600; 
-                        color: #64748b; 
-                        text-transform: uppercase; 
-                        margin-bottom: 1px; 
-                    }
-                    .metric-value { 
-                        font-size: 12px; 
-                        font-weight: 700; 
-                        color: #1e293b; 
-                    }
-                    .metric-unit { 
-                        font-size: 7px; 
-                        color: #94a3b8; 
-                    }
-                    .daily-table { 
-                        width: 100%; 
-                        border-collapse: collapse; 
-                        font-size: 9px;
-                        flex: 1;
-                        overflow: visible;
-                    }
-                    .daily-table thead { 
-                        background: #e2e8f0; 
-                    }
-                    .daily-table tbody { 
-                        display: table-row-group;
-                    }
-                    .daily-table th { 
-                        padding: 3px 2px; 
-                        text-align: left; 
-                        font-weight: 700; 
-                        color: #1e293b; 
-                        border: 0.5px solid #cbd5e1; 
-                    }
-                    .daily-table td { 
-                        padding: 2px 2px; 
-                        border: 0.5px solid #e2e8f0; 
-                    }
-                    .daily-table tr:nth-child(odd) { 
-                        background: white; 
-                    }
-                    .daily-table tr:nth-child(even) { 
-                        background: #f8fafc; 
-                    }
-                    .daily-table tr.late-row { 
-                        background: #fee2e2; 
-                        border-left: 3px solid #dc2626; 
-                    }
-                    .daily-table td.late { 
-                        color: #dc2626; 
-                        font-weight: 700; 
-                    }
-                    @media print {
-                        body { margin: 0; padding: 0; }
-                        * { margin: 0; padding: 0; }
-                    }
-                </style>
-            </head>
-            <body>
-            `;
-            
+            // Generate print HTML - LANDSCAPE, 2 CARDS PER PAGE, GROUPED BY DEPT\n            let printHTML = `\n            <!DOCTYPE html>\n            <html lang="en">\n            <head>\n                <meta charset="UTF-8">\n                <meta name="viewport" content="width=device-width, initial-scale=1.0">\n                <title>Attendance Report - ${new Date().toLocaleDateString()}</title>\n                <style>\n                    @page { size: A4 landscape; margin: 15px; }\n                    * { box-sizing: border-box; }\n                    html { \n                        height: 100%; \n                    }\n                    body { \n                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; \n                        margin: 0; \n                        padding: 0; \n                        background: white; \n                        height: 100%;\n                    }\n                    .dept-header-page {\n                        page-break-after: always;\n                        width: 100%;\n                        height: 100vh;\n                        display: flex;\n                        align-items: center;\n                        justify-content: center;\n                        text-align: center;\n                        border-bottom: 3px solid #1e293b;\n                    }\n                    .dept-header-page h1 {\n                        font-size: 48px;\n                        color: #1e293b;\n                        margin: 0;\n                        text-transform: uppercase;\n                        letter-spacing: 2px;\n                    }\n                    .dept-header-page p {\n                        font-size: 18px;\n                        color: #64748b;\n                        margin: 20px 0 0 0;\n                    }\n                    .cards-page {\n                        page-break-after: always;\n                        display: grid;\n                        grid-template-columns: 1fr 1fr;\n                        gap: 10px;\n                        padding: 10px;\n                        width: 100%;\n                        height: 100%;\n                        min-height: 100vh;\n                        break-inside: avoid;\n                    }\n                    .employee-card {\n                        border: 1px solid #e2e8f0;\n                        border-radius: 6px;\n                        overflow: hidden;\n                        background: white;\n                        display: flex;\n                        flex-direction: column;\n                        break-inside: avoid;\n                    }\n                    .employee-title { \n                        background: #f1f5f9; \n                        padding: 8px; \n                        border-bottom: 2px solid #cbd5e1; \n                        flex-shrink: 0;\n                    }\n                    .employee-title h2 { \n                        margin: 0; \n                        font-size: 13px; \n                        color: #1e293b; \n                    }\n                    .employee-title p { \n                        margin: 1px 0 0 0; \n                        font-size: 10px; \n                        color: #64748b; \n                    }\n                    .metrics { \n                        display: grid; \n                        grid-template-columns: repeat(6, 1fr); \n                        gap: 4px; \n                        padding: 8px; \n                        background: #fafbfc; \n                        border-bottom: 1px solid #e2e8f0; \n                        flex-shrink: 0;\n                    }\n                    .metric { \n                        text-align: center; \n                        font-size: 9px;\n                    }\n                    .metric-title { \n                        font-size: 8px; \n                        font-weight: 600; \n                        color: #64748b; \n                        text-transform: uppercase; \n                        margin-bottom: 1px; \n                    }\n                    .metric-value { \n                        font-size: 12px; \n                        font-weight: 700; \n                        color: #1e293b; \n                    }\n                    .metric-unit { \n                        font-size: 7px; \n                        color: #94a3b8; \n                    }\n                    .daily-table { \n                        width: 100%; \n                        border-collapse: collapse; \n                        font-size: 9px;\n                        flex: 1;\n                        overflow: visible;\n                    }\n                    .daily-table thead { \n                        background: #e2e8f0; \n                    }\n                    .daily-table tbody { \n                        display: table-row-group;\n                    }\n                    .daily-table th { \n                        padding: 3px 2px; \n                        text-align: left; \n                        font-weight: 700; \n                        color: #1e293b; \n                        border: 0.5px solid #cbd5e1; \n                    }\n                    .daily-table td { \n                        padding: 2px 2px; \n                        border: 0.5px solid #e2e8f0; \n                    }\n                    .daily-table tr:nth-child(odd) { \n                        background: white; \n                    }\n                    .daily-table tr:nth-child(even) { \n                        background: #f8fafc; \n                    }\n                    .daily-table tr.late-row { \n                        background: #fee2e2; \n                        border-left: 3px solid #dc2626; \n                    }\n                    .daily-table td.late { \n                        color: #dc2626; \n                        font-weight: 700; \n                    }\n                    @media print {\n                        body { margin: 0; padding: 0; }\n                        * { margin: 0; padding: 0; }\n                    }\n                </style>\n            </head>\n            <body>
+            `;\n            
             // Generate department pages + employee cards
             deptList.forEach(dept => {
                 const deptEmployees = byDept[dept];
                 
-                // Add department header page
-                printHTML += `
-                    <div class="dept-header-page">
-                        <div>
-                            <h1>${dept}</h1>
-                            <p>${deptEmployees.length} Employee${deptEmployees.length !== 1 ? 's' : ''}</p>
-                        </div>
-                    </div>
-                `;
-                
+                // Add department header page\n                printHTML += `\n                    <div class="dept-header-page">\n                        <div>\n                            <h1>${dept}</h1>\n                            <p>${deptEmployees.length} Employee${deptEmployees.length !== 1 ? 's' : ''}</p>\n                        </div>\n                    </div>
+                `;\n                
                 // Add employee cards, 2 per page
                 for (let i = 0; i < deptEmployees.length; i += 2) {
-                    printHTML += `<div class="cards-page">`;
-                    
+                    printHTML += `<div class="cards-page">`;\n                    
                     // First card in the pair
                     const emp1 = deptEmployees[i];
                     printHTML += generateEmployeeCard(emp1);
@@ -2409,15 +2065,10 @@ Please check the checkboxes next to the employees you want to print.');
                         printHTML += generateEmployeeCard(emp2);
                     }
                     
-                    printHTML += `</div>`;
-                }
+                    printHTML += `</div>`;\n                }
             });
-            
-            printHTML += `
-            </body>
-            </html>
-            `;
-            
+            \n            printHTML += `\n            </body>\n            </html>
+            `;\n            
             // Open print window
             const printWindow = window.open('', '_blank');
             printWindow.document.write(printHTML);
@@ -2436,62 +2087,11 @@ Please check the checkboxes next to the employees you want to print.');
                 const punctualityPercent = daysWorked > 0 ? Math.max(0, 100 - (lateCount / daysWorked * 100)).toFixed(0) : '-';
                 const hoursNum = parseFloat(emp.hours) || 0;
                 const absences = dateRange.actualDays - daysWorked;
-                
-                let cardHTML = `
-                    <div class="employee-card">
-                        <div class="employee-title">
-                            <h2>${emp.name}</h2>
-                            <p>ID: ${emp.id}</p>
-                        </div>
-                        <div class="metrics">
-                            <div class="metric">
-                                <div class="metric-title">Attendance</div>
-                                <div class="metric-value">${attendancePercent.toFixed(0)}%</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-title">Punctuality</div>
-                                <div class="metric-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-title">Hours</div>
-                                <div class="metric-value">${hoursNum.toFixed(2)}</div>
-                                <div class="metric-unit">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-title">Late Min</div>
-                                <div class="metric-value">${emp.lateMin || 0}</div>
-                                <div class="metric-unit">min</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-title">Absences</div>
-                                <div class="metric-value">${absences}</div>
-                                <div class="metric-unit">days</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-title">Worked</div>
-                                <div class="metric-value">${daysWorked}</div>
-                                <div class="metric-unit">days</div>
-                            </div>
-                        </div>
-                `;
-                
+                \n                let cardHTML = `\n                    <div class="employee-card">\n                        <div class="employee-title">\n                            <h2>${emp.name}</h2>\n                            <p>ID: ${emp.id}</p>\n                        </div>\n                        <div class="metrics">\n                            <div class="metric">\n                                <div class="metric-title">Attendance</div>\n                                <div class="metric-value">${attendancePercent.toFixed(0)}%</div>\n                            </div>\n                            <div class="metric">\n                                <div class="metric-title">Punctuality</div>\n                                <div class="metric-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>\n                            </div>\n                            <div class="metric">\n                                <div class="metric-title">Hours</div>\n                                <div class="metric-value">${hoursNum.toFixed(2)}</div>\n                                <div class="metric-unit">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>\n                            </div>\n                            <div class="metric">\n                                <div class="metric-title">Late Min</div>\n                                <div class="metric-value">${emp.lateMin || 0}</div>\n                                <div class="metric-unit">min</div>\n                            </div>\n                            <div class="metric">\n                                <div class="metric-title">Absences</div>\n                                <div class="metric-value">${absences}</div>\n                                <div class="metric-unit">days</div>\n                            </div>\n                            <div class="metric">\n                                <div class="metric-title">Worked</div>\n                                <div class="metric-value">${daysWorked}</div>\n                                <div class="metric-unit">days</div>\n                            </div>\n                        </div>
+                `;\n                
                 // Add daily breakdown table if available
-                if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
-                    cardHTML += `
-                        <table class="daily-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Day</th>
-                                    <th>Punches</th>
-                                    <th>Hrs</th>
-                                    <th>Late</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                    `;
-                    
+                if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {\n                    cardHTML += `\n                        <table class="daily-table">\n                            <thead>\n                                <tr>\n                                    <th>Date</th>\n                                    <th>Day</th>\n                                    <th>Punches</th>\n                                    <th>Hrs</th>\n                                    <th>Late</th>\n                                    <th>Status</th>\n                                </tr>\n                            </thead>\n                            <tbody>
+                    `;\n                    
                     emp.dailyBreakdown.forEach(day => {
                         const rowClass = day.lateMin > 0 ? 'late-row' : '';
                         const status = day.isMissed ? 'âŒ' : (day.hasMissedPunch ? 'âš ï¸' : 'âœ…');
@@ -2507,30 +2107,14 @@ Please check the checkboxes next to the employees you want to print.');
                             const totalHours = day.punchPairs.reduce((sum, p) => sum + (parseFloat(p.pairHours) || 0), 0);
                             if (totalHours > 0) hoursDisplay = totalHours.toFixed(1);
                         }
-                        
-                        cardHTML += `
-                            <tr class="${rowClass}">
-                                <td>${day.date}</td>
-                                <td>${day.dayName}</td>
-                                <td>${punches}</td>
-                                <td>${hoursDisplay}</td>
-                                <td class="${day.lateMin > 0 ? 'late' : ''}">${day.lateMin > 0 ? day.lateMin : 'â€”'}</td>
-                                <td>${status}</td>
-                            </tr>
-                        `;
-                    });
-                    
-                    cardHTML += `
-                            </tbody>
-                        </table>
-                    `;
-                }
+                        \n                        cardHTML += `\n                            <tr class="${rowClass}">\n                                <td>${day.date}</td>\n                                <td>${day.dayName}</td>\n                                <td>${punches}</td>\n                                <td>${hoursDisplay}</td>\n                                <td class="${day.lateMin > 0 ? 'late' : ''}">${day.lateMin > 0 ? day.lateMin : 'â€”'}</td>\n                                <td>${status}</td>\n                            </tr>
+                        `;\n                    });
+                    \n                    cardHTML += `\n                            </tbody>\n                        </table>
+                    `;\n                }
                 
-                cardHTML += `</div>`;
-                return cardHTML;
+                cardHTML += `</div>`;\n                return cardHTML;
             }
         }
-
         // ========== CHANGE TRACKING & AUDIT LOG ==========
         let changeLog = [];
         
@@ -2546,8 +2130,7 @@ Please check the checkboxes next to the employees you want to print.');
                 changeType: oldValue === undefined ? 'NEW' : (oldValue !== newValue ? 'MODIFIED' : 'UNCHANGED')
             };
             changeLog.push(change);
-            console.log(`ðŸ“ Change logged: ${empName} ${field}: "${oldValue}" â†’ "${newValue}"`);
-            return change;
+            console.log(`ðŸ“ Change logged: ${empName} ${field}: "${oldValue}" â†’ "${newValue}"`);\n            return change;
         }
         
         function getChangesSummary() {
@@ -2560,7 +2143,6 @@ Please check the checkboxes next to the employees you want to print.');
             };
             return summary;
         }
-
         // ========== SMART MONTH DETECTION ==========
         function detectMonthFromData(data) {
             // Extract month from:
@@ -2576,8 +2158,7 @@ Please check the checkboxes next to the employees you want to print.');
             if (dateRange && dateRange.start) {
                 detectedMonth = dateRange.start.getMonth() + 1;
                 detectedYear = dateRange.start.getFullYear();
-                console.log(`ðŸ“… Month/year extracted from parsed date range: ${detectedMonth}/${detectedYear}`);
-                return { month: detectedMonth, year: detectedYear };
+                console.log(`ðŸ“… Month/year extracted from parsed date range: ${detectedMonth}/${detectedYear}`);\n                return { month: detectedMonth, year: detectedYear };
             }
             
             // Check first 10 rows for date patterns
@@ -2592,8 +2173,7 @@ Please check the checkboxes next to the employees you want to print.');
                         detectedMonth = parseInt(dateRangeMatch[2]); // Month from first date
                         detectedYear = parseInt(dateRangeMatch[3]);
                         
-                        console.log(`ðŸ“… Detected month from date range: ${detectedMonth}/${detectedYear}`);
-                        return { month: detectedMonth, year: detectedYear };
+                        console.log(`ðŸ“… Detected month from date range: ${detectedMonth}/${detectedYear}`);\n                        return { month: detectedMonth, year: detectedYear };
                     }
                     
                     // Look for month names
@@ -2610,8 +2190,7 @@ Please check the checkboxes next to the employees you want to print.');
                                     detectedYear = parseInt(yearMatch[0]);
                                 }
                             }
-                            console.log(`ðŸ“… Detected month from name: ${detectedMonth}/${detectedYear}`);
-                        }
+                            console.log(`ðŸ“… Detected month from name: ${detectedMonth}/${detectedYear}`);\n                        }
                     });
                 }
             }
@@ -2619,16 +2198,14 @@ Please check the checkboxes next to the employees you want to print.');
             if (!detectedMonth) {
                 detectedMonth = new Date().getMonth() + 1;
                 detectedYear = new Date().getFullYear();
-                console.log(`âš ï¸ Could not detect month, using current: ${detectedMonth}/${detectedYear}`);
-            }
+                console.log(`âš ï¸ Could not detect month, using current: ${detectedMonth}/${detectedYear}`);\n            }
             
             return { month: detectedMonth, year: detectedYear };
         }
         
         // ========== DATA COMPARISON & MERGING ==========
         async function compareWithExisting(newEmployees, monthYear) {
-            const monthId = `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`;
-            
+            const monthId = `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`;\n            
             try {
                 // Get the existing month document (if it exists)
                 const monthDoc = await db.collection(MONTHS_COLLECTION).doc(monthId).get();
@@ -2719,64 +2296,36 @@ Please check the checkboxes next to the employees you want to print.');
                 alert('âš ï¸ No data to save. Please upload a report first.');
                 return;
             }
-
             try {
                 const btn = event.target;
                 btn.disabled = true;
                 btn.textContent = 'â³ Processing...';
-
                 // Detect month from data
                 const monthYear = detectMonthFromData(rawData);
-                const monthStr = `${String(monthYear.month).padStart(2, '0')}_${monthYear.year}`;
-                
-                console.log(`
-ðŸ—“ï¸ Processing report for: ${monthYear.month}/${monthYear.year}`);
-
+                const monthStr = `${String(monthYear.month).padStart(2, '0')}_${monthYear.year}`;\n                \n                console.log(`
+ðŸ—“ï¸ Processing report for: ${monthYear.month}/${monthYear.year}`);\n
                 // Compare with existing data
                 const comparison = await compareWithExisting(filteredData, monthYear);
                 
-                // Build summary message
-                let summaryMsg = `ðŸ“Š Data Merge Summary for ${monthYear.month}/${monthYear.year}:
-
-`;
-                summaryMsg += `âœ¨ NEW: ${comparison.new.length} employees
-`;
-                summaryMsg += `ðŸ”„ MODIFIED: ${comparison.modified.length} employees
-`;
-                summaryMsg += `âœ… UNCHANGED: ${comparison.unchanged.length} employees
-`;
-                
-                if (comparison.modified.length > 0) {
-                    summaryMsg += `
-Modified fields:
-`;
-                    comparison.modified.forEach(item => {
-                        summaryMsg += `
-  ${item.emp.name} (ID: ${item.emp.id}):
-`;
-                        item.differences.forEach(diff => {
-                            summaryMsg += `    â€¢ ${diff.field}: ${diff.oldValue} â†’ ${diff.newValue}
-`;
-                        });
+                // Build summary message\n                let summaryMsg = `ðŸ“Š Data Merge Summary for ${monthYear.month}/${monthYear.year}:\n\n`;\n                summaryMsg += `âœ¨ NEW: ${comparison.new.length} employees\n`;\n                summaryMsg += `ðŸ”„ MODIFIED: ${comparison.modified.length} employees\n`;\n                summaryMsg += `âœ… UNCHANGED: ${comparison.unchanged.length} employees
+`;\n                
+                if (comparison.modified.length > 0) {\n                    summaryMsg += `\nModified fields:
+`;\n                    comparison.modified.forEach(item => {\n                        summaryMsg += `\n  ${item.emp.name} (ID: ${item.emp.id}):
+`;\n                        item.differences.forEach(diff => {\n                            summaryMsg += `    â€¢ ${diff.field}: ${diff.oldValue} â†’ ${diff.newValue}
+`;\n                        });
                 }
                 
                 console.log(summaryMsg);
                 
-                // Show confirmation with changes
-                const proceed = confirm(summaryMsg + `
-
-Proceed to save all changes to Firestore?`);
-                
+                // Show confirmation with changes\n                const proceed = confirm(summaryMsg + `\n
+Proceed to save all changes to Firestore?`);\n                
                 if (!proceed) {
                     btn.textContent = 'â˜ï¸ Save to Cloud';
                     btn.disabled = false;
                     return;
                 }
-
                 // Save to Firestore with flat month-based organization
-                const monthId = `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`;
-                const reportId = `report_${monthId}_${Date.now()}`;
-                
+                const monthId = `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`;\n                const reportId = `report_${monthId}_${Date.now()}`;\n                
                 const reportData = {
                     reportId,
                     monthId,
@@ -2811,14 +2360,12 @@ Proceed to save all changes to Firestore?`);
                         year: monthYear.year,
                         monthId: monthId
                     };
-                    await saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}_${monthId}`, empData);
-                }
+                    await saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}_${monthId}`, empData);\n                }
                 
                 // Save change log separately for audit
                 await saveToFirestore(
                     AUDIT_COLLECTION,
-                    `audit_${monthId}_${Date.now()}`,
-                    {
+                    `audit_${monthId}_${Date.now()}`,\n                    {
                         timestamp: new Date(),
                         month: monthYear.month,
                         year: monthYear.year,
@@ -2828,13 +2375,8 @@ Proceed to save all changes to Firestore?`);
                         reportId: reportId
                     }
                 );
-                
-                alert(`âœ… Report saved successfully!
-
-${summaryMsg}
-
-Data saved to Firestore with full change history.`);
-                btn.textContent = 'â˜ï¸ Saved!';
+                \n                alert(`âœ… Report saved successfully!\n\n${summaryMsg}\n
+Data saved to Firestore with full change history.`);\n                btn.textContent = 'â˜ï¸ Saved!';
                 
                 // Refresh month dropdown to show new month if added
                 setTimeout(() => {
@@ -2849,7 +2391,6 @@ Data saved to Firestore with full change history.`);
                 console.error(error);
             }
         }
-
         function downloadFile(content, filename, type) {
             const blob = new Blob([content], { type });
             const url = window.URL.createObjectURL(blob);
@@ -2859,12 +2400,10 @@ Data saved to Firestore with full change history.`);
             a.click();
             window.URL.revokeObjectURL(url);
         }
-
         let currentEditingEmp = null;
         
         function enableEditMode(empId) {
-            const card = document.querySelector(`[data-id="${empId}"]`);
-            if (!card) return;
+            const card = document.querySelector(`[data-id="${empId}"]`);\n            if (!card) return;
             
             currentEditingEmp = empId;
             const emp = filteredData.find(e => e.id.toString() === empId.toString());
@@ -2889,16 +2428,8 @@ Data saved to Firestore with full change history.`);
             saveBtn.style.cssText = 'background: #16a34a; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.3rem; cursor: pointer; font-weight: 600; margin-left: auto;';
             saveBtn.onclick = () => saveEmployeeChanges(empId, card);
             header.appendChild(saveBtn);
-            
-            alert(`âœï¸ Edit mode ON for ${emp.name}
-
-Editable fields:
-â€¢ Hours
-â€¢ Late Minutes
-â€¢ Absences
-
-Click 'Save Changes' when done.`);
-        }
+            \n            alert(`âœï¸ Edit mode ON for ${emp.name}\n\nEditable fields:\nâ€¢ Hours\nâ€¢ Late Minutes\nâ€¢ Absences\n
+Click 'Save Changes' when done.`);\n        }
         
         async function saveEmployeeChanges(empId, card) {
             const emp = filteredData.find(e => e.id.toString() === empId.toString());
@@ -2943,8 +2474,7 @@ Click 'Save Changes' when done.`);
                     changes: changes,
                     month: monthYear.month,
                     year: monthYear.year,
-                    monthId: `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`
-                };
+                    monthId: `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`\n                };
                 
                 // Add to edit history
                 empData.edits.push({
@@ -2953,16 +2483,10 @@ Click 'Save Changes' when done.`);
                     changedBy: auth.currentUser?.email || 'anonymous'
                 });
                 
-                await saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}_${empData.monthId}`, empData);
-                
-                alert(`âœ… Changes saved for ${emp.name}!
-
-Modified fields:
-${changes.map(c => `â€¢ ${c.field}: ${c.oldValue} â†’ ${c.newValue}`).join('
-')}`);
+                await saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}_${empData.monthId}`, empData);\n                \n                alert(`âœ… Changes saved for ${emp.name}!\n\nModified fields:
+${changes.map(c => `â€¢ ${c.field}: ${c.oldValue} â†’ ${c.newValue}`).join('\n')}`);
             } else {
-                alert(`â„¹ï¸ No changes made to ${emp.name}`);
-            }
+                alert(`â„¹ï¸ No changes made to ${emp.name}`);\n            }
             
             currentEditingEmp = null;
         }
@@ -2973,10 +2497,8 @@ ${changes.map(c => `â€¢ ${c.field}: ${c.oldValue} â†’ ${c.newValue}`).j
                 alert('Please select at least one employee to print.');
                 return;
             }
-
             const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.getAttribute('data-id'));
             const selectedEmployees = filteredData.filter(emp => selectedIds.includes(emp.id.toString()));
-
             // Group employees by department
             const grouped = {};
             selectedEmployees.forEach(emp => {
@@ -2985,18 +2507,12 @@ ${changes.map(c => `â€¢ ${c.field}: ${c.oldValue} â†’ ${c.newValue}`).j
                 }
                 grouped[emp.dept].push(emp);
             });
-
             // Create print HTML with department grouping
             let printHTML = '<div id="print-container" style="display: none;">';
             
             for (const [dept, employees] of Object.entries(grouped)) {
-                // Add department header page
-                printHTML += `
-                    <div class="dept-header-page">
-                        <div class="dept-header-title">${dept}</div>
-                    </div>
-                `;
-                
+                // Add department header page\n                printHTML += `\n                    <div class="dept-header-page">\n                        <div class="dept-header-title">${dept}</div>\n                    </div>
+                `;\n                
                 // Add employee cards for this department
                 printHTML += '<div class="employees-grid">';
                 employees.forEach((emp) => {
@@ -3033,63 +2549,12 @@ ${changes.map(c => `â€¢ ${c.field}: ${c.oldValue} â†’ ${c.newValue}`).j
                         tier = 'Good';
                         tierAttr = 'good';
                     }
-                    
-                    printHTML += `
-                        <div class="employee-card" data-tier="${tierAttr}">
-                            <div class="employee-header">
-                                <div class="employee-info">
-                                    <div class="employee-name">${emp.name}</div>
-                                    <div class="employee-meta">
-                                        <span class="employee-dept">${emp.dept}</span>
-                                        <span class="employee-id">ID: ${emp.id}</span>
-                                    </div>
-                                </div>
-                                <div class="tier-badge">${tier}</div>
-                            </div>
-                            <div class="visual-metrics">
-                                <div class="metrics-line">
-                                    <div class="metric-card rate-card">
-                                        <div class="metric-card-title">Attendance</div>
-                                        <div class="metric-card-value">${attendancePercent.toFixed(0)}%</div>
-                                    </div>
-                                    <div class="metric-card punctuality-card">
-                                        <div class="metric-card-title">Punctuality</div>
-                                        <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
-                                    </div>
-                                    <div class="metric-card hours-card">
-                                        <div class="metric-card-title">Hours</div>
-                                        <div class="metric-card-value">${hoursNum.toFixed(2)}</div>
-                                        <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>
-                                        <div class="metric-card-sub">hrs</div>
-                                    </div>
-                                    <div class="metric-card late-card">
-                                        <div class="metric-card-title">Late Min</div>
-                                        <div class="metric-card-value">${emp.lateMin}</div>
-                                        <div class="metric-card-sub">min</div>
-                                    </div>
-                                    <div class="metric-card absence-card">
-                                        <div class="metric-card-title">Absences</div>
-                                        <div class="metric-card-value">${absences}</div>
-                                        <div class="metric-card-sub">days</div>
-                                    </div>
-                                    <div class="metric-card worked-card">
-                                        <div class="metric-card-title">Worked</div>
-                                        <div class="metric-card-value">${emp.daysWorked || '-'}</div>
-                                        <div class="metric-card-sub">days</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="daily-breakdown">
-                                ${renderDailyBreakdown(emp)}
-                            </div>
-                        </div>
-                    `;
-                });
+                    \n                    printHTML += `\n                        <div class="employee-card" data-tier="${tierAttr}">\n                            <div class="employee-header">\n                                <div class="employee-info">\n                                    <div class="employee-name">${emp.name}</div>\n                                    <div class="employee-meta">\n                                        <span class="employee-dept">${emp.dept}</span>\n                                        <span class="employee-id">ID: ${emp.id}</span>\n                                    </div>\n                                </div>\n                                <div class="tier-badge">${tier}</div>\n                            </div>\n                            <div class="visual-metrics">\n                                <div class="metrics-line">\n                                    <div class="metric-card rate-card">\n                                        <div class="metric-card-title">Attendance</div>\n                                        <div class="metric-card-value">${attendancePercent.toFixed(0)}%</div>\n                                    </div>\n                                    <div class="metric-card punctuality-card">\n                                        <div class="metric-card-title">Punctuality</div>\n                                        <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>\n                                    </div>\n                                    <div class="metric-card hours-card">\n                                        <div class="metric-card-title">Hours</div>\n                                        <div class="metric-card-value">${hoursNum.toFixed(2)}</div>\n                                        <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>\n                                        <div class="metric-card-sub">hrs</div>\n                                    </div>\n                                    <div class="metric-card late-card">\n                                        <div class="metric-card-title">Late Min</div>\n                                        <div class="metric-card-value">${emp.lateMin}</div>\n                                        <div class="metric-card-sub">min</div>\n                                    </div>\n                                    <div class="metric-card absence-card">\n                                        <div class="metric-card-title">Absences</div>\n                                        <div class="metric-card-value">${absences}</div>\n                                        <div class="metric-card-sub">days</div>\n                                    </div>\n                                    <div class="metric-card worked-card">\n                                        <div class="metric-card-title">Worked</div>\n                                        <div class="metric-card-value">${emp.daysWorked || '-'}</div>\n                                        <div class="metric-card-sub">days</div>\n                                    </div>\n                                </div>\n                            </div>\n                            <div class="daily-breakdown">\n                                ${renderDailyBreakdown(emp)}\n                            </div>\n                        </div>
+                    `;\n                });
                 printHTML += '</div>';
             }
             
             printHTML += '</div>';
-
             // Insert into DOM
             document.body.insertAdjacentHTML('beforeend', printHTML);
             
@@ -3107,7 +2572,6 @@ ${changes.map(c => `â€¢ ${c.field}: ${c.oldValue} â†’ ${c.newValue}`).j
                     el.style.display = 'none';
                 }
             });
-
             // Print
             setTimeout(() => {
                 window.print();
@@ -3122,7 +2586,6 @@ ${changes.map(c => `â€¢ ${c.field}: ${c.oldValue} â†’ ${c.newValue}`).j
                 });
             }, 100);
         }
-
         function processComplexData(data) {
             const employees = [];
             const titleCell = (data[0]?.[0] || '').toString().toLowerCase();
@@ -3138,7 +2601,6 @@ Detected Title:', titleCell);
                 dateRange.start = new Date(dateMatch[3], parseInt(dateMatch[1]) - 1, parseInt(dateMatch[2]));
                 dateRange.end = new Date(dateMatch[6], parseInt(dateMatch[4]) - 1, parseInt(dateMatch[5]));
             }
-
             if (titleCell.includes('attend. report')) {
                 console.log('Detected Format: Attend. Report');
                 const statsRow = data[6] || [];
@@ -3261,9 +2723,7 @@ Detected Title:', titleCell);
                                     hasMissedPunch: false
                                 };
                                 
-                                const times = cellContent.split(/[
-
-]+/).filter(t => t.trim() && /^\d{2}:\d{2}/.test(t.trim()));
+                                const times = cellContent.split(/[\n]+/).filter(t => t.trim() && /^\d{2}:\d{2}/.test(t.trim()));
                                 
                                 if (times.length === 0) {
                                     dayRecord.isMissed = true;
@@ -3419,7 +2879,6 @@ Detected Title:', titleCell);
                 alert('Could not detect employee data. Please ensure you are uploading a valid file.');
             }
         }
-
         function renderDashboard(data) {
             const totalEmp = data.length;
             const totalAbsences = data.reduce((a, c) => a + c.absences, 0);
@@ -3434,22 +2893,17 @@ Detected Title:', titleCell);
             document.getElementById('statAbsence').textContent = Math.round(totalAbsences);
             document.getElementById('statLate').textContent = Math.round(totalLateMin);
             document.getElementById('statAvg').textContent = avgAttendance + '%';
-            
-            console.log(`
-ðŸŽ¯ PUNCTUALITY CALCULATION DIAGNOSTICS:
-`);
-            
+            \n            console.log(`\nðŸŽ¯ PUNCTUALITY CALCULATION DIAGNOSTICS:
+`);\n            
             renderTable(data);
             updateCharts(data);
         }
-
         function renderTable(data) {
             if (data.length === 0) {
                 document.getElementById('tableBody').innerHTML = '<div style="text-align: center; color: #94a3b8; padding: 3rem 1.5rem; grid-column: 1/-1;">No matching employees.</div>';
                 return;
             }
             
-
             
             const cards = data.map((emp) => {
                 // Calculate metrics
@@ -3488,9 +2942,7 @@ Detected Title:', titleCell);
                     .filter(d => d !== null)
                     .join(', ') : 'N/A';
                 
-                console.log(`ðŸ“Š ${emp.name} (ID ${emp.id}):`);
-                console.log(`  daysWorked: ${daysWorked} | lateCount: ${lateCount} | lateDays: [${lateDays}] | Punctuality: ${punctualityPercent}%`);
-                
+                console.log(`ðŸ“Š ${emp.name} (ID ${emp.id}):`);\n                console.log(`  daysWorked: ${daysWorked} | lateCount: ${lateCount} | lateDays: [${lateDays}] | Punctuality: ${punctualityPercent}%`);\n                
                 // Determine performance tier
                 let tier = 'Excellent';
                 let tierColor = '#16a34a';
@@ -3516,81 +2968,16 @@ Detected Title:', titleCell);
                             break;
                         }
                     }
-                    streakInfo = currentStreak > 0 ? `${currentStreak} day streak` : '';
-                }
+                    streakInfo = currentStreak > 0 ? `${currentStreak} day streak` : '';\n                }
                 
                 let tierAttr = 'excellent';
                 if (absences > 3 || emp.lateMin > 200) tierAttr = 'critical';
                 else if (absences > 1 || emp.lateMin > 100) tierAttr = 'warning';
                 else if (absences > 0 || emp.lateMin > 0) tierAttr = 'good';
-                
-                return `
-                    <div class="employee-card" data-tier="${tierAttr}" data-id="${emp.id}">
-                        <div class="employee-header">
-                            <input type="checkbox" class="employee-checkbox" data-id="${emp.id}" style="margin-right: 0.5rem; width: 18px; height: 18px; cursor: pointer;">
-                            <div class="employee-info">
-                                <div class="employee-name">${emp.name}</div>
-                                <div class="employee-meta">
-                                    <span class="employee-dept">${emp.dept}</span>
-                                    <span class="employee-id">ID: ${emp.id}</span>
-                                </div>
-                            </div>
-                            <div class="tier-badge">${tier}</div>
-                            <button onclick="enableEditMode('${emp.id}')" style="background: #3b82f6; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 0.3rem; cursor: pointer; font-size: 0.8rem; margin-left: 0.5rem; font-weight: 600;">âœï¸ Edit</button>
-                        </div>
-                        
-                        <div class="visual-metrics">
-                            <!-- All 6 Metrics in Single Line -->
-                            <div class="metrics-line">
-                                <div class="metric-card rate-card">
-                                    <div class="metric-card-title">Attendance</div>
-                                    <div class="metric-card-value">${attendancePercent.toFixed(0)}%</div>
-                                </div>
-                                <div class="metric-card punctuality-card">
-                                    <div class="metric-card-title">Punctuality</div>
-                                    <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
-                                </div>
-                                <div class="metric-card hours-card">
-                                    <div class="metric-card-title">Hours</div>
-                                    <div class="metric-card-value">${hoursNum.toFixed(2)}</div>
-                                    <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>
-                                    <div class="metric-card-sub">hrs</div>
-                                </div>
-                                <div class="metric-card late-card">
-                                    <div class="metric-card-title">Late Min</div>
-                                    <div class="metric-card-value">${emp.lateMin}</div>
-                                    <div class="metric-card-sub">min</div>
-                                </div>
-                                <div class="metric-card absence-card">
-                                    <div class="metric-card-title">Absences</div>
-                                    <div class="metric-card-value">${absences}</div>
-                                    <div class="metric-card-sub">days</div>
-                                </div>
-                                <div class="metric-card worked-card">
-                                    <div class="metric-card-title">Worked</div>
-                                    <div class="metric-card-value">${emp.daysWorked || '-'}</div>
-                                    <div class="metric-card-sub">days</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="status-bar">
-                            <div class="status-left">
-                                <div class="status-tier" style="color: ${tierColor};">${tier}</div>
-                                <div class="status-streak">${streakInfo}</div>
-                            </div>
-                        </div>
-                        
-                        <div class="daily-breakdown">
-                            ${renderDailyBreakdown(emp)}
-                        </div>
-                    </div>
-                `;
-            }).join('');
+                \n                return `\n                    <div class="employee-card" data-tier="${tierAttr}" data-id="${emp.id}">\n                        <div class="employee-header">\n                            <input type="checkbox" class="employee-checkbox" data-id="${emp.id}" style="margin-right: 0.5rem; width: 18px; height: 18px; cursor: pointer;">\n                            <div class="employee-info">\n                                <div class="employee-name">${emp.name}</div>\n                                <div class="employee-meta">\n                                    <span class="employee-dept">${emp.dept}</span>\n                                    <span class="employee-id">ID: ${emp.id}</span>\n                                </div>\n                            </div>\n                            <div class="tier-badge">${tier}</div>\n                            <button onclick="enableEditMode('${emp.id}')" style="background: #3b82f6; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 0.3rem; cursor: pointer; font-size: 0.8rem; margin-left: 0.5rem; font-weight: 600;">âœï¸ Edit</button>\n                        </div>\n                        \n                        <div class="visual-metrics">\n                            <!-- All 6 Metrics in Single Line -->\n                            <div class="metrics-line">\n                                <div class="metric-card rate-card">\n                                    <div class="metric-card-title">Attendance</div>\n                                    <div class="metric-card-value">${attendancePercent.toFixed(0)}%</div>\n                                </div>\n                                <div class="metric-card punctuality-card">\n                                    <div class="metric-card-title">Punctuality</div>\n                                    <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>\n                                </div>\n                                <div class="metric-card hours-card">\n                                    <div class="metric-card-title">Hours</div>\n                                    <div class="metric-card-value">${hoursNum.toFixed(2)}</div>\n                                    <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>\n                                    <div class="metric-card-sub">hrs</div>\n                                </div>\n                                <div class="metric-card late-card">\n                                    <div class="metric-card-title">Late Min</div>\n                                    <div class="metric-card-value">${emp.lateMin}</div>\n                                    <div class="metric-card-sub">min</div>\n                                </div>\n                                <div class="metric-card absence-card">\n                                    <div class="metric-card-title">Absences</div>\n                                    <div class="metric-card-value">${absences}</div>\n                                    <div class="metric-card-sub">days</div>\n                                </div>\n                                <div class="metric-card worked-card">\n                                    <div class="metric-card-title">Worked</div>\n                                    <div class="metric-card-value">${emp.daysWorked || '-'}</div>\n                                    <div class="metric-card-sub">days</div>\n                                </div>\n                            </div>\n                        </div>\n                        \n                        <div class="status-bar">\n                            <div class="status-left">\n                                <div class="status-tier" style="color: ${tierColor};">${tier}</div>\n                                <div class="status-streak">${streakInfo}</div>\n                            </div>\n                        </div>\n                        \n                        <div class="daily-breakdown">\n                            ${renderDailyBreakdown(emp)}\n                        </div>\n                    </div>
+                `;\n            }).join('');
             
-
             document.getElementById('tableBody').innerHTML = cards;
-
             
             // Attach real-time edit listeners to all employee cards
             const allCards = document.querySelectorAll('.employee-card');
@@ -3610,8 +2997,7 @@ Detected Title:', titleCell);
             const period = hours >= 12 ? 'PM' : 'AM';
             hours = hours % 12 || 12;
             
-            return `${hours}:${mins} ${period}`;
-        }
+            return `${hours}:${mins} ${period}`;\n        }
         
         function parseTime(timeInput) {
             // Convert 12-hour or 24-hour format to 24-hour HH:MM
@@ -3634,56 +3020,45 @@ Detected Title:', titleCell);
             }
             
             // Format as HH:MM
-            return `${String(hours).padStart(2, '0')}:${mins}`;
-        }
-
+            return `${String(hours).padStart(2, '0')}:${mins}`;\n        }
         // ========== SHIFT TIME ADJUSTMENT ==========
         function timeToMinutes(timeStr) {
             if (!timeStr) return 0;
             const [h, m] = timeStr.split(':').map(Number);
             return h * 60 + (m || 0);
         }
-
         function minutesToTime(minutes) {
             const h = Math.floor(minutes / 60) % 24;
             const m = minutes % 60;
-            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-        }
-
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;\n        }
         function adjustTimeForShift(actualTimeStr, shiftKey, isClockOut) {
             // Returns { displayTime, actualTime, wasAdjusted, adjustedReason }
             if (!actualTimeStr || !shiftKey || !shiftDefinitions[shiftKey]) {
                 return { displayTime: actualTimeStr, actualTime: actualTimeStr, wasAdjusted: false };
             }
-
             const shift = shiftDefinitions[shiftKey];
             const bufferMinutes = 10;
             const actualMinutes = timeToMinutes(actualTimeStr);
             const shiftStartMinutes = timeToMinutes(shift.start);
             const shiftEndMinutes = timeToMinutes(shift.end);
-
             let displayMinutes = actualMinutes;
             let wasAdjusted = false;
             let adjustedReason = '';
-
             if (isClockOut) {
                 // Clock out: if more than 10 mins after shift end, lock to (shift end + 10 mins)
                 const maxAllowedMinutes = shiftEndMinutes + bufferMinutes;
                 if (actualMinutes > maxAllowedMinutes) {
                     displayMinutes = maxAllowedMinutes;
                     wasAdjusted = true;
-                    adjustedReason = `Beyond allowed 10-min buffer after shift end`;
-                }
+                    adjustedReason = `Beyond allowed 10-min buffer after shift end`;\n                }
             } else {
                 // Clock in: if more than 10 mins before shift start, lock to (shift start - 10 mins)
                 const minAllowedMinutes = shiftStartMinutes - bufferMinutes;
                 if (actualMinutes < minAllowedMinutes) {
                     displayMinutes = minAllowedMinutes;
                     wasAdjusted = true;
-                    adjustedReason = `Beyond allowed 10-min buffer before shift start`;
-                }
+                    adjustedReason = `Beyond allowed 10-min buffer before shift start`;\n                }
             }
-
             return {
                 displayTime: minutesToTime(displayMinutes),
                 actualTime: actualTimeStr,
@@ -3691,33 +3066,24 @@ Detected Title:', titleCell);
                 adjustedReason
             };
         }
-
         function formatTimeWithShiftAdjustment(actualIn, actualOut, shiftKey) {
             // Format punch pair with shift adjustment and actual times in parenthesis
             if (!actualIn && !actualOut) return 'â€”';
             
             const adjustedIn = adjustTimeForShift(actualIn, shiftKey, false);
             const adjustedOut = adjustTimeForShift(actualOut, shiftKey, true);
-
             let inDisplay = formatTime(adjustedIn.displayTime);
             let outDisplay = formatTime(adjustedOut.displayTime);
-
             // Add actual times in parenthesis if adjusted
             if (adjustedIn.wasAdjusted) {
-                inDisplay += ` (actual: ${formatTime(adjustedIn.actualTime)})`;
-            }
+                inDisplay += ` (actual: ${formatTime(adjustedIn.actualTime)})`;\n            }
             if (adjustedOut.wasAdjusted) {
-                outDisplay += ` (actual: ${formatTime(adjustedOut.actualTime)})`;
-            }
-
-            return `${inDisplay} â†’ ${outDisplay || '(missing)'}`;
-        }
+                outDisplay += ` (actual: ${formatTime(adjustedOut.actualTime)})`;\n            }
+            return `${inDisplay} â†’ ${outDisplay || '(missing)'}`;\n        }
         
-
         function renderDailyBreakdown(emp) {
             if (!emp.dailyBreakdown) {
-                return `<div style="padding: 0.2rem; color: #64748b; font-size: 0.6rem; text-align: center;">No data</div>`;
-            }
+                return `<div style="padding: 0.2rem; color: #64748b; font-size: 0.6rem; text-align: center;">No data</div>`;\n            }
             
             const lateDates = emp.dailyBreakdown.filter(d => d.lateMin > 0).length;
             const missedPunchDates = emp.dailyBreakdown.filter(d => d.hasMissedPunch).length;
@@ -3741,81 +3107,27 @@ Detected Title:', titleCell);
                     rowBorder = 'border-left: 3px solid #dc2626;';
                 }
                 
-                const rowStyle = `line-height: 1.2; background-color: ${rowColor}; ${rowBorder}`;
-                
+                const rowStyle = `line-height: 1.2; background-color: ${rowColor}; ${rowBorder}`;\n                
                 // If no punch pairs, show placeholder
-                if (hasNoPunches) {
-                    return `
-                        <tr style="${rowStyle}">
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};"><strong>${day.date}</strong></td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};"><strong>${day.dayName}</strong></td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;" colspan="2">â€”</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">â€”</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">â€”</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};">
-                                <button onclick="openDayEditModal('${emp.id}', ${dayIdx})" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.7rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit punch times">âœŽ</button>
-                            </td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">âŒ</td>
-                        </tr>
-                    `;
-                }
+                if (hasNoPunches) {\n                    return `\n                        <tr style="${rowStyle}">\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};"><strong>${day.date}</strong></td>\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};"><strong>${day.dayName}</strong></td>\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;" colspan="2">â€”</td>\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">â€”</td>\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">â€”</td>\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};">\n                                <button onclick="openDayEditModal('${emp.id}', ${dayIdx})" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.7rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit punch times">âœŽ</button>\n                            </td>\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">âŒ</td>\n                        </tr>
+                    `;\n                }
                 
                 // Build rows for each punch pair
                 return day.punchPairs.map((pair, pairIdx) => {
                     const adjustedIn = adjustTimeForShift(pair.in, emp.shift, false);
                     const adjustedOut = adjustTimeForShift(pair.out, emp.shift, true);
-                    const inDisplay = `${formatTime(adjustedIn.displayTime)}${adjustedIn.wasAdjusted ? `<br><span style="font-size: 0.45rem; color: #e74c3c; font-weight: 600;" title="${adjustedIn.adjustedReason}">(actual: ${formatTime(adjustedIn.actualTime)})</span>` : ''}`;
-                    const outDisplay = `${formatTime(adjustedOut.displayTime)}${adjustedOut.wasAdjusted ? `<br><span style="font-size: 0.45rem; color: #e74c3c; font-weight: 600;" title="${adjustedOut.adjustedReason}">(actual: ${formatTime(adjustedOut.actualTime)})</span>` : ''}`;
-                    
-                    return `
-                    <tr style="${rowStyle}">
-                        ${pairIdx === 0 ? `
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.date}</strong></td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.dayName}</strong></td>
-                        ` : ''}
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${inDisplay}</td>
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${outDisplay}</td>
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times" data-hours-cell="true" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : 'â€”'}</td>
-                        ${pairIdx === 0 ? `
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; font-weight: ${day.lateMin > 0 ? '700' : '400'}; color: ${day.lateMin > 0 ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>
+                    const inDisplay = `${formatTime(adjustedIn.displayTime)}${adjustedIn.wasAdjusted ? `<br><span style="font-size: 0.45rem; color: #e74c3c; font-weight: 600;" title="${adjustedIn.adjustedReason}">(actual: ${formatTime(adjustedIn.actualTime)})</span>` : ''}`;\n                    const outDisplay = `${formatTime(adjustedOut.displayTime)}${adjustedOut.wasAdjusted ? `<br><span style="font-size: 0.45rem; color: #e74c3c; font-weight: 600;" title="${adjustedOut.adjustedReason}">(actual: ${formatTime(adjustedOut.actualTime)})</span>` : ''}`;\n                    \n                    return `\n                    <tr style="${rowStyle}">
+                        ${pairIdx === 0 ? `\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.date}</strong></td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.dayName}</strong></td>\n                        ` : ''}\n                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${inDisplay}</td>\n                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${outDisplay}</td>\n                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times" data-hours-cell="true" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : 'â€”'}</td>
+                        ${pairIdx === 0 ? `\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; font-weight: ${day.lateMin > 0 ? '700' : '400'}; color: ${day.lateMin > 0 ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">
                                 <button onclick="openDayEditModal('${emp.id}', ${dayIdx})" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.7rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit punch times">âœŽ</button>
                             </td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">${day.isMissed ? 'âŒ' : (day.hasMissedPunch ? 'âš ï¸' : 'âœ…')}</td>
-                        ` : ''}
-                    </tr>
-                `;
-                }).join('');
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">${day.isMissed ? 'âŒ' : (day.hasMissedPunch ? 'âš ï¸' : 'âœ…')}</td>\n                        ` : ''}\n                    </tr>
+                `;\n                }).join('');
             }).join('');
-            
-            return `
-                <div style="padding: 0.2rem; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 0.2rem;">
-                    <div style="padding: 0 0.2rem;">
-                        <div style="font-size: 0.55rem; color: #64748b;">
-                            <strong>Format:</strong> 9:30 AM or 09:30 | <strong style="color: #f3f4f6; background: #e0e0e0; padding: 0.1rem 0.3rem; border-radius: 2px;">No Punches (Gray)</strong> | <strong style="color: #dc2626; background: #fee2e2; padding: 0.1rem 0.3rem; border-radius: 2px;">Late (Red)</strong> | <strong style="background: white; padding: 0.1rem 0.3rem; border: 1px solid #e2e8f0; border-radius: 2px;">On-time (White)</strong>
-                        </div>
-                    </div>
-                    <!-- DAILY TABLE WITH PUNCH TIMES (Edit via modal button) -->
-                    <table style="width: 100%; font-size: 0.6rem; border-collapse: collapse; font-family: monospace; line-height: 1;">
-                        <thead>
-                            <tr style="background: #e2e8f0;">
-                                <th style="padding: 0.15rem 0.2rem; text-align: left; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Date</th>
-                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Day</th>
-                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #fef08a;">IN</th>
-                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #fef08a;">OUT</th>
-                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #dbeafe;">Hrs</th>
-                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Late</th>
-                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Edit</th>
-                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">S</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${tableRows}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
+            \n            return `\n                <div style="padding: 0.2rem; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 0.2rem;">\n                    <div style="padding: 0 0.2rem;">\n                        <div style="font-size: 0.55rem; color: #64748b;">\n                            <strong>Format:</strong> 9:30 AM or 09:30 | <strong style="color: #f3f4f6; background: #e0e0e0; padding: 0.1rem 0.3rem; border-radius: 2px;">No Punches (Gray)</strong> | <strong style="color: #dc2626; background: #fee2e2; padding: 0.1rem 0.3rem; border-radius: 2px;">Late (Red)</strong> | <strong style="background: white; padding: 0.1rem 0.3rem; border: 1px solid #e2e8f0; border-radius: 2px;">On-time (White)</strong>\n                        </div>\n                    </div>\n                    <!-- DAILY TABLE WITH PUNCH TIMES (Edit via modal button) -->\n                    <table style="width: 100%; font-size: 0.6rem; border-collapse: collapse; font-family: monospace; line-height: 1;">\n                        <thead>\n                            <tr style="background: #e2e8f0;">\n                                <th style="padding: 0.15rem 0.2rem; text-align: left; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Date</th>\n                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Day</th>\n                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #fef08a;">IN</th>\n                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #fef08a;">OUT</th>\n                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #dbeafe;">Hrs</th>\n                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Late</th>\n                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Edit</th>\n                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">S</th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            ${tableRows}\n                        </tbody>\n                    </table>\n                </div>
+            `;\n        }
         
         
         async function saveEmployeeChanges(empId) {
@@ -3826,8 +3138,7 @@ Detected Title:', titleCell);
             }
             
             try {
-                console.log(`ðŸ’¾ Saving changes for ${emp.name}...`);
-                
+                console.log(`ðŸ’¾ Saving changes for ${emp.name}...`);\n                
                 // Get the currently selected month from the dropdown
                 const currentMonth = document.getElementById('monthSelector').value;
                 if (!currentMonth) {
@@ -3839,14 +3150,11 @@ Detected Title:', titleCell);
                 emp.editHistory = cellEditHistory;
                 
                 // Update Firestore with the modified employee data
-                const docId = `emp_${emp.id}_${currentMonth}`;
-                await saveToFirestore(EMPLOYEES_COLLECTION, docId, emp);
+                const docId = `emp_${emp.id}_${currentMonth}`;\n                await saveToFirestore(EMPLOYEES_COLLECTION, docId, emp);
                 
-                console.log(`âœ… Saved to Firestore: ${docId}`);
-                
+                console.log(`âœ… Saved to Firestore: ${docId}`);\n                
                 // Re-calculate and update card metrics immediately
-                const card = document.querySelector(`.employee-card[data-id="${String(empId)}"]`);
-                if (card) {
+                const card = document.querySelector(`.employee-card[data-id="${String(empId)}"]`);\n                if (card) {
                     updateCardDisplay(emp, card);
                     
                     // Re-render the daily breakdown
@@ -3858,17 +3166,12 @@ Detected Title:', titleCell);
                     // Visual feedback
                     card.style.borderColor = '#10b981';
                     setTimeout(() => { card.style.borderColor = '#e2e8f0'; }, 2000);
-                    
-                    alert(`âœ… Changes saved for ${emp.name}!
-
-Metrics updated live.`);
-                } else {
-                    alert(`âœ… Changes saved for ${emp.name}!`);
-                }
+                    \n                    alert(`âœ… Changes saved for ${emp.name}!\n
+Metrics updated live.`);\n                } else {
+                    alert(`âœ… Changes saved for ${emp.name}!`);\n                }
             } catch (error) {
                 console.error('âŒ Error saving employee changes:', error);
-                alert(`âŒ Error saving changes: ${error.message}`);
-            }
+                alert(`âŒ Error saving changes: ${error.message}`);\n            }
         }
         
         
@@ -3888,70 +3191,17 @@ Metrics updated live.`);
                 // Parse existing time values
                 const [inHour, inMin] = pair.in ? pair.in.split(':') : ['', ''];
                 const [outHour, outMin] = pair.out ? pair.out.split(':') : ['', ''];
-                
-                return `
-                    <div style="margin-bottom: 20px; padding: 16px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 6px;">
-                        <div style="font-weight: 700; color: #1e293b; font-size: 1.05rem; margin-bottom: 16px;">Pair ${pairIdx + 1}</div>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                            <div>
-                                <label style="display: block; font-size: 0.8rem; color: #475569; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">IN Time</label>
-                                <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">
-                                    <input type="number" min="0" max="23" class="modal-punch-in-hour-${pairIdx}" value="${inHour}" 
-                                        placeholder="HH" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #0369a1; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
-                                    <span style="color: #1e293b; font-weight: bold; font-size: 1.3rem;">:</span>
-                                    <input type="number" min="0" max="59" class="modal-punch-in-min-${pairIdx}" value="${inMin}" 
-                                        placeholder="MM" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #0369a1; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <label style="display: block; font-size: 0.8rem; color: #475569; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">OUT Time</label>
-                                <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">
-                                    <input type="number" min="0" max="23" class="modal-punch-out-hour-${pairIdx}" value="${outHour}" 
-                                        placeholder="HH" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #dc2626; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
-                                    <span style="color: #1e293b; font-weight: bold; font-size: 1.3rem;">:</span>
-                                    <input type="number" min="0" max="59" class="modal-punch-out-min-${pairIdx}" value="${outMin}" 
-                                        placeholder="MM" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #dc2626; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+                \n                return `\n                    <div style="margin-bottom: 20px; padding: 16px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 6px;">\n                        <div style="font-weight: 700; color: #1e293b; font-size: 1.05rem; margin-bottom: 16px;">Pair ${pairIdx + 1}</div>\n                        \n                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">\n                            <div>\n                                <label style="display: block; font-size: 0.8rem; color: #475569; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">IN Time</label>\n                                <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">\n                                    <input type="number" min="0" max="23" class="modal-punch-in-hour-${pairIdx}" value="${inHour}" \n                                        placeholder="HH" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #0369a1; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">\n                                    <span style="color: #1e293b; font-weight: bold; font-size: 1.3rem;">:</span>\n                                    <input type="number" min="0" max="59" class="modal-punch-in-min-${pairIdx}" value="${inMin}" \n                                        placeholder="MM" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #0369a1; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">\n                                </div>\n                            </div>\n                            \n                            <div>\n                                <label style="display: block; font-size: 0.8rem; color: #475569; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">OUT Time</label>\n                                <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">\n                                    <input type="number" min="0" max="23" class="modal-punch-out-hour-${pairIdx}" value="${outHour}" \n                                        placeholder="HH" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #dc2626; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">\n                                    <span style="color: #1e293b; font-weight: bold; font-size: 1.3rem;">:</span>\n                                    <input type="number" min="0" max="59" class="modal-punch-out-min-${pairIdx}" value="${outMin}" \n                                        placeholder="MM" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #dc2626; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">\n                                </div>\n                            </div>\n                        </div>\n                    </div>
+                `;\n            }).join('');
             
             const editHistoryHtml = buildModalEditHistory(emp, dayIdx);
-            
-            const modalHtml = `
-                <div id="dayEditModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 16px;" onclick="if(event.target.id === 'dayEditModal') closeDayEditModal()">
-                    <div style="background: white; border-radius: 8px; padding: 20px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);" onclick="event.stopPropagation()">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; gap: 12px;">
-                            <h2 style="margin: 0; color: #1e293b; font-size: 1.2rem; line-height: 1.3;">${emp.name}<br><span style="font-size: 0.95rem; color: #64748b; font-weight: 400;">${day.date} (${day.dayName})</span></h2>
-                            <button onclick="closeDayEditModal()" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #94a3b8; padding: 0; min-width: 40px;">âœ•</button>
-                        </div>
-                        
-                        <div style="margin-bottom: 24px;">
-                            <h3 style="margin: 0 0 16px 0; color: #475569; font-size: 1.05rem; font-weight: 700;">Punch Times</h3>
-                            ${emp.shift && shiftDefinitions[emp.shift] ? `
-                                <div style="padding: 12px; background: #e0f2fe; border-left: 4px solid #0369a1; border-radius: 4px; margin-bottom: 16px; font-size: 0.9rem;">
+            \n            const modalHtml = `\n                <div id="dayEditModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 16px;" onclick="if(event.target.id === 'dayEditModal') closeDayEditModal()">\n                    <div style="background: white; border-radius: 8px; padding: 20px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);" onclick="event.stopPropagation()">\n                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; gap: 12px;">\n                            <h2 style="margin: 0; color: #1e293b; font-size: 1.2rem; line-height: 1.3;">${emp.name}<br><span style="font-size: 0.95rem; color: #64748b; font-weight: 400;">${day.date} (${day.dayName})</span></h2>\n                            <button onclick="closeDayEditModal()" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #94a3b8; padding: 0; min-width: 40px;">âœ•</button>\n                        </div>\n                        \n                        <div style="margin-bottom: 24px;">\n                            <h3 style="margin: 0 0 16px 0; color: #475569; font-size: 1.05rem; font-weight: 700;">Punch Times</h3>
+                            ${emp.shift && shiftDefinitions[emp.shift] ? `\n                                <div style="padding: 12px; background: #e0f2fe; border-left: 4px solid #0369a1; border-radius: 4px; margin-bottom: 16px; font-size: 0.9rem;">
                                     <strong>ðŸ“… Shift: ${emp.shift.toUpperCase()}</strong> 
                                     ${formatTime(shiftDefinitions[emp.shift].start)} - ${formatTime(shiftDefinitions[emp.shift].end)}
                                     <br><span style="font-size: 0.85rem; color: #475569;">â³ Times beyond Â±10 min buffer will auto-lock to shift boundary</span>
-                                </div>
-                            ` : ''}
-                            ${pairRows}
-                        </div>
-                        
-                        ${editHistoryHtml}
-                        
-                        <div style="display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; flex-wrap: wrap;">
-                            <button onclick="closeDayEditModal()" style="padding: 12px 24px; background: #e2e8f0; color: #1e293b; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1rem;">Cancel</button>
-                            <button onclick="saveDayPunchTimes('${empId}', ${dayIdx})" style="padding: 12px 24px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1rem;">ðŸ’¾ Save</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
+                                </div>\n                            ` : ''}\n                            ${pairRows}\n                        </div>\n                        \n                        ${editHistoryHtml}\n                        \n                        <div style="display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; flex-wrap: wrap;">\n                            <button onclick="closeDayEditModal()" style="padding: 12px 24px; background: #e2e8f0; color: #1e293b; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1rem;">Cancel</button>\n                            <button onclick="saveDayPunchTimes('${empId}', ${dayIdx})" style="padding: 12px 24px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1rem;">ðŸ’¾ Save</button>\n                        </div>\n                    </div>\n                </div>
+            `;\n            
             document.body.insertAdjacentHTML('beforeend', modalHtml);
             
             // Add ESC key support
@@ -3970,8 +3220,7 @@ Metrics updated live.`);
             
             // Collect all edits for this day
             Object.keys(cellEditHistory).forEach(key => {
-                if (key.startsWith(`${emp.id}_${dayIdx}_`)) {
-                    const edits = cellEditHistory[key];
+                if (key.startsWith(`${emp.id}_${dayIdx}_`)) {\n                    const edits = cellEditHistory[key];
                     edits.forEach(edit => {
                         historyEntries.push({
                             timestamp: edit.timestamp,
@@ -3984,8 +3233,7 @@ Metrics updated live.`);
             historyEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             
             if (historyEntries.length === 0) {
-                return `<div style="padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; color: #94a3b8; font-size: 0.85rem; text-align: center;">No edit history for this day</div>`;
-            }
+                return `<div style="padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; color: #94a3b8; font-size: 0.85rem; text-align: center;">No edit history for this day</div>`;\n            }
             
             const historyHtml = historyEntries.slice(0, 10).map((edit, idx) => {
                 const timestamp = new Date(edit.timestamp);
@@ -3999,39 +3247,16 @@ Metrics updated live.`);
                     const days = Math.floor(diff / 86400000);
                     
                     if (minutes < 1) timeDisplay = 'Just now';
-                    else if (minutes < 60) timeDisplay = `${minutes}m ago`;
-                    else if (hours < 24) timeDisplay = `${hours}h ago`;
-                    else if (days < 7) timeDisplay = `${days}d ago`;
-                    else timeDisplay = timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    else if (minutes < 60) timeDisplay = `${minutes}m ago`;\n                    else if (hours < 24) timeDisplay = `${hours}h ago`;\n                    else if (days < 7) timeDisplay = `${days}d ago`;\n                    else timeDisplay = timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                 }
                 
                 // Handle fieldType - may be 'in', 'out', or extracted from key
                 const fieldType = edit.fieldType || 'edit';
                 const fieldDisplay = fieldType.toUpperCase();
-                
-                return `
-                    <div style="padding: 8px; background: white; border: 1px solid #e2e8f0; border-radius: 3px; margin-bottom: 6px;">
-                        <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">
-                            <strong>${fieldDisplay}</strong> â€¢ ${timeDisplay}
-                        </div>
-                        <div style="display: flex; gap: 6px; font-family: monospace; font-size: 0.8rem;">
-                            <span style="color: #b45309; background: #fffbeb; padding: 2px 4px; border-radius: 2px;">${edit.original || '(empty)'}</span>
-                            <span style="color: #cbd5e1;">â†’</span>
-                            <span style="color: #059669; background: #ecfdf5; padding: 2px 4px; border-radius: 2px;">${edit.newValue}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            return `
-                <div>
-                    <h3 style="margin: 0 0 12px 0; color: #475569; font-size: 1rem;">Edit History (${historyEntries.length} ${historyEntries.length === 1 ? 'edit' : 'edits'})</h3>
-                    <div style="background: #f1f5f9; padding: 12px; border-radius: 4px;">
-                        ${historyHtml}
-                    </div>
-                </div>
-            `;
-        }
+                \n                return `\n                    <div style="padding: 8px; background: white; border: 1px solid #e2e8f0; border-radius: 3px; margin-bottom: 6px;">\n                        <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">\n                            <strong>${fieldDisplay}</strong> â€¢ ${timeDisplay}\n                        </div>\n                        <div style="display: flex; gap: 6px; font-family: monospace; font-size: 0.8rem;">\n                            <span style="color: #b45309; background: #fffbeb; padding: 2px 4px; border-radius: 2px;">${edit.original || '(empty)'}</span>\n                            <span style="color: #cbd5e1;">â†’</span>\n                            <span style="color: #059669; background: #ecfdf5; padding: 2px 4px; border-radius: 2px;">${edit.newValue}</span>\n                        </div>\n                    </div>
+                `;\n            }).join('');
+            \n            return `\n                <div>\n                    <h3 style="margin: 0 0 12px 0; color: #475569; font-size: 1rem;">Edit History (${historyEntries.length} ${historyEntries.length === 1 ? 'edit' : 'edits'})</h3>\n                    <div style="background: #f1f5f9; padding: 12px; border-radius: 4px;">\n                        ${historyHtml}\n                    </div>\n                </div>
+            `;\n        }
         
         // Save punch times from modal
         function saveDayPunchTimes(empId, dayIdx) {
@@ -4047,17 +3272,12 @@ Metrics updated live.`);
             // Collect and validate all inputs from number fields
             const updates = [];
             for (let pairIdx = 0; pairIdx < pairCount; pairIdx++) {
-                let inHour = document.querySelector(`.modal-punch-in-hour-${pairIdx}`).value;
-                let inMin = document.querySelector(`.modal-punch-in-min-${pairIdx}`).value;
-                let outHour = document.querySelector(`.modal-punch-out-hour-${pairIdx}`).value;
-                let outMin = document.querySelector(`.modal-punch-out-min-${pairIdx}`).value;
-                
+                let inHour = document.querySelector(`.modal-punch-in-hour-${pairIdx}`).value;\n                let inMin = document.querySelector(`.modal-punch-in-min-${pairIdx}`).value;\n                let outHour = document.querySelector(`.modal-punch-out-hour-${pairIdx}`).value;\n                let outMin = document.querySelector(`.modal-punch-out-min-${pairIdx}`).value;\n                
                 // Validate and format numbers
                 if (inHour) {
                     const h = parseInt(inHour);
                     if (isNaN(h) || h < 0 || h > 23) {
-                        alert(`âŒ Invalid IN hour for Pair ${pairIdx + 1}. Must be 0-23.`);
-                        return;
+                        alert(`âŒ Invalid IN hour for Pair ${pairIdx + 1}. Must be 0-23.`);\n                        return;
                     }
                     inHour = String(h).padStart(2, '0');
                 }
@@ -4065,8 +3285,7 @@ Metrics updated live.`);
                 if (inMin) {
                     const m = parseInt(inMin);
                     if (isNaN(m) || m < 0 || m > 59) {
-                        alert(`âŒ Invalid IN minute for Pair ${pairIdx + 1}. Must be 0-59.`);
-                        return;
+                        alert(`âŒ Invalid IN minute for Pair ${pairIdx + 1}. Must be 0-59.`);\n                        return;
                     }
                     inMin = String(m).padStart(2, '0');
                 }
@@ -4074,8 +3293,7 @@ Metrics updated live.`);
                 if (outHour) {
                     const h = parseInt(outHour);
                     if (isNaN(h) || h < 0 || h > 23) {
-                        alert(`âŒ Invalid OUT hour for Pair ${pairIdx + 1}. Must be 0-23.`);
-                        return;
+                        alert(`âŒ Invalid OUT hour for Pair ${pairIdx + 1}. Must be 0-23.`);\n                        return;
                     }
                     outHour = String(h).padStart(2, '0');
                 }
@@ -4083,16 +3301,13 @@ Metrics updated live.`);
                 if (outMin) {
                     const m = parseInt(outMin);
                     if (isNaN(m) || m < 0 || m > 59) {
-                        alert(`âŒ Invalid OUT minute for Pair ${pairIdx + 1}. Must be 0-59.`);
-                        return;
+                        alert(`âŒ Invalid OUT minute for Pair ${pairIdx + 1}. Must be 0-59.`);\n                        return;
                     }
                     outMin = String(m).padStart(2, '0');
                 }
                 
                 // Build time strings
-                const inTime = (inHour && inMin) ? `${inHour}:${inMin}` : '';
-                const outTime = (outHour && outMin) ? `${outHour}:${outMin}` : '';
-                
+                const inTime = (inHour && inMin) ? `${inHour}:${inMin}` : '';\n                const outTime = (outHour && outMin) ? `${outHour}:${outMin}` : '';\n                
                 if (inTime || outTime) {
                     updates.push({
                         pairIdx: pairIdx,
@@ -4138,20 +3353,15 @@ Metrics updated live.`);
             
             // Save to Firestore
             emp.editHistory = cellEditHistory;
-            saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}`, emp).then(() => {
-                console.log(`âœ… Saved punch times for ${emp.name} to Firestore`);
-            }).catch(err => {
-                console.error(`âŒ Failed to save to Firestore:`, err);
-                alert(`âš ï¸ Changes saved locally but failed to sync to server. Please try again.`);
-            });
+            saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}`, emp).then(() => {\n                console.log(`âœ… Saved punch times for ${emp.name} to Firestore`);\n            }).catch(err => {
+                console.error(`âŒ Failed to save to Firestore:`, err);\n                alert(`âš ï¸ Changes saved locally but failed to sync to server. Please try again.`);\n            });
             
             closeDayEditModal();
         }
         
         // Record punch edit with timestamp
         function recordPunchEdit(empId, dayIdx, pairIdx, fieldType, original, newValue) {
-            const historyKey = `${empId}_${dayIdx}_${pairIdx}_${fieldType}`;
-            if (!cellEditHistory[historyKey]) {
+            const historyKey = `${empId}_${dayIdx}_${pairIdx}_${fieldType}`;\n            if (!cellEditHistory[historyKey]) {
                 cellEditHistory[historyKey] = [];
             }
             cellEditHistory[historyKey].push({
@@ -4193,9 +3403,7 @@ Metrics updated live.`);
                 });
             }
             
-            emp.hours = `${totalHours.toFixed(2)} hrs`;
-            emp.late = `${totalLateMin} min`;
-        }
+            emp.hours = `${totalHours.toFixed(2)} hrs`;\n            emp.late = `${totalLateMin} min`;\n        }
         
         // Close day edit modal
         function closeDayEditModal() {
@@ -4212,17 +3420,8 @@ Metrics updated live.`);
             const display = cell.querySelector('.punch-display');
             const currentValue = display.textContent.trim() === 'â€”' ? '' : display.textContent.trim();
             
-            // Replace with editable input
-            cell.innerHTML = `
-                <input type="text" class="punch-edit-input" value="${currentValue}" 
-                    style="width: 100%; padding: 2px 4px; font-size: 0.6rem; border: 2px solid #8b5cf6; border-radius: 3px; text-align: center;" 
-                    placeholder="9:30 AM" onkeydown="if(event.key==='Enter') savePunchTime(this); if(event.key==='Escape') cancelEdit(this)">
-                <div style="display: flex; gap: 2px; margin-top: 4px; justify-content: center;">
-                    <button onclick="savePunchTime(this)" style="padding: 2px 6px; background: #10b981; color: white; border: none; border-radius: 2px; font-size: 0.5rem; cursor: pointer; font-weight: bold;">âœ“ Save</button>
-                    <button onclick="cancelEdit(this)" style="padding: 2px 6px; background: #ef4444; color: white; border: none; border-radius: 2px; font-size: 0.5rem; cursor: pointer; font-weight: bold;">âœ• Cancel</button>
-                </div>
-            `;
-            
+            // Replace with editable input\n            cell.innerHTML = `\n                <input type="text" class="punch-edit-input" value="${currentValue}" \n                    style="width: 100%; padding: 2px 4px; font-size: 0.6rem; border: 2px solid #8b5cf6; border-radius: 3px; text-align: center;" \n                    placeholder="9:30 AM" onkeydown="if(event.key==='Enter') savePunchTime(this); if(event.key==='Escape') cancelEdit(this)">\n                <div style="display: flex; gap: 2px; margin-top: 4px; justify-content: center;">\n                    <button onclick="savePunchTime(this)" style="padding: 2px 6px; background: #10b981; color: white; border: none; border-radius: 2px; font-size: 0.5rem; cursor: pointer; font-weight: bold;">âœ“ Save</button>\n                    <button onclick="cancelEdit(this)" style="padding: 2px 6px; background: #ef4444; color: white; border: none; border-radius: 2px; font-size: 0.5rem; cursor: pointer; font-weight: bold;">âœ• Cancel</button>\n                </div>
+            `;\n            
             // Focus and select input
             const input = cell.querySelector('.punch-edit-input');
             input.focus();
@@ -4286,43 +3485,26 @@ Accepted formats:\
             const pair = day.punchPairs[pairIdx];
             const value = type === 'in' ? pair.in : pair.out;
             const display = formatTime(value) || 'â€”';
-            
-            cell.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
-                    <span class="punch-display">${display}</span>
-                    <button class="punch-edit-btn" onclick="enterEditMode(this)" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.5rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit ${type} time">âœï¸</button>
-                </div>
-            `;
-        }
-
+            \n            cell.innerHTML = `\n                <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">\n                    <span class="punch-display">${display}</span>\n                    <button class="punch-edit-btn" onclick="enterEditMode(this)" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.5rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit ${type} time">âœï¸</button>\n                </div>
+            `;\n        }
         function updatePunchTime(cell, type, parsedTime) {
             const empId = parseInt(cell.dataset.empId);
             const dayIdx = parseInt(cell.dataset.dayIdx);
             const pairIdx = parseInt(cell.dataset.pairIdx);
             const newTime = parsedTime;
-            
-            console.log(`
-âœˆï¸ UPDATE PUNCH TIME CALLED`);
-            console.log(`   Type: ${type}, empId: ${empId}, dayIdx: ${dayIdx}, pairIdx: ${pairIdx}`);
-            console.log(`   New value: '${newTime}'`);
-            
+            \n            console.log(`
+âœˆï¸ UPDATE PUNCH TIME CALLED`);\n            console.log(`   Type: ${type}, empId: ${empId}, dayIdx: ${dayIdx}, pairIdx: ${pairIdx}`);\n            console.log(`   New value: '${newTime}'`);\n            
             const emp = filteredData.find(e => e.id == empId);  // Use == for string/number compatibility
-            console.log(`   Looking for empId=${empId} in filteredData (${filteredData.length} employees)`);
-            console.log(`   Found: ${emp ? 'YES' : 'NO'}`);
-            
+            console.log(`   Looking for empId=${empId} in filteredData (${filteredData.length} employees)`);\n            console.log(`   Found: ${emp ? 'YES' : 'NO'}`);\n            
             if (!emp) {
-                console.error(`âŒ Employee not found in filteredData`);
-                return;
+                console.error(`âŒ Employee not found in filteredData`);\n                return;
             }
             
             if (!emp.dailyBreakdown) {
-                console.error(`âŒ Employee found but no dailyBreakdown property`);
-                console.log(`   Employee object keys:`, Object.keys(emp));
-                return;
+                console.error(`âŒ Employee found but no dailyBreakdown property`);\n                console.log(`   Employee object keys:`, Object.keys(emp));\n                return;
             }
             
-            console.log(`âœ… Employee found with ${emp.dailyBreakdown.length} days`);
-            
+            console.log(`âœ… Employee found with ${emp.dailyBreakdown.length} days`);\n            
             const day = emp.dailyBreakdown[dayIdx];
             
             // If this is a "No punches" day, create the first punch pair
@@ -4334,8 +3516,7 @@ Accepted formats:\
             
             // Store original value for edit history
             const originalValue = type === 'in' ? pair.in : pair.out;
-            const historyKey = `${empId}_${dayIdx}_${pairIdx}_${type}`;
-            
+            const historyKey = `${empId}_${dayIdx}_${pairIdx}_${type}`;\n            
             if (!cellEditHistory[historyKey]) {
                 cellEditHistory[historyKey] = [];
             }
@@ -4348,8 +3529,7 @@ Accepted formats:\
                 editCount: cellEditHistory[historyKey].length + 1
             });
             
-            console.log(`   ðŸ“ Edit recorded: ${originalValue || 'â€”'} â†’ ${newTime}`);
-            
+            console.log(`   ðŸ“ Edit recorded: ${originalValue || 'â€”'} â†’ ${newTime}`);\n            
             if (type === 'in') {
                 pair.in = newTime;
             } else {
@@ -4376,8 +3556,7 @@ Accepted formats:\
                 pair.pairHours = 0;
             }
             
-            console.log(`   Updated pair[${pairIdx}].pairHours = ${pair.pairHours}`);
-            let dayTotalMinutes = 0;
+            console.log(`   Updated pair[${pairIdx}].pairHours = ${pair.pairHours}`);\n            let dayTotalMinutes = 0;
             day.punchPairs.forEach(p => {
                 if (p.in && p.out) {
                     const inParts = p.in.split(':').map(Number);
@@ -4422,52 +3601,37 @@ Accepted formats:\
             emp.hours = newHours + ' hrs';
             emp.lateMin = Math.round(totalLateMinutes);
             
-            console.log(`   Recalculated total hours: ${emp.hours}, late: ${emp.lateMin} min`);
-            
+            console.log(`   Recalculated total hours: ${emp.hours}, late: ${emp.lateMin} min`);\n            
             // Update display instantly
-            const card = document.querySelector(`.employee-card[data-id="${String(empId)}"]`);
-            console.log(`   Card found: ${card ? 'YES' : 'NO'}`);
-            
+            const card = document.querySelector(`.employee-card[data-id="${String(empId)}"]`);\n            console.log(`   Card found: ${card ? 'YES' : 'NO'}`);\n            
             if (card) {
-                console.log(`   Calling updateCardDisplay...`);
-                updateCardDisplay(emp, card);
+                console.log(`   Calling updateCardDisplay...`);\n                updateCardDisplay(emp, card);
                 
                 // Update the hours cell in the table immediately
-                console.log(`   ðŸ” Looking for hours cell - dayIdx=${dayIdx}, pairIdx=${pairIdx}`);
-                const breakdownDiv = card.querySelector('.daily-breakdown');
-                console.log(`   âž¡ï¸ Breakdown div found: ${breakdownDiv ? 'YES' : 'NO'}`);
-                
+                console.log(`   ðŸ” Looking for hours cell - dayIdx=${dayIdx}, pairIdx=${pairIdx}`);\n                const breakdownDiv = card.querySelector('.daily-breakdown');
+                console.log(`   âž¡ï¸ Breakdown div found: ${breakdownDiv ? 'YES' : 'NO'}`);\n                
                 if (breakdownDiv) {
                     // First, check what elements exist
                     const allTds = breakdownDiv.querySelectorAll('td');
-                    console.log(`   âž¡ï¸ Total TD elements in breakdown: ${allTds.length}`);
-                    
+                    console.log(`   âž¡ï¸ Total TD elements in breakdown: ${allTds.length}`);\n                    
                     const hoursCells = breakdownDiv.querySelectorAll('[data-hours-cell="true"]');
-                    console.log(`   âž¡ï¸ Hours cells with data-hours-cell="true": ${hoursCells.length}`);
-                    
+                    console.log(`   âž¡ï¸ Hours cells with data-hours-cell="true": ${hoursCells.length}`);\n                    
                     // Try the selector
-                    const selector = `[data-hours-cell="true"][data-day-idx="${dayIdx}"][data-pair-idx="${pairIdx}"]`;
-                    console.log(`   âž¡ï¸ Using selector: ${selector}`);
-                    const hoursCell = breakdownDiv.querySelector(selector);
-                    console.log(`   âž¡ï¸ Hours cell found: ${hoursCell ? 'YES' : 'NO'}`);
-                    
+                    const selector = `[data-hours-cell="true"][data-day-idx="${dayIdx}"][data-pair-idx="${pairIdx}"]`;\n                    console.log(`   âž¡ï¸ Using selector: ${selector}`);\n                    const hoursCell = breakdownDiv.querySelector(selector);
+                    console.log(`   âž¡ï¸ Hours cell found: ${hoursCell ? 'YES' : 'NO'}`);\n                    
                     if (hoursCell) {
                         hoursCell.textContent = parseFloat(pair.pairHours).toFixed(2);
-                        console.log(`   âœï¸ Updated hours cell for day ${dayIdx}, pair ${pairIdx} to ${pair.pairHours}`);
-                    } else {
+                        console.log(`   âœï¸ Updated hours cell for day ${dayIdx}, pair ${pairIdx} to ${pair.pairHours}`);\n                    } else {
                         // If not found, try logging the first few cells to see what attributes they have
-                        console.log(`   ðŸ”Ž Sample hours cell attributes:`);
-                        hoursCells.forEach((cell, idx) => {
+                        console.log(`   ðŸ”Ž Sample hours cell attributes:`);\n                        hoursCells.forEach((cell, idx) => {
                             if (idx < 3) {
-                                console.log(`      Cell ${idx}: data-day-idx="${cell.dataset.dayIdx}" data-pair-idx="${cell.dataset.pairIdx}"`);
-                            }
+                                console.log(`      Cell ${idx}: data-day-idx="${cell.dataset.dayIdx}" data-pair-idx="${cell.dataset.pairIdx}"`);\n                            }
                         });
                     }
                 }
             }
             
-            console.log(`âœ… Updated ${type} time for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newTime}, Late: ${pairIdx === 0 ? day.lateMin : 'N/A'} min`);
-            
+            console.log(`âœ… Updated ${type} time for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newTime}, Late: ${pairIdx === 0 ? day.lateMin : 'N/A'} min`);\n            
             // Add "EDITED" badge to the cell (subtle indicator)
             const editCount = cellEditHistory[historyKey].length;
             
@@ -4478,25 +3642,8 @@ Accepted formats:\
             // Create subtle badge
             const badge = document.createElement('span');
             badge.className = 'edit-badge';
-            badge.textContent = 'âœŽ';
-            badge.title = `Edited ${editCount} time${editCount > 1 ? 's' : ''} - Click to view history`;
-            badge.style.cssText = `
-                position: absolute;
-                top: 1px;
-                right: 2px;
-                background: transparent;
-                color: #8b5cf6;
-                font-size: 0.7rem;
-                padding: 0;
-                border-radius: 50%;
-                cursor: help;
-                font-weight: bold;
-                white-space: nowrap;
-                z-index: 500;
-                opacity: 0.7;
-                transition: all 0.2s ease;
-            `;
-            
+            badge.textContent = 'âœŽ';\n            badge.title = `Edited ${editCount} time${editCount > 1 ? 's' : ''} - Click to view history`;\n            badge.style.cssText = `\n                position: absolute;\n                top: 1px;\n                right: 2px;\n                background: transparent;\n                color: #8b5cf6;\n                font-size: 0.7rem;\n                padding: 0;\n                border-radius: 50%;\n                cursor: help;\n                font-weight: bold;\n                white-space: nowrap;\n                z-index: 500;\n                opacity: 0.7;\n                transition: all 0.2s ease;
+            `;\n            
             // Hover effect
             badge.onmouseover = () => { badge.style.opacity = '1'; badge.style.color = '#a78bfa'; };
             badge.onmouseout = () => { badge.style.opacity = '0.7'; badge.style.color = '#8b5cf6'; };
@@ -4520,16 +3667,10 @@ Accepted formats:\
             
             const edits = cellEditHistory[historyKey] || [];
             
-            // Build clean tooltip content
-            let content = `
-                <div style="margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
-                    <div style="font-weight: 600; color: #0f172a; font-size: 0.85rem;">Edit History</div>
-                    <div style="font-size: 0.7rem; color: #64748b; margin-top: 2px;">${empName} â€¢ ${fieldType.toUpperCase()} edits</div>
-                </div>`;
-            
+            // Build clean tooltip content\n            let content = `\n                <div style="margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">\n                    <div style="font-weight: 600; color: #0f172a; font-size: 0.85rem;">Edit History</div>\n                    <div style="font-size: 0.7rem; color: #64748b; margin-top: 2px;">${empName} â€¢ ${fieldType.toUpperCase()} edits</div>
+                </div>`;\n            
             if (edits.length === 0) {
-                content += `<div style="color: #94a3b8; font-size: 0.75rem; font-style: italic;">No edits recorded</div>`;
-            } else {
+                content += `<div style="color: #94a3b8; font-size: 0.75rem; font-style: italic;">No edits recorded</div>`;\n            } else {
                 edits.forEach((edit, idx) => {
                     const timestamp = new Date(edit.timestamp);
                     const isValidDate = !isNaN(timestamp.getTime());
@@ -4543,50 +3684,22 @@ Accepted formats:\
                         const days = Math.floor(diff / 86400000);
                         
                         if (minutes < 1) timeDisplay = 'Just now';
-                        else if (minutes < 60) timeDisplay = `${minutes}m ago`;
-                        else if (hours < 24) timeDisplay = `${hours}h ago`;
-                        else if (days < 7) timeDisplay = `${days}d ago`;
-                        else {
+                        else if (minutes < 60) timeDisplay = `${minutes}m ago`;\n                        else if (hours < 24) timeDisplay = `${hours}h ago`;\n                        else if (days < 7) timeDisplay = `${days}d ago`;\n                        else {
                             const dateStr = timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                             timeDisplay = dateStr;
                         }
                     }
                     
                     const originalDisplay = edit.original ? edit.original : '(empty)';
-                    
-                    content += `
-                        <div style="margin: 10px 0; padding: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 0.75rem;">
-                            <div style="color: #64748b; margin-bottom: 6px; font-weight: 500; font-size: 0.7rem;">Edit ${idx + 1} â€¢ ${timeDisplay}</div>
-                            <div style="display: flex; align-items: center; gap: 8px; font-family: 'Courier New', monospace; font-weight: 500;">
-                                <span style="color: #b45309; background: #fffbeb; padding: 3px 6px; border-radius: 2px; flex-shrink: 0;">${originalDisplay}</span>
-                                <span style="color: #cbd5e1; font-size: 0.8rem;">â†’</span>
-                                <span style="color: #059669; background: #ecfdf5; padding: 3px 6px; border-radius: 2px; flex-shrink: 0;">${edit.newValue}</span>
-                            </div>
-                        </div>
-                    `;
-                });
+                    \n                    content += `\n                        <div style="margin: 10px 0; padding: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 0.75rem;">\n                            <div style="color: #64748b; margin-bottom: 6px; font-weight: 500; font-size: 0.7rem;">Edit ${idx + 1} â€¢ ${timeDisplay}</div>\n                            <div style="display: flex; align-items: center; gap: 8px; font-family: 'Courier New', monospace; font-weight: 500;">\n                                <span style="color: #b45309; background: #fffbeb; padding: 3px 6px; border-radius: 2px; flex-shrink: 0;">${originalDisplay}</span>\n                                <span style="color: #cbd5e1; font-size: 0.8rem;">â†’</span>\n                                <span style="color: #059669; background: #ecfdf5; padding: 3px 6px; border-radius: 2px; flex-shrink: 0;">${edit.newValue}</span>\n                            </div>\n                        </div>
+                    `;\n                });
             }
             
             // Create tooltip element
             const tooltip = document.createElement('div');
             tooltip.className = 'edit-history-tooltip';
-            tooltip.innerHTML = content;
-            tooltip.style.cssText = `
-                position: fixed;
-                background: white;
-                border: 1px solid #cbd5e1;
-                border-radius: 6px;
-                padding: 14px;
-                font-size: 0.8rem;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-                z-index: 10000;
-                max-width: 380px;
-                max-height: 500px;
-                overflow-y: auto;
-                animation: slideIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-                pointer-events: auto;
-            `;
-            
+            tooltip.innerHTML = content;\n            tooltip.style.cssText = `\n                position: fixed;\n                background: white;\n                border: 1px solid #cbd5e1;\n                border-radius: 6px;\n                padding: 14px;\n                font-size: 0.8rem;\n                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);\n                z-index: 10000;\n                max-width: 380px;\n                max-height: 500px;\n                overflow-y: auto;\n                animation: slideIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);\n                pointer-events: auto;
+            `;\n            
             document.body.appendChild(tooltip);
             
             // Position tooltip near the badge
@@ -4641,18 +3754,8 @@ Accepted formats:\
         // Add animation styles
         if (!document.querySelector('style[data-edit-history]')) {
             const style = document.createElement('style');
-            style.setAttribute('data-edit-history', 'true');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { opacity: 0; transform: translateY(-5px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                @keyframes slideOut {
-                    from { opacity: 1; transform: translateY(0); }
-                    to { opacity: 0; transform: translateY(-5px); }
-                }
-            `;
-            document.head.appendChild(style);
+            style.setAttribute('data-edit-history', 'true');\n            style.textContent = `\n                @keyframes slideIn {\n                    from { opacity: 0; transform: translateY(-5px); }\n                    to { opacity: 1; transform: translateY(0); }\n                }\n                @keyframes slideOut {\n                    from { opacity: 1; transform: translateY(0); }\n                    to { opacity: 0; transform: translateY(-5px); }\n                }
+            `;\n            document.head.appendChild(style);
         }
         
         // Attach event listeners for real-time editing
@@ -4660,8 +3763,7 @@ Accepted formats:\
             // The onblur handlers are already in the HTML, so we don't need to do anything
             // Just verify they're there
             const punchCells = card.querySelectorAll('[contenteditable="true"]');
-            console.log(`ðŸ”— Found ${punchCells.length} editable punch cells with onblur handlers`);
-        }
+            console.log(`ðŸ”— Found ${punchCells.length} editable punch cells with onblur handlers`);\n        }
         
         function updateCardDisplay(emp, card) {
             // Recalculate metrics
@@ -4676,23 +3778,17 @@ Accepted formats:\
             const punctualityPercent = daysWorked > 0 ? Math.max(0, 100 - (lateCount / daysWorked * 100)).toFixed(0) : '-';
             const absences = Math.max(0, dateRange.actualDays - daysWorked);
             
-            console.log(`   ðŸ“Š updateCardDisplay for ${emp.name}:`);
-            console.log(`      emp.hours="${emp.hours}" â†’ hoursNum=${hoursNum}`);
-            
+            console.log(`   ðŸ“Š updateCardDisplay for ${emp.name}:`);\n            console.log(`      emp.hours="${emp.hours}" â†’ hoursNum=${hoursNum}`);\n            
             // Update metric cards in the HTML
             const metrics = card.querySelectorAll('.metric-card-value');
-            console.log(`      Found ${metrics.length} metric-card-value elements`);
-            if (metrics && metrics.length >= 3) {
-                console.log(`      BEFORE: metric[2]="${metrics[2].textContent}"`);
-                metrics[0].textContent = attendancePercent.toFixed(0) + '%'; // Attendance
+            console.log(`      Found ${metrics.length} metric-card-value elements`);\n            if (metrics && metrics.length >= 3) {
+                console.log(`      BEFORE: metric[2]="${metrics[2].textContent}"`);\n                metrics[0].textContent = attendancePercent.toFixed(0) + '%'; // Attendance
                 metrics[1].textContent = punctualityPercent + (punctualityPercent !== '-' ? '%' : ''); // Punctuality
                 metrics[2].textContent = hoursNum.toFixed(2); // Hours
                 if (metrics.length > 3) metrics[3].textContent = (emp.lateMin || 0); // Late Min
                 if (metrics.length > 4) metrics[4].textContent = absences; // Absences
                 if (metrics.length > 5) metrics[5].textContent = daysWorked; // Worked
-                console.log(`      AFTER: metric[2]="${metrics[2].textContent}"`);
-                console.log(`      âœ… Updated metric cards`);
-            } else {
+                console.log(`      AFTER: metric[2]="${metrics[2].textContent}"`);\n                console.log(`      âœ… Updated metric cards`);\n            } else {
                 console.log(`      âš ï¸ Not enough metrics found (need 3+, found ${metrics.length})`);
             }
         }
@@ -4794,7 +3890,6 @@ Accepted formats:\
                 }
             });
         }
-
         searchBox.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             const results = rawData.filter(d => d.name.toLowerCase().includes(term) || d.id.toString().includes(term));
@@ -4808,4 +3903,3 @@ Accepted formats:\
     </script>
 </body>
 </html>
-
