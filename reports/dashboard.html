@@ -1020,7 +1020,7 @@
                 // Build daily breakdown HTML if available
                 let dailyBreakdownHtml = '';
                 if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
-                    dailyBreakdownHtml = renderDailyBreakdown(emp);
+                    dailyBreakdownHtml = `<div class="daily-breakdown">${renderDailyBreakdown(emp)}</div>`;
                 }
                 
                 // Create card with metrics AND daily breakdown
