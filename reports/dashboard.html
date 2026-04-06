@@ -1600,24 +1600,19 @@
                         
                         // Fill in missing days as absent if actualDays is higher than data provided
                         // This ensures the complete month is shown even if Excel only has partial days
-                        if (dailyBreakdown.length < dateRange.actualDays) {
-                            console.log(`  📅 Filling missing days: Current breakdown has ${dailyBreakdown.length} days, but month has ${dateRange.actualDays} days`);
-                            for (let dayIndex = dailyBreakdown.length; dayIndex < dateRange.actualDays; dayIndex++) {
-                                const dayNum = dayIndex + 1;
-                                const dayDate = new Date(dateRange.start);
-                                dayDate.setDate(dayDate.getDate() + dayIndex);
-                                const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayDate.getDay()];
-                                
-                                const dayRecord = {
-                                    dayNum, dayName, inTime: '-', outTime: '-', allTimes: [], punchPairs: [], hours: 0, lateMin: 0, isMissed: true, hasMissedPunch: false, date: dayDate.toISOString().split('T')[0]
-                                };
-                                dailyBreakdown.push(dayRecord);
-                                missedDays++;
-                                console.log(`    Added missing day ${dayNum} (${dayDate.toISOString().split('T')[0]})`);
-                            }
-                            console.log(`  ✓ Filled in ${dateRange.actualDays - (dailyBreakdown.length - (dateRange.actualDays - dailyBreakdown.length))} missing days for ${name}`);
-                        } else {
-                            console.log(`  ✓ ${name}: Daily breakdown complete (${dailyBreakdown.length} days = ${dateRange.actualDays} days)`);
+                        const targetDays = dateRange.actualDays || 31;
+                        while (dailyBreakdown.length < targetDays) {
+                            const dayIndex = dailyBreakdown.length;
+                            const dayNum = dayIndex + 1;
+                            const dayDate = new Date(dateRange.start);
+                            dayDate.setDate(dayDate.getDate() + dayIndex);
+                            const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayDate.getDay()];
+                            
+                            const dayRecord = {
+                                dayNum, dayName, inTime: '-', outTime: '-', allTimes: [], punchPairs: [], hours: 0, lateMin: 0, isMissed: true, hasMissedPunch: false, date: dayDate.toISOString().split('T')[0]
+                            };
+                            dailyBreakdown.push(dayRecord);
+                            missedDays++;
                         }
                         
                         employees.push({
@@ -3035,20 +3030,20 @@
                                 dailyBreakdown.push(dayRecord);
                             }
                             
-                            // Fill in missing days as absent if actualDays is higher than data provided
-                            if (dailyBreakdown.length < dateRange.actualDays) {
-                                for (let dayIndex = dailyBreakdown.length; dayIndex < dateRange.actualDays; dayIndex++) {
-                                    const dayNum = dayIndex + 1;
-                                    const dayDate = new Date(dateRange.start);
-                                    dayDate.setDate(dayDate.getDate() + dayIndex);
-                                    const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayDate.getDay()];
-                                    
-                                    const dayRecord = {
-                                        dayNum, dayName, inTime: '-', outTime: '-', allTimes: [], punchPairs: [], hours: 0, lateMin: 0, isMissed: true, hasMissedPunch: false, date: dayDate.toISOString().split('T')[0]
-                                    };
-                                    dailyBreakdown.push(dayRecord);
-                                    missedDays++;
-                                }
+                            // Fill in missing days as absent to ensure complete month
+                            const targetDays = dateRange.actualDays || 31;
+                            while (dailyBreakdown.length < targetDays) {
+                                const dayIndex = dailyBreakdown.length;
+                                const dayNum = dayIndex + 1;
+                                const dayDate = new Date(dateRange.start);
+                                dayDate.setDate(dayDate.getDate() + dayIndex);
+                                const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayDate.getDay()];
+                                
+                                const dayRecord = {
+                                    dayNum, dayName, inTime: '-', outTime: '-', allTimes: [], punchPairs: [], hours: 0, lateMin: 0, isMissed: true, hasMissedPunch: false, date: dayDate.toISOString().split('T')[0]
+                                };
+                                dailyBreakdown.push(dayRecord);
+                                missedDays++;
                             }
                             
                             const totalHours = (totalMinutes / 60).toFixed(2);
