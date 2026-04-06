@@ -3573,18 +3573,6 @@
             }
             
             console.log(`   Updated pair[${pairIdx}].pairHours = ${pair.pairHours}`);
-            
-            // Update the hours cell in the table immediately
-            const breakdownDiv = card.querySelector('.daily-breakdown');
-            if (breakdownDiv) {
-                const hoursCell = breakdownDiv.querySelector(`[data-hours-cell="true"][data-day-idx="${dayIdx}"][data-pair-idx="${pairIdx}"]`);
-                if (hoursCell) {
-                    hoursCell.textContent = parseFloat(pair.pairHours).toFixed(2);
-                    console.log(`   ✏️ Updated hours cell for day ${dayIdx}, pair ${pairIdx} to ${pair.pairHours}`);
-                } else {
-                    console.log(`   ⚠️ Could not find hours cell for day ${dayIdx}, pair ${pairIdx}`);
-                }
-            }
             let dayTotalMinutes = 0;
             day.punchPairs.forEach(p => {
                 if (p.in && p.out) {
@@ -3639,6 +3627,16 @@
             if (card) {
                 console.log(`   Calling updateCardDisplay...`);
                 updateCardDisplay(emp, card);
+                
+                // Update the hours cell in the table immediately
+                const breakdownDiv = card.querySelector('.daily-breakdown');
+                if (breakdownDiv) {
+                    const hoursCell = breakdownDiv.querySelector(`[data-hours-cell="true"][data-day-idx="${dayIdx}"][data-pair-idx="${pairIdx}"]`);
+                    if (hoursCell) {
+                        hoursCell.textContent = parseFloat(pair.pairHours).toFixed(2);
+                        console.log(`   ✏️ Updated hours cell for day ${dayIdx}, pair ${pairIdx} to ${pair.pairHours}`);
+                    }
+                }
             }
             
             console.log(`✅ Updated ${type} time for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newTime}, Late: ${pairIdx === 0 ? day.lateMin : 'N/A'} min`);
