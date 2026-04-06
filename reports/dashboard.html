@@ -3385,7 +3385,7 @@
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};"><strong>${day.dayName}</strong></td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-is-new="true" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" placeholder="9:30 AM" title="Click to add IN time (e.g., 9:30 AM or 09:30)">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-is-new="true" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" placeholder="5:30 PM" title="Click to add OUT time (e.g., 5:30 PM or 17:30)">—</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">—</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" data-hours-cell="true">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">❌</td>
                         </tr>
@@ -3401,7 +3401,7 @@
                         ` : ''}
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" title="Edit IN time (e.g., 9:30 AM or 09:30)">${formatTime(pair.in)}</td>
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" title="Edit OUT time (e.g., 5:30 PM or 17:30)">${formatTime(pair.out)}</td>
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : '—'}</td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times" data-hours-cell="true">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : '—'}</td>
                         ${pairIdx === 0 ? `
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; font-weight: ${day.lateMin > 0 ? '700' : '400'}; color: ${day.lateMin > 0 ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">${day.isMissed ? '❌' : (day.hasMissedPunch ? '⚠️' : '✅')}</td>
@@ -3615,18 +3615,48 @@
                 const newCell = cell.cloneNode(true);
                 cell.parentNode.replaceChild(newCell, cell);
                 
-                // Add input listener for instant updates
-                newCell.addEventListener('input', debounce((event) => {
-                    // Quick validation as user types
+                // Add input listener for LIVE hour calculation as they type
+                newCell.addEventListener('input', (event) => {
                     const userInput = event.target.textContent.trim();
-                    if (userInput && userInput !== '—' && userInput.length > 0) {
-                        // Only call full update if it looks like a valid time format
-                        const type = event.target.classList.contains('editable-punch-in') ? 'in' : 'out';
-                        updatePunchTime(event, type);
+                    const type = event.target.classList.contains('editable-punch-in') ? 'in' : 'out';
+                    
+                    // Find the same row's IN and OUT cells
+                    const row = event.target.closest('tr');
+                    if (!row) return;
+                    
+                    const inCell = row.querySelector('.editable-punch-in');
+                    const outCell = row.querySelector('.editable-punch-out');
+                    const hoursCell = row.querySelector('[data-hours-cell="true"]');
+                    
+                    if (!inCell || !outCell || !hoursCell) return;
+                    
+                    // Parse both times to attempt live calculation
+                    const inTime = parseTime(inCell.textContent.trim());
+                    const outTime = parseTime(outCell.textContent.trim());
+                    
+                    // If both times are valid, show live calculation
+                    if (inTime && outTime && inTime !== '—' && outTime !== '—') {
+                        const inParts = inTime.split(':').map(Number);
+                        const outParts = outTime.split(':').map(Number);
+                        const inMinutes = inParts[0] * 60 + inParts[1];
+                        const outMinutes = outParts[0] * 60 + outParts[1];
+                        
+                        let diffMinutes = outMinutes - inMinutes;
+                        if (diffMinutes < 0) diffMinutes += 24 * 60;
+                        
+                        const hours = (diffMinutes / 60).toFixed(2);
+                        hoursCell.textContent = hours;
+                        hoursCell.style.background = '#dbeafe';
+                        hoursCell.style.fontWeight = '700';
+                        hoursCell.style.color = '#0369a1';
+                    } else {
+                        hoursCell.textContent = '—';
+                        hoursCell.style.background = '#dbeafe';
+                        hoursCell.style.fontWeight = '400';
                     }
-                }, 300));
+                });
                 
-                // Also keep blur for final validation
+                // Also keep blur for final validation and full data update
                 newCell.addEventListener('blur', (event) => {
                     const type = event.target.classList.contains('editable-punch-in') ? 'in' : 'out';
                     updatePunchTime(event, type);
