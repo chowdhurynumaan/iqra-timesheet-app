@@ -1092,6 +1092,7 @@
         let currentWorkbook = null;
         let allSheetData = {};
         let dateRange = { start: null, end: null, actualDays: 0 };
+        let cellEditHistory = {}; // Tracks edit history: key = "empId_dayIdx_pairIdx_type", value = array of edits
 
         // Safety check for file input existence
         if (!fileInput) {
@@ -3546,6 +3547,24 @@
             
             const pair = day.punchPairs[pairIdx];
             
+            // Store original value for edit history
+            const originalValue = type === 'in' ? pair.in : pair.out;
+            const historyKey = `${empId}_${dayIdx}_${pairIdx}_${type}`;
+            
+            if (!cellEditHistory[historyKey]) {
+                cellEditHistory[historyKey] = [];
+            }
+            
+            // Record the edit
+            cellEditHistory[historyKey].push({
+                original: originalValue,
+                newValue: newTime,
+                timestamp: new Date(),
+                editCount: cellEditHistory[historyKey].length + 1
+            });
+            
+            console.log(`   📝 Edit recorded: ${originalValue || '—'} → ${newTime}`);
+            
             if (type === 'in') {
                 pair.in = newTime;
             } else {
@@ -3663,6 +3682,121 @@
             }
             
             console.log(`✅ Updated ${type} time for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newTime}, Late: ${pairIdx === 0 ? day.lateMin : 'N/A'} min`);
+            
+            // Add "EDITED" badge to the cell
+            const historyKey = `${empId}_${dayIdx}_${pairIdx}_${type}`;
+            const editCount = cellEditHistory[historyKey].length;
+            
+            // Remove old badge if it exists
+            const oldBadge = event.target.querySelector('.edit-badge');
+            if (oldBadge) oldBadge.remove();
+            
+            // Create and add new badge
+            const badge = document.createElement('span');
+            badge.className = 'edit-badge';
+            badge.textContent = `EDITED (${editCount})`;
+            badge.style.cssText = `
+                position: absolute;
+                top: -8px;
+                right: -8px;
+                background: #ef4444;
+                color: white;
+                font-size: 0.5rem;
+                padding: 2px 4px;
+                border-radius: 3px;
+                cursor: pointer;
+                font-weight: bold;
+                white-space: nowrap;
+                z-index: 1000;
+            `;
+            
+            // Make the cell position relative so badge positions correctly
+            event.target.style.position = 'relative';
+            event.target.appendChild(badge);
+            
+            // Attach click handler to show history tooltip
+            badge.onclick = (e) => {
+                e.stopPropagation();
+                showEditHistoryTooltip(event.target, historyKey, emp.name, type, dayIdx);
+            };
+        }
+        
+        // Show edit history in a tooltip
+        function showEditHistoryTooltip(cellElement, historyKey, empName, fieldType, dayNum) {
+            // Remove any existing tooltips
+            const existingTooltip = document.querySelector('.edit-history-tooltip');
+            if (existingTooltip) existingTooltip.remove();
+            
+            const edits = cellEditHistory[historyKey] || [];
+            
+            // Build tooltip content
+            let content = `<div style="font-weight: bold; margin-bottom: 8px; color: #1e293b;">📋 Edit History - ${empName}</div>`;
+            content += `<div style="font-size: 0.7rem; color: #64748b; margin-bottom: 8px;">${fieldType.toUpperCase()} time edits</div>`;
+            
+            edits.forEach((edit, idx) => {
+                const timestamp = new Date(edit.timestamp);
+                const timeStr = timestamp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const dateStr = timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                
+                const originalDisplay = edit.original ? edit.original : '—';
+                
+                content += `
+                    <div style="margin: 8px 0; padding: 6px; background: #f1f5f9; border-radius: 3px; font-size: 0.75rem;">
+                        <div style="color: #64748b; margin-bottom: 3px;">Edit ${idx + 1} @ ${timeStr} (${dateStr})</div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="color: #dc2626; font-weight: bold;">${originalDisplay}</span>
+                            <span style="color: #64748b;">→</span>
+                            <span style="color: #16a34a; font-weight: bold;">${edit.newValue}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Create tooltip element
+            const tooltip = document.createElement('div');
+            tooltip.className = 'edit-history-tooltip';
+            tooltip.innerHTML = content;
+            tooltip.style.cssText = `
+                position: fixed;
+                background: white;
+                border: 2px solid #3b82f6;
+                border-radius: 6px;
+                padding: 12px;
+                font-size: 0.8rem;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+                z-index: 10000;
+                max-width: 320px;
+                max-height: 400px;
+                overflow-y: auto;
+            `;
+            
+            document.body.appendChild(tooltip);
+            
+            // Position tooltip near the badge
+            const rect = cellElement.getBoundingClientRect();
+            tooltip.style.left = (rect.right + 10) + 'px';
+            tooltip.style.top = rect.top + 'px';
+            
+            // Adjust if tooltip goes off-screen
+            setTimeout(() => {
+                const tooltipRect = tooltip.getBoundingClientRect();
+                if (tooltipRect.right > window.innerWidth) {
+                    tooltip.style.left = (rect.left - tooltipRect.width - 10) + 'px';
+                }
+                if (tooltipRect.bottom > window.innerHeight) {
+                    tooltip.style.top = (rect.bottom - tooltipRect.height) + 'px';
+                }
+            }, 0);
+            
+            // Close tooltip on click elsewhere
+            const closeTooltip = (e) => {
+                if (!tooltip.contains(e.target) && !e.target.classList.contains('edit-badge')) {
+                    tooltip.remove();
+                    document.removeEventListener('click', closeTooltip);
+                }
+            };
+            
+            document.addEventListener('click', closeTooltip);
         }
         
         // Attach event listeners for real-time editing
