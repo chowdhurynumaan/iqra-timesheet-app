@@ -785,10 +785,14 @@
             // Create table body with Excel-like alternating colors
             const tbody = document.createElement('tbody');
             let shiftNum = 1;
-            Object.entries(shiftDefinitions).forEach(([deptName, times], idx) => {
+            let rowIdx = 0;
+            // Filter to show only compound shifts (containing "/" which indicates multiple time blocks)
+            Object.entries(shiftDefinitions)
+                .filter(([deptName]) => deptName.includes('/'))
+                .forEach(([deptName, times]) => {
                 const row = document.createElement('tr');
                 // Alternate between white and light orange like Excel
-                const isOdd = idx % 2 === 0;
+                const isOdd = rowIdx % 2 === 0;
                 row.style.cssText = `
                     background: ${isOdd ? '#FFFBF5' : '#FFF4E6'};
                     border: 1px solid #8B7355;
@@ -869,6 +873,7 @@
                 
                 tbody.appendChild(row);
                 shiftNum++;
+                rowIdx++;
             });
             table.appendChild(tbody);
             
@@ -891,7 +896,8 @@
             `;
             editor.appendChild(saveButton);
             
-            console.log(`🎯 Shift table (Excel style) rendered for ${Object.keys(shiftDefinitions).length} shifts`);
+            const compoundShiftCount = Object.keys(shiftDefinitions).filter(name => name.includes('/')).length;
+            console.log(`🎯 Shift table (Excel style) rendered for ${compoundShiftCount} compound shifts (filtered from ${Object.keys(shiftDefinitions).length} total)`);
         }
         
         async function saveShiftDefinitions() {
