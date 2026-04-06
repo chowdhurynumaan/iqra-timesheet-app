@@ -1795,19 +1795,36 @@
                 sheetSelect.appendChild(option);
             });
             
-            // Populate department filter
-            const depts = new Set(rawData.map(e => e.dept));
+            // Populate department filter (clear existing, keep "All Departments")
+            const depts = new Set(rawData.map(e => e.dept).filter(d => d && d !== 'undefined'));
             const deptSelect = document.getElementById('deptFilter');
-            depts.forEach(dept => {
+            
+            // Keep only the "All Departments" option
+            deptSelect.innerHTML = '<option value="">All Departments</option>';
+            
+            // Add departments in sorted order
+            const sortedDepts = Array.from(depts).sort();
+            sortedDepts.forEach(dept => {
                 const option = document.createElement('option');
                 option.value = dept;
                 option.textContent = dept;
                 deptSelect.appendChild(option);
             });
             
-            deptSelect.addEventListener('change', (e) => {
-                filteredData = rawData.filter(emp => !e.target.value || emp.dept === e.target.value);
+            // Remove old listeners by cloning the element
+            const newDeptSelect = deptSelect.cloneNode(true);
+            deptSelect.parentNode.replaceChild(newDeptSelect, deptSelect);
+            
+            // Add fresh change event listener
+            newDeptSelect.addEventListener('change', (e) => {
+                const selectedDept = e.target.value;
+                if (selectedDept) {
+                    filteredData = rawData.filter(emp => emp.dept === selectedDept);
+                } else {
+                    filteredData = [...rawData];
+                }
                 renderDashboard(filteredData);
+                displayEmployeeData(filteredData);
             });
             
             // Set date inputs
