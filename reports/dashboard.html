@@ -3598,11 +3598,10 @@
             
             return `
                 <div style="padding: 0.2rem; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 0.2rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 0.2rem;">
+                    <div style="padding: 0 0.2rem;">
                         <div style="font-size: 0.55rem; color: #64748b;">
                             <strong>Format:</strong> 9:30 AM or 09:30 | <strong style="color: #f3f4f6; background: #e0e0e0; padding: 0.1rem 0.3rem; border-radius: 2px;">No Punches (Gray)</strong> | <strong style="color: #dc2626; background: #fee2e2; padding: 0.1rem 0.3rem; border-radius: 2px;">Late (Red)</strong> | <strong style="background: white; padding: 0.1rem 0.3rem; border: 1px solid #e2e8f0; border-radius: 2px;">On-time (White)</strong>
                         </div>
-                        <button onclick="saveEmployeeChanges('${emp.id}')" style="padding: 0.2rem 0.6rem; background: #10b981; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: 700; font-size: 0.55rem;">💾 SAVE</button>
                     </div>
                     <!-- DAILY TABLE WITH PUNCH TIMES (Edit via modal button) -->
                     <table style="width: 100%; font-size: 0.6rem; border-collapse: collapse; font-family: monospace; line-height: 1;">
@@ -3943,6 +3942,16 @@
             
             // Update UI
             displayEmployeeData(filteredData);
+            
+            // Save to Firestore
+            emp.editHistory = cellEditHistory;
+            saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}`, emp).then(() => {
+                console.log(`✅ Saved punch times for ${emp.name} to Firestore`);
+            }).catch(err => {
+                console.error(`❌ Failed to save to Firestore:`, err);
+                alert(`⚠️ Changes saved locally but failed to sync to server. Please try again.`);
+            });
+            
             closeDayEditModal();
         }
         
