@@ -142,11 +142,109 @@
         .hidden { display: none; }
         
         @media (max-width: 768px) {
+            /* Basic responsive adjustments */
             .stats-grid { grid-template-columns: 1fr; }
             .charts-section { grid-template-columns: 1fr; }
             .employees-grid { grid-template-columns: 1fr; }
+            body { padding: 1rem 0.5rem; }
             h1 { font-size: 1.75rem; }
             .stat-value { font-size: 2rem; }
+            
+            /* Control panel should stack on mobile */
+            .control-panel { 
+                grid-template-columns: 1fr; 
+                padding: 1rem;
+                gap: 1rem;
+            }
+            
+            /* Header adjustments */
+            .header { 
+                padding: 1.5rem; 
+                margin-bottom: 1rem;
+            }
+            
+            /* Shift table mobile optimizations */
+            table {
+                font-size: 0.85rem;
+                width: 100%;
+                display: block;
+            }
+            
+            table thead {
+                display: none; /* Hide header on mobile, use data attributes instead */
+            }
+            
+            table tbody {
+                display: block;
+                width: 100%;
+            }
+            
+            table tr {
+                display: block;
+                margin-bottom: 1rem;
+                border: 1px solid #cbd5e1;
+                border-radius: 0.5rem;
+                padding: 0.5rem;
+            }
+            
+            table th, table td {
+                padding: 0.5rem 0;
+                display: block;
+                width: 100%;
+                text-align: left;
+                border: none;
+            }
+            
+            table th {
+                background: transparent;
+                font-weight: 700;
+                color: #2c1810;
+            }
+            
+            table td {
+                padding: 0.75rem 0;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            
+            table td:last-child {
+                border-bottom: none;
+            }
+            
+            table td:before {
+                content: attr(data-label);
+                font-weight: 700;
+                display: block;
+                font-size: 0.75rem;
+                color: #475569;
+                margin-bottom: 0.25rem;
+                text-transform: uppercase;
+            }
+            
+            /* Shift input fields - make smaller on mobile */
+            input[type="time"] {
+                width: 100%;
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+            
+            /* Buttons - full width on mobile */
+            .btn-upload, .btn-filter, .btn-export {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            /* Editor sections */
+            #shiftEditor {
+                width: 100%;
+                padding: 0.5rem;
+                overflow-x: visible;
+            }
+            
+            /* Table wrapper - allow horizontal scroll if needed */
+            table {
+                min-width: 300px;
+            }
         }
         
         @media print {
