@@ -445,54 +445,89 @@
                 <p class="subtitle">Upload your attendance report (CSV or Excel) to visualize performance</p>
             </div>
             <div class="header-right">
-                <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;" onclick="toggleHeaderButtons()">
-                    <span id="headerCollapseIcon" style="font-size: 0.9rem; transition: transform 0.3s; transform: rotate(180deg);">▼</span>
-                    <label style="margin: 0; cursor: pointer; font-weight: 500; color: #475569; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">Tools</label>
-                </div>
-                <div id="headerButtonsContainer" style="display: none; gap: 2rem; align-items: flex-end; flex-wrap: wrap; transition: all 0.2s; margin-top: 1rem;">
-                    <div class="button-group">
-                        <label class="btn-upload">
-                            <span>📋 Upload Employee Form</span>
-                            <input type="file" id="employeeFormFile" accept=".csv,.xlsx,.xls">
-                        </label>
-                        <label class="btn-upload">
-                            <span>📊 Upload Report</span>
-                            <input type="file" id="csvFile" accept=".csv,.xlsx,.xls">
-                        </label>
-                    </div>
-                    <div class="button-group">
-                        <button class="btn-export" onclick="exportToCSV()">📥 Export CSV</button>
-                        <button class="btn-export" onclick="exportToExcel()">📑 Export Excel</button>
-                        <button class="btn-export" onclick="saveReportToFirebase()">☁️ Save Cloud</button>
-                        <button class="btn-export" onclick="printSelected()" style="background: #059669;">🖨️ Print</button>
-                    </div>
-                </div>
+                <!-- Empty, Tools moved to unified container below -->
             </div>
         </div>
-
-        <div id="controlPanel" class="control-panel">
-            <div class="control-section">
-                <label>📅 Uploaded Months:</label>
-                <select id="monthSelector" onchange="loadMonthData()">
+        
+        <!-- Simple Month Selector -->
+        <div style="background: white; border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;">
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <label style="font-size: 0.85rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">📅 Select Month:</label>
+                <select id="monthSelector" onchange="loadMonthData()" style="padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 1rem; transition: all 0.2s;">
                     <option value="">Loading months...</option>
                 </select>
             </div>
+
+        <div id="controlAndAnalyticsSection" style="background: white; border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;">
+            <!-- Tools Section -->
+            <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0;" onclick="toggleHeaderButtons()">
+                <span id="headerCollapseIcon" style="font-size: 0.9rem; transition: transform 0.3s; transform: rotate(180deg);">▼</span>
+                <h3 style="margin: 0; font-size: 1rem; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em;">🛠️ Tools</h3>
+            </div>
+            <div id="headerButtonsContainer" style="display: none; gap: 2rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 1.5rem;">
+                <div class="button-group">
+                    <label class="btn-upload">
+                        <span>📋 Upload Employee Form</span>
+                        <input type="file" id="employeeFormFile" accept=".csv,.xlsx,.xls">
+                    </label>
+                    <label class="btn-upload">
+                        <span>📊 Upload Report</span>
+                        <input type="file" id="csvFile" accept=".csv,.xlsx,.xls">
+                    </label>
+                </div>
+                <div class="button-group">
+                    <button class="btn-export" onclick="exportToCSV()">📥 Export CSV</button>
+                    <button class="btn-export" onclick="exportToExcel()">📑 Export Excel</button>
+                    <button class="btn-export" onclick="saveReportToFirebase()">☁️ Save Cloud</button>
+                    <button class="btn-export" onclick="printSelected()" style="background: #059669;">🖨️ Print</button>
+                </div>
+            </div>
             
-            <!-- NEW: Department/Shift Settings -->
-            <div class="control-section" id="deptShiftSection">
+            <!-- Shift Settings Section -->
+            <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0;">
                 <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;" onclick="toggleShiftSettings()">
-                    <span id="shiftCollapseIcon" style="font-size: 1.2rem; transition: transform 0.2s;">▶</span>
-                    <label style="margin: 0; cursor: pointer; font-weight: 600;">🏢 Shift Settings</label>
+                    <span id="shiftCollapseIcon" style="font-size: 0.9rem; transition: transform 0.3s;">▶</span>
+                    <h3 style="margin: 0; font-size: 1rem; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em;">🏢 Shift Settings</h3>
                 </div>
                 <div id="deptShiftEditor" style="display: none; gap: 1rem; flex-wrap: wrap; align-items: flex-end; margin-top: 1rem;">
                     <!-- Shifts will be populated dynamically by renderShiftDefinitionsUI() -->
                 </div>
+                <div style="margin-top: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.85rem;">Department:</label>
+                    <div id="deptFilter" style="display: flex; flex-wrap: wrap; gap: 1rem;">
+                        <!-- Radio buttons will be populated dynamically -->
+                    </div>
+                </div>
             </div>
             
-            <div class="control-section">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Department:</label>
-                <div id="deptFilter" style="display: flex; flex-wrap: wrap; gap: 1rem;">
-                    <!-- Radio buttons will be populated dynamically -->
+            <!-- Analytics Section -->
+            <div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;" onclick="toggleChartsSection()">
+                    <span id="chartsCollapseIcon" style="font-size: 0.9rem; transition: transform 0.3s; transform: rotate(180deg);">▼</span>
+                    <h3 style="margin: 0; font-size: 1rem; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em;">📊 Analytics</h3>
+                </div>
+                
+                <div id="chartsContainer" class="charts-section" style="display: none; margin-top: 1rem;">
+                    <div class="chart-card" id="lateChartWrapper">
+                        <div class="chart-title">⏰ Top 15 Late Arrivals</div>
+                        <div class="chart-container">
+                            <canvas id="lateChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card" id="deptChartWrapper">
+                        <div class="chart-title">📈 Attendance by Department</div>
+                        <div class="chart-container">
+                            <canvas id="deptChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card" id="deptLateChartWrapper">
+                        <div class="chart-title">⏱️ Late Minutes by Department</div>
+                        <div class="chart-container">
+                            <canvas id="deptLateChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -516,35 +551,6 @@
             </div>
         </div>
 
-        <div id="chartsSection" style="background: white; border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;">
-            <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;" onclick="toggleChartsSection()">
-                <span id="chartsCollapseIcon" style="font-size: 0.9rem; transition: transform 0.3s; transform: rotate(180deg);">▼</span>
-                <h2 style="margin: 0; font-size: 1.2rem; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em;">📊 Analytics</h2>
-            </div>
-            
-            <div id="chartsContainer" class="charts-section" style="display: none; margin-top: 1.5rem;">
-                <div class="chart-card" id="lateChartWrapper">
-                    <div class="chart-title">⏰ Top 15 Late Arrivals</div>
-                    <div class="chart-container">
-                        <canvas id="lateChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-card" id="deptChartWrapper">
-                    <div class="chart-title">📈 Attendance by Department</div>
-                    <div class="chart-container">
-                        <canvas id="deptChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-card" id="deptLateChartWrapper">
-                    <div class="chart-title">⏱️ Late Minutes by Department</div>
-                    <div class="chart-container">
-                        <canvas id="deptLateChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="employees-section">
             <div class="section-title">👤 Employee Performance Cards</div>
@@ -1256,7 +1262,7 @@
                     
                     // Show data panels
                     document.getElementById('statsGrid').style.display = 'grid';
-                    document.getElementById('chartsSection').style.display = 'block';
+                    document.getElementById('controlAndAnalyticsSection').style.display = 'block';
                     
                     // Initialize department filter & shift settings
                     initializeControlPanel();
@@ -1666,8 +1672,7 @@
             renderDashboard(filteredData);
             displayEmployeeData(filteredData);
             document.getElementById('statsGrid').classList.remove('hidden');
-            document.getElementById('chartsSection').style.display = 'block';
-            document.getElementById('controlPanel').classList.remove('hidden');
+            document.getElementById('controlAndAnalyticsSection').style.display = 'block';
         }
 
         function parseSheet(data, sheetName) {
