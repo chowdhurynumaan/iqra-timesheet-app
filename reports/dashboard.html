@@ -3596,61 +3596,34 @@
                 const [inHour, inMin] = pair.in ? pair.in.split(':') : ['', ''];
                 const [outHour, outMin] = pair.out ? pair.out.split(':') : ['', ''];
                 
-                // Generate hour options (0-23)
-                const hourOptions = Array.from({length: 24}, (_, i) => {
-                    const hour = String(i).padStart(2, '0');
-                    return `<option value="${hour}" ${inHour === hour ? 'selected' : ''}>${hour}</option>`;
-                }).join('');
-                
-                const hourOptionsOut = Array.from({length: 24}, (_, i) => {
-                    const hour = String(i).padStart(2, '0');
-                    return `<option value="${hour}" ${outHour === hour ? 'selected' : ''}>${hour}</option>`;
-                }).join('');
-                
-                // Generate minute options (00, 15, 30, 45)
-                const minOptions = [0, 15, 30, 45].map(m => {
-                    const min = String(m).padStart(2, '0');
-                    return `<option value="${min}" ${inMin === min ? 'selected' : ''}>${min}</option>`;
-                }).join('');
-                
-                const minOptionsOut = [0, 15, 30, 45].map(m => {
-                    const min = String(m).padStart(2, '0');
-                    return `<option value="${min}" ${outMin === min ? 'selected' : ''}>${min}</option>`;
-                }).join('');
-                
                 return `
                     <div style="display: grid; grid-template-columns: 80px 1fr 1fr; gap: 12px; margin-bottom: 12px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; align-items: end;">
                         <div style="font-weight: 600; color: #1e293b; font-size: 0.95rem; line-height: 1.8rem;">Pair ${pairIdx + 1}</div>
                         
                         <div>
                             <label style="display: block; font-size: 0.75rem; color: #64748b; font-weight: 600; margin-bottom: 6px; text-transform: uppercase;">IN Time</label>
-                            <div style="display: flex; gap: 4px; align-items: center;">
-                                <select class="modal-punch-in-hour-${pairIdx}" style="flex: 1; padding: 6px 4px; font-size: 0.85rem; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; font-weight: 600;">
-                                    <option value="">--</option>
-                                    ${hourOptions}
-                                </select>
-                                <span style="color: #94a3b8; font-weight: bold;">:</span>
-                                <select class="modal-punch-in-min-${pairIdx}" style="flex: 1; padding: 6px 4px; font-size: 0.85rem; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; font-weight: 600;">
-                                    <option value="">--</option>
-                                    ${minOptions}
-                                </select>
+                            <div style="display: flex; gap: 4px; align-items: center; justify-content: space-between;">
+                                <input type="number" min="0" max="23" class="modal-punch-in-hour-${pairIdx}" value="${inHour}" 
+                                    placeholder="HH" style="width: 50px; padding: 8px 6px; font-size: 0.9rem; border: 2px solid #0369a1; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
+                                <span style="color: #1e293b; font-weight: bold; font-size: 1.1rem;">:</span>
+                                <input type="number" min="0" max="59" class="modal-punch-in-min-${pairIdx}" value="${inMin}" 
+                                    placeholder="MM" style="width: 50px; padding: 8px 6px; font-size: 0.9rem; border: 2px solid #0369a1; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
                             </div>
                         </div>
                         
                         <div>
                             <label style="display: block; font-size: 0.75rem; color: #64748b; font-weight: 600; margin-bottom: 6px; text-transform: uppercase;">OUT Time</label>
-                            <div style="display: flex; gap: 4px; align-items: center;">
-                                <select class="modal-punch-out-hour-${pairIdx}" style="flex: 1; padding: 6px 4px; font-size: 0.85rem; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; font-weight: 600;">
-                                    <option value="">--</option>
-                                    ${hourOptionsOut}
-                                </select>
-                                <span style="color: #94a3b8; font-weight: bold;">:</span>
-                                <select class="modal-punch-out-min-${pairIdx}" style="flex: 1; padding: 6px 4px; font-size: 0.85rem; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; font-weight: 600;">
-                                    <option value="">--</option>
-                                    ${minOptionsOut}
-                                </select>
+                            <div style="display: flex; gap: 4px; align-items: center; justify-content: space-between;">
+                                <input type="number" min="0" max="23" class="modal-punch-out-hour-${pairIdx}" value="${outHour}" 
+                                    placeholder="HH" style="width: 50px; padding: 8px 6px; font-size: 0.9rem; border: 2px solid #dc2626; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
+                                <span style="color: #1e293b; font-weight: bold; font-size: 1.1rem;">:</span>
+                                <input type="number" min="0" max="59" class="modal-punch-out-min-${pairIdx}" value="${outMin}" 
+                                    placeholder="MM" style="width: 50px; padding: 8px 6px; font-size: 0.9rem; border: 2px solid #dc2626; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
                             </div>
                         </div>
+                    </div>
+                `;
+            }).join('');
                     </div>
                 `;
             }).join('');
@@ -3773,15 +3746,52 @@
             const day = emp.dailyBreakdown[dayIdx];
             const pairCount = day.punchPairs.length;
             
-            // Collect and validate all inputs from dropdowns
+            // Collect and validate all inputs from number fields
             const updates = [];
             for (let pairIdx = 0; pairIdx < pairCount; pairIdx++) {
-                const inHour = document.querySelector(`.modal-punch-in-hour-${pairIdx}`).value;
-                const inMin = document.querySelector(`.modal-punch-in-min-${pairIdx}`).value;
-                const outHour = document.querySelector(`.modal-punch-out-hour-${pairIdx}`).value;
-                const outMin = document.querySelector(`.modal-punch-out-min-${pairIdx}`).value;
+                let inHour = document.querySelector(`.modal-punch-in-hour-${pairIdx}`).value;
+                let inMin = document.querySelector(`.modal-punch-in-min-${pairIdx}`).value;
+                let outHour = document.querySelector(`.modal-punch-out-hour-${pairIdx}`).value;
+                let outMin = document.querySelector(`.modal-punch-out-min-${pairIdx}`).value;
                 
-                // Build time strings (or leave as is if empty)
+                // Validate and format numbers
+                if (inHour) {
+                    const h = parseInt(inHour);
+                    if (isNaN(h) || h < 0 || h > 23) {
+                        alert(`❌ Invalid IN hour for Pair ${pairIdx + 1}. Must be 0-23.`);
+                        return;
+                    }
+                    inHour = String(h).padStart(2, '0');
+                }
+                
+                if (inMin) {
+                    const m = parseInt(inMin);
+                    if (isNaN(m) || m < 0 || m > 59) {
+                        alert(`❌ Invalid IN minute for Pair ${pairIdx + 1}. Must be 0-59.`);
+                        return;
+                    }
+                    inMin = String(m).padStart(2, '0');
+                }
+                
+                if (outHour) {
+                    const h = parseInt(outHour);
+                    if (isNaN(h) || h < 0 || h > 23) {
+                        alert(`❌ Invalid OUT hour for Pair ${pairIdx + 1}. Must be 0-23.`);
+                        return;
+                    }
+                    outHour = String(h).padStart(2, '0');
+                }
+                
+                if (outMin) {
+                    const m = parseInt(outMin);
+                    if (isNaN(m) || m < 0 || m > 59) {
+                        alert(`❌ Invalid OUT minute for Pair ${pairIdx + 1}. Must be 0-59.`);
+                        return;
+                    }
+                    outMin = String(m).padStart(2, '0');
+                }
+                
+                // Build time strings
                 const inTime = (inHour && inMin) ? `${inHour}:${inMin}` : '';
                 const outTime = (outHour && outMin) ? `${outHour}:${outMin}` : '';
                 
