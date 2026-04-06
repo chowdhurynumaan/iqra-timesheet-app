@@ -1267,7 +1267,7 @@ Then re-upload the file.`;
         if (!fileInput) {
             console.error('âŒ File input element not found! Check HTML structure.');
         } else {
-            console.log('âœ… File input element found, setting up listener...');
+            console.log('Upload');
             
             // Load available months from Firebase on page load
             loadAvailableMonths();
@@ -1283,9 +1283,7 @@ Then re-upload the file.`;
                 
                 const isExcel = /\.(xlsx?|xls)$/.test(file.name.toLowerCase());
                 
-                console.log('ðŸ“¥ FILE UPLOAD DETECTED
-File Name:', file.name, '
-File Type:', isExcel ? 'Excel' : 'CSV');
+                console.log('Upload');
 
                 if (isExcel) {
                     const reader = new FileReader();

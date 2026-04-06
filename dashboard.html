@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1282,10 +1282,8 @@ Then re-upload the file.`;
                 }
                 
                 const isExcel = /\.(xlsx?|xls)$/.test(file.name.toLowerCase());
-                console.log('File uploaded: ' + file.name);
-
-
-File Type:', isExcel ? 'Excel' : 'CSV');
+                
+                console.log('Upload detected');
 
                 if (isExcel) {
                     const reader = new FileReader();
