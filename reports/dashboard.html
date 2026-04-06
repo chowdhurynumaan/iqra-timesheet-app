@@ -2288,10 +2288,14 @@
             
             // Set date inputs
             if (dateRange.start) {
-                document.getElementById('startDate').value = dateRange.start.toISOString().split('T')[0];
+                // Handle both Date objects and Firestore Timestamp objects
+                const startDate = dateRange.start.toDate ? dateRange.start.toDate() : new Date(dateRange.start);
+                document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
             }
             if (dateRange.end) {
-                document.getElementById('endDate').value = dateRange.end.toISOString().split('T')[0];
+                // Handle both Date objects and Firestore Timestamp objects
+                const endDate = dateRange.end.toDate ? dateRange.end.toDate() : new Date(dateRange.end);
+                document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
             }
         }
 
