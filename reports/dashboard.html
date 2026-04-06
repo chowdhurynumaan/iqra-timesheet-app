@@ -2286,63 +2286,8 @@
                 });
             });
             
-            // Set date inputs
-            if (dateRange.start) {
-                try {
-                    console.log(`📅 DEBUG: dateRange.start type:`, typeof dateRange.start, dateRange.start);
-                    let startDate;
-                    // Firestore Timestamp with toDate() method
-                    if (dateRange.start.toDate && typeof dateRange.start.toDate === 'function') {
-                        startDate = dateRange.start.toDate();
-                    }
-                    // Firestore Timestamp with _seconds property (plain object)
-                    else if (dateRange.start._seconds !== undefined) {
-                        startDate = new Date(dateRange.start._seconds * 1000);
-                    }
-                    // String format
-                    else if (typeof dateRange.start === 'string') {
-                        startDate = new Date(dateRange.start);
-                    }
-                    // Regular Date object
-                    else {
-                        startDate = new Date(dateRange.start);
-                    }
-                    
-                    if (startDate && !isNaN(startDate.getTime())) {
-                        document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
-                    }
-                } catch (err) {
-                    console.error('❌ Error processing start date:', err);
-                }
-            }
-            if (dateRange.end) {
-                try {
-                    console.log(`📅 DEBUG: dateRange.end type:`, typeof dateRange.end, dateRange.end);
-                    let endDate;
-                    // Firestore Timestamp with toDate() method
-                    if (dateRange.end.toDate && typeof dateRange.end.toDate === 'function') {
-                        endDate = dateRange.end.toDate();
-                    }
-                    // Firestore Timestamp with _seconds property (plain object)
-                    else if (dateRange.end._seconds !== undefined) {
-                        endDate = new Date(dateRange.end._seconds * 1000);
-                    }
-                    // String format
-                    else if (typeof dateRange.end === 'string') {
-                        endDate = new Date(dateRange.end);
-                    }
-                    // Regular Date object
-                    else {
-                        endDate = new Date(dateRange.end);
-                    }
-                    
-                    if (endDate && !isNaN(endDate.getTime())) {
-                        document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
-                    }
-                } catch (err) {
-                    console.error('❌ Error processing end date:', err);
-                }
-            }
+            // Skip date inputs if not properly populated - they're optional
+            // Date inputs will be set by the user if needed
         }
 
         function filterByDateRange() {
