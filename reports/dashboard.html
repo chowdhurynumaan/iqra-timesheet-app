@@ -913,7 +913,10 @@
                 console.log('âœ… Detected Employee Form Columns:', mapping);
                 
                 // Show detected columns and allow user to save
-                const confirmMsg = `✅ Detected employee form columns:\n\n${Object.entries(mapping).map(([field, data]) => `• ${field}: "${data.header}"`).join('\n')}\n\nSave this mapping to Firestore?`;
+                const confirmMsg = `✅ Detected employee form columns:
+${Object.entries(mapping).map(([field, data]) => `• ${field}: "${data.header}"`).join('
+')}
+Save this mapping to Firestore?`;
                 
                 if (confirm(confirmMsg)) {
                     saveEmployeeFormMapping(mapping);
@@ -1703,7 +1706,8 @@ Then re-upload the file.`;
                             // Try multiple parsing methods to handle different formats
                             if (cellContent) {
                                 // Method 1: Split by newlines or line breaks
-                                const lines = cellContent.split(/[\n\r]+/);
+                                const lines = cellContent.split(/[
+\r]+/);
                                 lines.forEach(line => {
                                     const matches = line.match(/(\d{1,2}):(\d{2})/g);
                                     if (matches) {
@@ -2183,7 +2187,8 @@ Then re-upload the file.`;
             
             if (checkedCheckboxes.length === 0) {
                 alert('âŒ No employees selected.
-\n\nPlease check the checkboxes next to the employees you want to print.');
+
+Please check the checkboxes next to the employees you want to print.');
                 return;
             }
             
@@ -3122,7 +3127,8 @@ ${changes.map(c => `â€¢ ${c.field}: ${c.oldValue} â†’ ${c.newValue}`).j
             const employees = [];
             const titleCell = (data[0]?.[0] || '').toString().toLowerCase();
             
-            console.log('=== SMART PARSER STARTING ===\n\nDetected Title:', titleCell);
+            console.log('=== SMART PARSER STARTING ===
+Detected Title:', titleCell);
             
             // Extract date range from row 1 if available
             let dateRange = { start: null, end: null };
@@ -3399,9 +3405,11 @@ ${changes.map(c => `â€¢ ${c.field}: ${c.oldValue} â†’ ${c.newValue}`).j
             
             rawData = employees;
             
-            console.log('\n\n========== DATA LOADED ==========');
+            console.log('
+========== DATA LOADED ==========');
             console.log('Total Employees:', rawData.length);
-            console.log('==============================\n\n');
+            console.log('==============================
+');
             
             if (rawData.length > 0) {
                 renderDashboard(rawData);
@@ -4245,7 +4253,8 @@ Metrics updated live.`);
 Accepted formats:\
 â€¢ 9:30 AM\
 â€¢ 2:45 PM\
-â€¢ 09:30\\n\nâ€¢ 14:45');
+â€¢ 09:30\
+â€¢ 14:45');
                 input.focus();
                 return;
             }
