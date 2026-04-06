@@ -16,6 +16,7 @@ config.firebaserc.js
 firestore.rules
 .env
 .env.local
+serviceAccountKey.json
 
 # ========== SYSTEM FILES ==========
 .DS_Store
