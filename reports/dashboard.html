@@ -2298,8 +2298,8 @@
                             </div>
                             <div class="metric">
                                 <div class="metric-title">Hours</div>
-                                <div class="metric-value">${hoursNum.toFixed(0)}</div>
-                                <div class="metric-unit">hrs</div>
+                                <div class="metric-value">${hoursNum.toFixed(2)}</div>
+                                <div class="metric-unit">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>
                             </div>
                             <div class="metric">
                                 <div class="metric-title">Late Min</div>
