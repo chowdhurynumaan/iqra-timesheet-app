@@ -785,14 +785,13 @@
             // Create table body with Excel-like alternating colors
             const tbody = document.createElement('tbody');
             let shiftNum = 1;
-            let rowIdx = 0;
-            // Filter to show only compound shifts (containing "/" which indicates multiple time blocks)
+            // Show only fundamental shifts (NOT compound ones with "/" or "Slot")
             Object.entries(shiftDefinitions)
-                .filter(([deptName]) => deptName.includes('/'))
-                .forEach(([deptName, times]) => {
+                .filter(([deptName]) => !deptName.includes('/') && !deptName.includes('Slot'))
+                .forEach(([deptName, times], idx) => {
                 const row = document.createElement('tr');
                 // Alternate between white and light orange like Excel
-                const isOdd = rowIdx % 2 === 0;
+                const isOdd = idx % 2 === 0;
                 row.style.cssText = `
                     background: ${isOdd ? '#FFFBF5' : '#FFF4E6'};
                     border: 1px solid #8B7355;
@@ -873,7 +872,6 @@
                 
                 tbody.appendChild(row);
                 shiftNum++;
-                rowIdx++;
             });
             table.appendChild(tbody);
             
@@ -896,8 +894,8 @@
             `;
             editor.appendChild(saveButton);
             
-            const compoundShiftCount = Object.keys(shiftDefinitions).filter(name => name.includes('/')).length;
-            console.log(`🎯 Shift table (Excel style) rendered for ${compoundShiftCount} compound shifts (filtered from ${Object.keys(shiftDefinitions).length} total)`);
+            const fundamentalShiftCount = Object.keys(shiftDefinitions).filter(name => !name.includes('/') && !name.includes('Slot')).length;
+            console.log(`🎯 Shift table (Excel style) rendered for ${fundamentalShiftCount} fundamental shifts (WK, EV, FT)`);
         }
         
         async function saveShiftDefinitions() {
@@ -1060,8 +1058,6 @@
                     // Extract columns: In(1), Out(2), In2(3), Out2(4), ..., Dept(8)
                     const inTime1 = shiftRow[1];   // First time block - in
                     const outTime1 = shiftRow[2];  // First time block - out
-                    const inTime2 = shiftRow[3];   // Second time block - in
-                    const outTime2 = shiftRow[4];  // Second time block - out
                     const deptName = shiftRow[8];  // Department name(s)
                     
                     // Skip if no valid department name or if it's the header
@@ -1070,40 +1066,22 @@
                     const dept = String(deptName).trim();
                     const t1in = normalizeTime(inTime1);
                     const t1out = normalizeTime(outTime1);
-                    const t2in = normalizeTime(inTime2);
-                    const t2out = normalizeTime(outTime2);
                     
                     // Skip if no valid times in first block
                     if (!t1in || !t1out) continue;
                     
-                    // Check if this is a compound shift with TWO time blocks (e.g., WK/EV with 8:00-16:00 AND 18:00-20:00)
-                    if (dept.includes('/') && t2in && t2out) {
-                        // Split compound names and create separate entries for each time block
-                        const parts = dept.split('/').map(p => p.trim());
-                        
-                        // Create entries for both time blocks
-                        if (parts.length >= 2) {
-                            // Slot 1: Use first time block  
-                            newShifts[`${dept} - Slot 1`] = {
-                                start: t1in,
-                                end: t1out
-                            };
-                            console.log(`   ✓ Shift: ${dept} - Slot 1 = ${t1in} to ${t1out}`);
-                            
-                            // Slot 2: Use second time block
-                            newShifts[`${dept} - Slot 2`] = {
-                                start: t2in,
-                                end: t2out
-                            };
-                            console.log(`   ✓ Shift: ${dept} - Slot 2 = ${t2in} to ${t2out}`);
-                        }
-                    } else {
-                        // Single shift or compound without second time block
-                        newShifts[dept] = {
+                    // For compound shifts (WK/EV), extract ONLY the FIRST component shift
+                    // Compound assignments are handled at employee level, not shift definition level
+                    // This keeps the shift table clean with just WK, EV, FT
+                    const shiftName = dept.includes('/') ? dept.split('/')[0].trim() : dept;
+                    
+                    // Only add if we haven't already extracted this shift
+                    if (!newShifts[shiftName]) {
+                        newShifts[shiftName] = {
                             start: t1in,
                             end: t1out
                         };
-                        console.log(`   ✓ Shift: ${dept} = ${t1in} to ${t1out}`);
+                        console.log(`   ✓ Shift: ${shiftName} = ${t1in} to ${t1out}`);
                     }
                 }
                 
@@ -1881,8 +1859,8 @@
                                 // Calculate late minutes
                                 const firstParts = times[0].trim().split(':').map(Number);
                                 if (firstParts.length >= 2) {
-                                    const expectedStart = dept.toUpperCase().includes('EV') ? 1080 : 540;
                                     const actualStart = firstParts[0] * 60 + firstParts[1];
+                                    const expectedStart = getExpectedStartTime(dept, actualStart);
                                     if (actualStart > expectedStart) {
                                         const lateMin = actualStart - expectedStart;
                                         dayRecord.lateMin = lateMin;
@@ -1934,8 +1912,8 @@
                                 // Calculate late minutes from first punch
                                 const firstParts = times[0].trim().split(':').map(Number);
                                 if (firstParts.length >= 2) {
-                                    const expectedStart = dept.toUpperCase().includes('EV') ? 1080 : 540;
                                     const actualStart = firstParts[0] * 60 + firstParts[1];
+                                    const expectedStart = getExpectedStartTime(dept, actualStart);
                                     if (actualStart > expectedStart) {
                                         const lateMin = actualStart - expectedStart;
                                         dayRecord.lateMin = lateMin;
@@ -3204,6 +3182,58 @@
             }, 100);
         }
 
+        function getExpectedStartTime(dept, actualStart) {
+            // For compound shifts (like "WK/EV"), determine which shift they worked based on punch time
+            // Then check them against that specific shift's start time
+            // For single shifts, use that shift's time
+            
+            if (dept.includes('/')) {
+                // Compound shift: extract individual shift names and get their times
+                const shifts = dept.split('/').map(s => s.trim());
+                const shiftTimes = {};
+                
+                for (const shift of shifts) {
+                    // Find this shift in shiftDefinitions
+                    const matchingShift = Object.keys(shiftDefinitions).find(
+                        key => !key.includes('Slot') && key === shift
+                    );
+                    
+                    if (matchingShift && shiftDefinitions[matchingShift]) {
+                        const timeParts = shiftDefinitions[matchingShift].start.split(':').map(Number);
+                        const startInMinutes = timeParts[0] * 60 + (timeParts[1] || 0);
+                        shiftTimes[shift] = startInMinutes;
+                    }
+                }
+                
+                // Determine which shift was likely worked based on actual punch time
+                // Person working EV typically comes between 17:00-18:30 (1020-1110 min)
+                // Person working WK typically comes between 08:00-10:00 (480-600 min)
+                // Use midpoint: if punch is before 12:00 (720 min), assume WK; otherwise EV
+                const timeValues = Object.values(shiftTimes);
+                if (timeValues.length > 0) {
+                    const avgMidpoint = (Math.min(...timeValues) + Math.max(...timeValues)) / 2;
+                    if (actualStart < avgMidpoint) {
+                        // Likely early shift - check against minimum (earliest) shift start
+                        return Math.min(...timeValues);
+                    } else {
+                        // Likely evening shift - check against maximum (latest) shift start
+                        return Math.max(...timeValues);
+                    }
+                }
+                
+                return 540; // Fallback
+            } else {
+                // Single shift: use its specific time
+                if (shiftDefinitions[dept]) {
+                    const timeParts = shiftDefinitions[dept].start.split(':').map(Number);
+                    return timeParts[0] * 60 + (timeParts[1] || 0);
+                }
+                
+                // Fallback: check dept name for EV hint
+                return dept.toUpperCase().includes('EV') ? 1080 : 540;
+            }
+        }
+        
         function processComplexData(data) {
             const employees = [];
             const titleCell = (data[0]?.[0] || '').toString().toLowerCase();
