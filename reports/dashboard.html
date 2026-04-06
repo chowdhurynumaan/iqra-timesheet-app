@@ -1378,10 +1378,36 @@
                         dateRange.start = new Date(dateMatch[3], parseInt(dateMatch[1]) - 1, parseInt(dateMatch[2]));
                         dateRange.end = new Date(dateMatch[6], parseInt(dateMatch[4]) - 1, parseInt(dateMatch[5]));
                         dateRange.actualDays = Math.floor((dateRange.end - dateRange.start) / (1000 * 60 * 60 * 24)) + 1;
-                        console.log(`📅 Date Range: ${dateRange.start.toLocaleDateString()} to ${dateRange.end.toLocaleDateString()} (${dateRange.actualDays} days)`);
+                        console.log(`📅 Date Range (from header): ${dateRange.start.toLocaleDateString()} to ${dateRange.end.toLocaleDateString()} (${dateRange.actualDays} days)`);
                         return;
                     }
                 }
+            }
+            
+            // Fallback: Try to detect from dates in the data itself (YYYY-MM-DD format)
+            for (let i = 0; i < Math.min(100, data.length); i++) {
+                const row = data[i];
+                for (let j = 0; j < Math.min(20, row.length); j++) {
+                    const cell = (row[j] || '').toString().trim();
+                    const dateMatchISO = cell.match(/(\d{4})-(\d{2})-(\d{2})/);
+                    if (dateMatchISO && !dateRange.start) {
+                        dateRange.start = new Date(dateMatchISO[1], parseInt(dateMatchISO[2]) - 1, parseInt(dateMatchISO[3]));
+                        console.log(`📅 Found start date from data: ${dateRange.start.toLocaleDateString()}`);
+                    } else if (dateMatchISO && dateRange.start) {
+                        const potentialEnd = new Date(dateMatchISO[1], parseInt(dateMatchISO[2]) - 1, parseInt(dateMatchISO[3]));
+                        dateRange.end = potentialEnd;
+                    }
+                }
+            }
+            
+            // If we found dates, calculate the range
+            if (dateRange.start && dateRange.end) {
+                dateRange.actualDays = Math.floor((dateRange.end - dateRange.start) / (1000 * 60 * 60 * 24)) + 1;
+                console.log(`📅 Date Range (detected from data): ${dateRange.start.toLocaleDateString()} to ${dateRange.end.toLocaleDateString()} (${dateRange.actualDays} days)`);
+            } else {
+                // Fallback to a reasonable default based on month
+                dateRange.actualDays = 31;
+                console.log(`📅 Date Range: Using default 31 days`);
             }
         }
 
