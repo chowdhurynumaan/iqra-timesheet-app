@@ -628,7 +628,8 @@
         console.log('ðŸ“¦ Using collections: months, employees, audit');
         
         // ========== FIREBASE UTILITY FUNCTIONS ==========
-        // Remove undefined values from objects (Firestore doesn't allow undefined)\n        function cleanUndefined(obj) {
+        // Remove undefined values from objects (Firestore doesn't allow undefined)
+        function cleanUndefined(obj) {
             if (Array.isArray(obj)) {
                 return obj.map(cleanUndefined);
             } else if (obj && typeof obj === 'object') {
@@ -681,7 +682,8 @@
         
         // ========== ATTENDANCE DATA PERSISTENCE ==========
         async function saveAttendanceReport(employees, timestamp) {
-            const reportId = `report_${Date.now()}`;\n            const reportData = {
+            const reportId = `report_${Date.now()}`;
+            const reportData = {
                 reportId,
                 timestamp: new Date(),
                 totalEmployees: employees.length,
@@ -695,7 +697,8 @@
         }
         
         async function saveEmployeeRecord(employee) {
-            const empId = `emp_${employee.id}`;\n            const empData = {
+            const empId = `emp_${employee.id}`;
+            const empData = {
                 ...employee,
                 lastUpdated: new Date(),
                 appId: TIMESHEET_APP_ID
@@ -708,7 +711,8 @@
         async function loadPreviousReports(limit = 10) {
             try {
                 const snapshot = await db
-                    .collection(`${TIMESHEET_COLLECTION}/reports`)\n                    .orderBy('timestamp', 'desc')
+                    .collection(`${TIMESHEET_COLLECTION}/reports`)
+                    .orderBy('timestamp', 'desc')
                     .limit(limit)
                     .get();
                 
@@ -769,7 +773,8 @@
             uploadedMonths.forEach(month => {
                 const [year, monthNum] = month.id.split('_').map(Number);
                 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                const displayText = `${monthNames[monthNum - 1]} ${year}`;\n                
+                const displayText = `${monthNames[monthNum - 1]} ${year}`;
+                
                 const option = document.createElement('option');
                 option.value = month.id;
                 option.textContent = displayText;
@@ -882,7 +887,12 @@
             if (Object.keys(mapping).length > 0) {
                 console.log('âœ… Detected Employee Form Columns:', mapping);
                 
-                // Show detected columns and allow user to save\n                const confirmMsg = `✅ Detected employee form columns:\n${Object.entries(mapping).map(([field, data]) => `• ${field}: "${data.header}"`).join('\n')}\n\nSave this mapping to Firestore?`;                
+                // Show detected columns and allow user to save
+                const confirmMsg = `✅ Detected employee form columns:
+${Object.entries(mapping).map(([field, data]) => `• ${field}: "${data.header}"`).join('
+')}
+
+Save this mapping to Firestore?`;                
                 if (confirm(confirmMsg)) {
                     saveEmployeeFormMapping(mapping);
                 } else {
@@ -891,7 +901,21 @@
             } else {
                 // No columns detected - show what was found and ask for manual help
                 const foundHeaders = headerRow.slice(0, 10).join(', ');
-                const msg = `âš ï¸ Could not automatically detect standard columns.\n\nHeaders found:\n${foundHeaders}\n\nPlease rename your columns to match one of these patterns:\nâ€¢ ID: id, emp id, employee id, code\nâ€¢ Name: name, employee name, full name\nâ€¢ Department: department, dept, section\nâ€¢ Shift: shift, schedule\nâ€¢ Phone: phone, contact, mobile\nâ€¢ Email: email, e-mail\n\n\nThen re-upload the file.`;                alert(msg);
+                const msg = `âš ï¸ Could not automatically detect standard columns.
+
+Headers found:
+${foundHeaders}
+
+Please rename your columns to match one of these patterns:
+â€¢ ID: id, emp id, employee id, code
+â€¢ Name: name, employee name, full name
+â€¢ Department: department, dept, section
+â€¢ Shift: shift, schedule
+â€¢ Phone: phone, contact, mobile
+â€¢ Email: email, e-mail
+
+
+Then re-upload the file.`;                alert(msg);
                 console.log('âŒ Could not auto-detect columns. Available headers:', headerRow);
             }
         }
@@ -1013,7 +1037,8 @@
                     const pairIdx = cell.dataset.pairIdx;
                     const type = cell.dataset.type;
                     
-                    const historyKey = `${empId}_${dayIdx}_${pairIdx}_${type}`;\n                    
+                    const historyKey = `${empId}_${dayIdx}_${pairIdx}_${type}`;
+                    
                     if (cellEditHistory[historyKey] && cellEditHistory[historyKey].length > 0) {
                         // Remove old badge if exists
                         const oldBadge = cell.querySelector('.edit-badge');
@@ -1023,7 +1048,26 @@
                         const badge = document.createElement('span');
                         badge.className = 'edit-badge';
                         const editCount = cellEditHistory[historyKey].length;
-                        badge.textContent = '\u270e';\n                        badge.title = `Edited ${editCount} time${editCount > 1 ? 's' : ''} - Click to view history`;\n                        badge.style.cssText = `\n                            position: absolute;\n                            top: 1px;\n                            right: 2px;\n                            background: transparent;\n                            color: #8b5cf6;\n                            font-size: 0.7rem;\n                            padding: 0;\n                            border-radius: 50%;\n                            cursor: help;\n                            font-weight: bold;\n                            white-space: nowrap;\n                            z-index: 500;\n                            opacity: 0.7;\n                            transition: all 0.2s ease;\n\n                        `;\n                                                // Hover effect
+                        badge.textContent = '\u270e';
+                        badge.title = `Edited ${editCount} time${editCount > 1 ? 's' : ''} - Click to view history`;
+                        badge.style.cssText = `
+                            position: absolute;
+                            top: 1px;
+                            right: 2px;
+                            background: transparent;
+                            color: #8b5cf6;
+                            font-size: 0.7rem;
+                            padding: 0;
+                            border-radius: 50%;
+                            cursor: help;
+                            font-weight: bold;
+                            white-space: nowrap;
+                            z-index: 500;
+                            opacity: 0.7;
+                            transition: all 0.2s ease;
+
+                        `;
+                                                // Hover effect
                         badge.onmouseover = () => { badge.style.opacity = '1'; badge.style.color = '#a78bfa'; };
                         badge.onmouseout = () => { badge.style.opacity = '0.7'; badge.style.color = '#8b5cf6'; };
                         
@@ -1112,14 +1156,62 @@
                 // Build daily breakdown HTML if available
                 let dailyBreakdownHtml = '';
                 if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
-                    dailyBreakdownHtml = `<div class="daily-breakdown">${renderDailyBreakdown(emp)}</div>`;\n                }
+                    dailyBreakdownHtml = `<div class="daily-breakdown">${renderDailyBreakdown(emp)}</div>`;
+                }
                 
                 // Create card with metrics AND daily breakdown
                 const card = document.createElement('div');
                 card.className = 'employee-card';
                 card.setAttribute('data-tier', tier);
                 card.setAttribute('data-id', emp.id);
-                card.innerHTML = `\n                    <div class="employee-header">\n                        <input type="checkbox" class="employee-checkbox" data-id="${emp.id}" style="margin-right: 0.75rem; width: 20px; height: 20px; cursor: pointer; flex-shrink: 0;">\n                        <div class="employee-info">\n                            <div class="employee-name">${name}</div>\n                            <div class="employee-meta">\n                                <span class="employee-dept">${id}</span>\n                                <span class="employee-dept" style="background: #dbeafe; color: #0369a1;">${dept}</span>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="visual-metrics">\n                        <div class="metrics-line">\n                            <div class="metric-card rate-card">\n                                <div class="metric-card-title">Attendance</div>\n                                <div class="metric-card-value">${attendancePercent.toFixed(0)}%</div>\n                            </div>\n                            <div class="metric-card punctuality-card">\n                                <div class="metric-card-title">Punctuality</div>\n                                <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>\n                            </div>\n                            <div class="metric-card hours-card">\n                                <div class="metric-card-title">Hours</div>\n                                <div class="metric-card-value">${hoursNum.toFixed(2)}</div>\n                                <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>\n                                <div class="metric-card-sub">hrs</div>\n                            </div>\n                            <div class="metric-card late-card">\n                                <div class="metric-card-title">Late Min</div>\n                                <div class="metric-card-value">${lateMin}</div>\n                                <div class="metric-card-sub">min</div>\n                            </div>\n                            <div class="metric-card absence-card">\n                                <div class="metric-card-title">Absences</div>\n                                <div class="metric-card-value">${absences}</div>\n                                <div class="metric-card-sub">days</div>\n                            </div>\n                            <div class="metric-card worked-card">\n                                <div class="metric-card-title">Worked</div>\n                                <div class="metric-card-value">${daysWorked}</div>\n                                <div class="metric-card-sub">days</div>\n                            </div>\n                        </div>\n                    </div>\n                    ${dailyBreakdownHtml}\n\n                `;\n                                tableBody.appendChild(card);
+                card.innerHTML = `
+                    <div class="employee-header">
+                        <input type="checkbox" class="employee-checkbox" data-id="${emp.id}" style="margin-right: 0.75rem; width: 20px; height: 20px; cursor: pointer; flex-shrink: 0;">
+                        <div class="employee-info">
+                            <div class="employee-name">${name}</div>
+                            <div class="employee-meta">
+                                <span class="employee-dept">${id}</span>
+                                <span class="employee-dept" style="background: #dbeafe; color: #0369a1;">${dept}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="visual-metrics">
+                        <div class="metrics-line">
+                            <div class="metric-card rate-card">
+                                <div class="metric-card-title">Attendance</div>
+                                <div class="metric-card-value">${attendancePercent.toFixed(0)}%</div>
+                            </div>
+                            <div class="metric-card punctuality-card">
+                                <div class="metric-card-title">Punctuality</div>
+                                <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
+                            </div>
+                            <div class="metric-card hours-card">
+                                <div class="metric-card-title">Hours</div>
+                                <div class="metric-card-value">${hoursNum.toFixed(2)}</div>
+                                <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>
+                                <div class="metric-card-sub">hrs</div>
+                            </div>
+                            <div class="metric-card late-card">
+                                <div class="metric-card-title">Late Min</div>
+                                <div class="metric-card-value">${lateMin}</div>
+                                <div class="metric-card-sub">min</div>
+                            </div>
+                            <div class="metric-card absence-card">
+                                <div class="metric-card-title">Absences</div>
+                                <div class="metric-card-value">${absences}</div>
+                                <div class="metric-card-sub">days</div>
+                            </div>
+                            <div class="metric-card worked-card">
+                                <div class="metric-card-title">Worked</div>
+                                <div class="metric-card-value">${daysWorked}</div>
+                                <div class="metric-card-sub">days</div>
+                            </div>
+                        </div>
+                    </div>
+                    ${dailyBreakdownHtml}
+
+                `;
+                                tableBody.appendChild(card);
             });
             
             console.log(`ðŸ“Š Displayed ${employees.length} employees with complete metrics & daily breakdown`);
@@ -1343,7 +1435,10 @@
             }
             rawData = bestResult.employees;
             filteredData = [...rawData];
-            \n            console.log(`\n\nâœ… DATA LOADED FROM: ${bestResult.source}`);            console.log(`ðŸ“Š Total Employees: ${rawData.length}, Days: ${dateRange.actualDays}`);
+            
+            console.log(`
+
+âœ… DATA LOADED FROM: ${bestResult.source}`);            console.log(`ðŸ“Š Total Employees: ${rawData.length}, Days: ${dateRange.actualDays}`);
             
             // Parse individual employee sheets for enhanced lateness data
             parseIndividualSheets(sheets, rawData);
@@ -1569,7 +1664,8 @@
                             // Try multiple parsing methods to handle different formats
                             if (cellContent) {
                                 // Method 1: Split by newlines or line breaks
-                                const lines = cellContent.split(/[\n\r]+/);
+                                const lines = cellContent.split(/[
+\r]+/);
                                 lines.forEach(line => {
                                     const matches = line.match(/(\d{1,2}):(\d{2})/g);
                                     if (matches) {
@@ -2010,7 +2106,13 @@
             renderDashboard(filteredData);
         }
         function exportToCSV() {
-            let csv = 'ID,Name,Department,Total Hours,Late Minutes,Absences\\n\n';            filteredData.forEach(emp => {\n                csv += `"${emp.id}","${emp.name}","${emp.dept}","${emp.hours}","${emp.lateMin}","${emp.absences}"\\n\n`;\n            });            downloadFile(csv, 'attendance_report.csv', 'text/csv');
+            let csv = 'ID,Name,Department,Total Hours,Late Minutes,Absences\
+
+';            filteredData.forEach(emp => {
+                csv += `"${emp.id}","${emp.name}","${emp.dept}","${emp.hours}","${emp.lateMin}","${emp.absences}"\
+
+`;
+            });            downloadFile(csv, 'attendance_report.csv', 'text/csv');
         }
         function exportToExcel() {
             const sheetData = filteredData.map(emp => ({
@@ -2033,7 +2135,9 @@
             console.log(`DEBUG: Found ${checkedCheckboxes.length} CHECKED checkboxes`);
             
             if (checkedCheckboxes.length === 0) {
-                alert('âŒ No employees selected.\n\nPlease check the checkboxes next to the employees you want to print.');                return;
+                alert('âŒ No employees selected.
+
+Please check the checkboxes next to the employees you want to print.');                return;
             }
             
             const selectedEmployees = [];
@@ -2070,13 +2174,179 @@
                 console.log(`   ${dept}: ${byDept[dept].length} employees`);
             });
             
-            // Generate print HTML - LANDSCAPE, 2 CARDS PER PAGE, GROUPED BY DEPT\n            let printHTML = `\n            <!DOCTYPE html>\n            <html lang="en">\n            <head>\n                <meta charset="UTF-8">\n                <meta name="viewport" content="width=device-width, initial-scale=1.0">\n                <title>Attendance Report - ${new Date().toLocaleDateString()}</title>\n                <style>\n                    @page { size: A4 landscape; margin: 15px; }\n                    * { box-sizing: border-box; }\n                    html { \n                        height: 100%; \n                    }\n                    body { \n                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; \n                        margin: 0; \n                        padding: 0; \n                        background: white; \n                        height: 100%;\n                    }\n                    .dept-header-page {\n                        page-break-after: always;\n                        width: 100%;\n                        height: 100vh;\n                        display: flex;\n                        align-items: center;\n                        justify-content: center;\n                        text-align: center;\n                        border-bottom: 3px solid #1e293b;\n                    }\n                    .dept-header-page h1 {\n                        font-size: 48px;\n                        color: #1e293b;\n                        margin: 0;\n                        text-transform: uppercase;\n                        letter-spacing: 2px;\n                    }\n                    .dept-header-page p {\n                        font-size: 18px;\n                        color: #64748b;\n                        margin: 20px 0 0 0;\n                    }\n                    .cards-page {\n                        page-break-after: always;\n                        display: grid;\n                        grid-template-columns: 1fr 1fr;\n                        gap: 10px;\n                        padding: 10px;\n                        width: 100%;\n                        height: 100%;\n                        min-height: 100vh;\n                        break-inside: avoid;\n                    }\n                    .employee-card {\n                        border: 1px solid #e2e8f0;\n                        border-radius: 6px;\n                        overflow: hidden;\n                        background: white;\n                        display: flex;\n                        flex-direction: column;\n                        break-inside: avoid;\n                    }\n                    .employee-title { \n                        background: #f1f5f9; \n                        padding: 8px; \n                        border-bottom: 2px solid #cbd5e1; \n                        flex-shrink: 0;\n                    }\n                    .employee-title h2 { \n                        margin: 0; \n                        font-size: 13px; \n                        color: #1e293b; \n                    }\n                    .employee-title p { \n                        margin: 1px 0 0 0; \n                        font-size: 10px; \n                        color: #64748b; \n                    }\n                    .metrics { \n                        display: grid; \n                        grid-template-columns: repeat(6, 1fr); \n                        gap: 4px; \n                        padding: 8px; \n                        background: #fafbfc; \n                        border-bottom: 1px solid #e2e8f0; \n                        flex-shrink: 0;\n                    }\n                    .metric { \n                        text-align: center; \n                        font-size: 9px;\n                    }\n                    .metric-title { \n                        font-size: 8px; \n                        font-weight: 600; \n                        color: #64748b; \n                        text-transform: uppercase; \n                        margin-bottom: 1px; \n                    }\n                    .metric-value { \n                        font-size: 12px; \n                        font-weight: 700; \n                        color: #1e293b; \n                    }\n                    .metric-unit { \n                        font-size: 7px; \n                        color: #94a3b8; \n                    }\n                    .daily-table { \n                        width: 100%; \n                        border-collapse: collapse; \n                        font-size: 9px;\n                        flex: 1;\n                        overflow: visible;\n                    }\n                    .daily-table thead { \n                        background: #e2e8f0; \n                    }\n                    .daily-table tbody { \n                        display: table-row-group;\n                    }\n                    .daily-table th { \n                        padding: 3px 2px; \n                        text-align: left; \n                        font-weight: 700; \n                        color: #1e293b; \n                        border: 0.5px solid #cbd5e1; \n                    }\n                    .daily-table td { \n                        padding: 2px 2px; \n                        border: 0.5px solid #e2e8f0; \n                    }\n                    .daily-table tr:nth-child(odd) { \n                        background: white; \n                    }\n                    .daily-table tr:nth-child(even) { \n                        background: #f8fafc; \n                    }\n                    .daily-table tr.late-row { \n                        background: #fee2e2; \n                        border-left: 3px solid #dc2626; \n                    }\n                    .daily-table td.late { \n                        color: #dc2626; \n                        font-weight: 700; \n                    }\n                    @media print {\n                        body { margin: 0; padding: 0; }\n                        * { margin: 0; padding: 0; }\n                    }\n                </style>\n            </head>\n            <body>\n\n            `;\n                        // Generate department pages + employee cards
+            // Generate print HTML - LANDSCAPE, 2 CARDS PER PAGE, GROUPED BY DEPT
+            let printHTML = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Attendance Report - ${new Date().toLocaleDateString()}</title>
+                <style>
+                    @page { size: A4 landscape; margin: 15px; }
+                    * { box-sizing: border-box; }
+                    html { 
+                        height: 100%; 
+                    }
+                    body { 
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; 
+                        margin: 0; 
+                        padding: 0; 
+                        background: white; 
+                        height: 100%;
+                    }
+                    .dept-header-page {
+                        page-break-after: always;
+                        width: 100%;
+                        height: 100vh;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        text-align: center;
+                        border-bottom: 3px solid #1e293b;
+                    }
+                    .dept-header-page h1 {
+                        font-size: 48px;
+                        color: #1e293b;
+                        margin: 0;
+                        text-transform: uppercase;
+                        letter-spacing: 2px;
+                    }
+                    .dept-header-page p {
+                        font-size: 18px;
+                        color: #64748b;
+                        margin: 20px 0 0 0;
+                    }
+                    .cards-page {
+                        page-break-after: always;
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 10px;
+                        padding: 10px;
+                        width: 100%;
+                        height: 100%;
+                        min-height: 100vh;
+                        break-inside: avoid;
+                    }
+                    .employee-card {
+                        border: 1px solid #e2e8f0;
+                        border-radius: 6px;
+                        overflow: hidden;
+                        background: white;
+                        display: flex;
+                        flex-direction: column;
+                        break-inside: avoid;
+                    }
+                    .employee-title { 
+                        background: #f1f5f9; 
+                        padding: 8px; 
+                        border-bottom: 2px solid #cbd5e1; 
+                        flex-shrink: 0;
+                    }
+                    .employee-title h2 { 
+                        margin: 0; 
+                        font-size: 13px; 
+                        color: #1e293b; 
+                    }
+                    .employee-title p { 
+                        margin: 1px 0 0 0; 
+                        font-size: 10px; 
+                        color: #64748b; 
+                    }
+                    .metrics { 
+                        display: grid; 
+                        grid-template-columns: repeat(6, 1fr); 
+                        gap: 4px; 
+                        padding: 8px; 
+                        background: #fafbfc; 
+                        border-bottom: 1px solid #e2e8f0; 
+                        flex-shrink: 0;
+                    }
+                    .metric { 
+                        text-align: center; 
+                        font-size: 9px;
+                    }
+                    .metric-title { 
+                        font-size: 8px; 
+                        font-weight: 600; 
+                        color: #64748b; 
+                        text-transform: uppercase; 
+                        margin-bottom: 1px; 
+                    }
+                    .metric-value { 
+                        font-size: 12px; 
+                        font-weight: 700; 
+                        color: #1e293b; 
+                    }
+                    .metric-unit { 
+                        font-size: 7px; 
+                        color: #94a3b8; 
+                    }
+                    .daily-table { 
+                        width: 100%; 
+                        border-collapse: collapse; 
+                        font-size: 9px;
+                        flex: 1;
+                        overflow: visible;
+                    }
+                    .daily-table thead { 
+                        background: #e2e8f0; 
+                    }
+                    .daily-table tbody { 
+                        display: table-row-group;
+                    }
+                    .daily-table th { 
+                        padding: 3px 2px; 
+                        text-align: left; 
+                        font-weight: 700; 
+                        color: #1e293b; 
+                        border: 0.5px solid #cbd5e1; 
+                    }
+                    .daily-table td { 
+                        padding: 2px 2px; 
+                        border: 0.5px solid #e2e8f0; 
+                    }
+                    .daily-table tr:nth-child(odd) { 
+                        background: white; 
+                    }
+                    .daily-table tr:nth-child(even) { 
+                        background: #f8fafc; 
+                    }
+                    .daily-table tr.late-row { 
+                        background: #fee2e2; 
+                        border-left: 3px solid #dc2626; 
+                    }
+                    .daily-table td.late { 
+                        color: #dc2626; 
+                        font-weight: 700; 
+                    }
+                    @media print {
+                        body { margin: 0; padding: 0; }
+                        * { margin: 0; padding: 0; }
+                    }
+                </style>
+            </head>
+            <body>
+
+            `;
+                        // Generate department pages + employee cards
             deptList.forEach(dept => {
                 const deptEmployees = byDept[dept];
                 
-                // Add department header page\n                printHTML += `\n                    <div class="dept-header-page">\n                        <div>\n                            <h1>${dept}</h1>\n                            <p>${deptEmployees.length} Employee${deptEmployees.length !== 1 ? 's' : ''}</p>\n                        </div>\n                    </div>\n\n                `;\n                                // Add employee cards, 2 per page
+                // Add department header page
+                printHTML += `
+                    <div class="dept-header-page">
+                        <div>
+                            <h1>${dept}</h1>
+                            <p>${deptEmployees.length} Employee${deptEmployees.length !== 1 ? 's' : ''}</p>
+                        </div>
+                    </div>
+
+                `;
+                                // Add employee cards, 2 per page
                 for (let i = 0; i < deptEmployees.length; i += 2) {
-                    printHTML += `<div class="cards-page">`;\n                    
+                    printHTML += `<div class="cards-page">`;
+                    
                     // First card in the pair
                     const emp1 = deptEmployees[i];
                     printHTML += generateEmployeeCard(emp1);
@@ -2087,9 +2357,16 @@
                         printHTML += generateEmployeeCard(emp2);
                     }
                     
-                    printHTML += `</div>`;\n                }
+                    printHTML += `</div>`;
+                }
             });
-            \n            printHTML += `\n            </body>\n            </html>\n\n            `;\n                        // Open print window
+            
+            printHTML += `
+            </body>
+            </html>
+
+            `;
+                        // Open print window
             const printWindow = window.open('', '_blank');
             printWindow.document.write(printHTML);
             printWindow.document.close();
@@ -2107,8 +2384,63 @@
                 const punctualityPercent = daysWorked > 0 ? Math.max(0, 100 - (lateCount / daysWorked * 100)).toFixed(0) : '-';
                 const hoursNum = parseFloat(emp.hours) || 0;
                 const absences = dateRange.actualDays - daysWorked;
-                \n                let cardHTML = `\n                    <div class="employee-card">\n                        <div class="employee-title">\n                            <h2>${emp.name}</h2>\n                            <p>ID: ${emp.id}</p>\n                        </div>\n                        <div class="metrics">\n                            <div class="metric">\n                                <div class="metric-title">Attendance</div>\n                                <div class="metric-value">${attendancePercent.toFixed(0)}%</div>\n                            </div>\n                            <div class="metric">\n                                <div class="metric-title">Punctuality</div>\n                                <div class="metric-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>\n                            </div>\n                            <div class="metric">\n                                <div class="metric-title">Hours</div>\n                                <div class="metric-value">${hoursNum.toFixed(2)}</div>\n                                <div class="metric-unit">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>\n                            </div>\n                            <div class="metric">\n                                <div class="metric-title">Late Min</div>\n                                <div class="metric-value">${emp.lateMin || 0}</div>\n                                <div class="metric-unit">min</div>\n                            </div>\n                            <div class="metric">\n                                <div class="metric-title">Absences</div>\n                                <div class="metric-value">${absences}</div>\n                                <div class="metric-unit">days</div>\n                            </div>\n                            <div class="metric">\n                                <div class="metric-title">Worked</div>\n                                <div class="metric-value">${daysWorked}</div>\n                                <div class="metric-unit">days</div>\n                            </div>\n                        </div>\n\n                `;\n                                // Add daily breakdown table if available
-                if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {\n                    cardHTML += `\n                        <table class="daily-table">\n                            <thead>\n                                <tr>\n                                    <th>Date</th>\n                                    <th>Day</th>\n                                    <th>Punches</th>\n                                    <th>Hrs</th>\n                                    <th>Late</th>\n                                    <th>Status</th>\n                                </tr>\n                            </thead>\n                            <tbody>\n\n                    `;\n                                        emp.dailyBreakdown.forEach(day => {
+                
+                let cardHTML = `
+                    <div class="employee-card">
+                        <div class="employee-title">
+                            <h2>${emp.name}</h2>
+                            <p>ID: ${emp.id}</p>
+                        </div>
+                        <div class="metrics">
+                            <div class="metric">
+                                <div class="metric-title">Attendance</div>
+                                <div class="metric-value">${attendancePercent.toFixed(0)}%</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-title">Punctuality</div>
+                                <div class="metric-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-title">Hours</div>
+                                <div class="metric-value">${hoursNum.toFixed(2)}</div>
+                                <div class="metric-unit">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-title">Late Min</div>
+                                <div class="metric-value">${emp.lateMin || 0}</div>
+                                <div class="metric-unit">min</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-title">Absences</div>
+                                <div class="metric-value">${absences}</div>
+                                <div class="metric-unit">days</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-title">Worked</div>
+                                <div class="metric-value">${daysWorked}</div>
+                                <div class="metric-unit">days</div>
+                            </div>
+                        </div>
+
+                `;
+                                // Add daily breakdown table if available
+                if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
+                    cardHTML += `
+                        <table class="daily-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Day</th>
+                                    <th>Punches</th>
+                                    <th>Hrs</th>
+                                    <th>Late</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                    `;
+                                        emp.dailyBreakdown.forEach(day => {
                         const rowClass = day.lateMin > 0 ? 'late-row' : '';
                         const status = day.isMissed ? 'âŒ' : (day.hasMissedPunch ? 'âš ï¸' : 'âœ…');
                         const punches = day.punchPairs && day.punchPairs.length > 0 
@@ -2123,8 +2455,27 @@
                             const totalHours = day.punchPairs.reduce((sum, p) => sum + (parseFloat(p.pairHours) || 0), 0);
                             if (totalHours > 0) hoursDisplay = totalHours.toFixed(1);
                         }
-                        \n                        cardHTML += `\n                            <tr class="${rowClass}">\n                                <td>${day.date}</td>\n                                <td>${day.dayName}</td>\n                                <td>${punches}</td>\n                                <td>${hoursDisplay}</td>\n                                <td class="${day.lateMin > 0 ? 'late' : ''}">${day.lateMin > 0 ? day.lateMin : 'â€”'}</td>\n                                <td>${status}</td>\n                            </tr>\n\n                        `;\n                    });                    \n                    cardHTML += `\n                            </tbody>\n                        </table>\n\n                    `;\n                }                
-                cardHTML += `</div>`;\n                return cardHTML;
+                        
+                        cardHTML += `
+                            <tr class="${rowClass}">
+                                <td>${day.date}</td>
+                                <td>${day.dayName}</td>
+                                <td>${punches}</td>
+                                <td>${hoursDisplay}</td>
+                                <td class="${day.lateMin > 0 ? 'late' : ''}">${day.lateMin > 0 ? day.lateMin : 'â€”'}</td>
+                                <td>${status}</td>
+                            </tr>
+
+                        `;
+                    });                    
+                    cardHTML += `
+                            </tbody>
+                        </table>
+
+                    `;
+                }                
+                cardHTML += `</div>`;
+                return cardHTML;
             }
         }
         // ========== CHANGE TRACKING & AUDIT LOG ==========
@@ -2222,7 +2573,8 @@
         
         // ========== DATA COMPARISON & MERGING ==========
         async function compareWithExisting(newEmployees, monthYear) {
-            const monthId = `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`;\n            
+            const monthId = `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`;
+            
             try {
                 // Get the existing month document (if it exists)
                 const monthDoc = await db.collection(MONTHS_COLLECTION).doc(monthId).get();
@@ -2319,23 +2671,55 @@
                 btn.textContent = 'â³ Processing...';
                 // Detect month from data
                 const monthYear = detectMonthFromData(rawData);
-                const monthStr = `${String(monthYear.month).padStart(2, '0')}_${monthYear.year}`;\n                \n                console.log(`\n\nðŸ—“ï¸ Processing report for: ${monthYear.month}/${monthYear.year}`);
+                const monthStr = `${String(monthYear.month).padStart(2, '0')}_${monthYear.year}`;
+                
+                console.log(`
+
+ðŸ—“ï¸ Processing report for: ${monthYear.month}/${monthYear.year}`);
                 // Compare with existing data
                 const comparison = await compareWithExisting(filteredData, monthYear);
                 
-                // Build summary message\n                let summaryMsg = `ðŸ“Š Data Merge Summary for ${monthYear.month}/${monthYear.year}:\n\n`;\n                summaryMsg += `âœ¨ NEW: ${comparison.new.length} employees\n`;\n                summaryMsg += `ðŸ”„ MODIFIED: ${comparison.modified.length} employees\n`;\n                summaryMsg += `âœ… UNCHANGED: ${comparison.unchanged.length} employees\n\n`;\n                                if (comparison.modified.length > 0) {\n                    summaryMsg += `\nModified fields:\n\n`;\n                    comparison.modified.forEach(item => {\n                        summaryMsg += `\n  ${item.emp.name} (ID: ${item.emp.id}):`;\n                        item.differences.forEach(diff => {\n                            summaryMsg += `    â€¢ ${diff.field}: ${diff.oldValue} â†’ ${diff.newValue}
-`;\n                        });\n                }
+                // Build summary message
+                let summaryMsg = `ðŸ“Š Data Merge Summary for ${monthYear.month}/${monthYear.year}:
+
+`;
+                summaryMsg += `âœ¨ NEW: ${comparison.new.length} employees
+`;
+                summaryMsg += `ðŸ”„ MODIFIED: ${comparison.modified.length} employees
+`;
+                summaryMsg += `âœ… UNCHANGED: ${comparison.unchanged.length} employees
+
+`;
+                                if (comparison.modified.length > 0) {
+                    summaryMsg += `
+Modified fields:
+
+`;
+                    comparison.modified.forEach(item => {
+                        summaryMsg += `
+  ${item.emp.name} (ID: ${item.emp.id}):`;
+                        item.differences.forEach(diff => {
+                            summaryMsg += `    â€¢ ${diff.field}: ${diff.oldValue} â†’ ${diff.newValue}
+`;
+                        });
+                }
                 
                 console.log(summaryMsg);
                 
-                // Show confirmation with changes\n                const proceed = confirm(summaryMsg + `\n\n\nProceed to save all changes to Firestore?`);                
+                // Show confirmation with changes
+                const proceed = confirm(summaryMsg + `
+
+
+Proceed to save all changes to Firestore?`);                
                 if (!proceed) {
                     btn.textContent = 'â˜ï¸ Save to Cloud';
                     btn.disabled = false;
                     return;
                 }
                 // Save to Firestore with flat month-based organization
-                const monthId = `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`;\n                const reportId = `report_${monthId}_${Date.now()}`;\n                
+                const monthId = `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`;
+                const reportId = `report_${monthId}_${Date.now()}`;
+                
                 const reportData = {
                     reportId,
                     monthId,
@@ -2376,7 +2760,8 @@
                 // Save change log separately for audit
                 await saveToFirestore(
                     AUDIT_COLLECTION,
-                    `audit_${monthId}_${Date.now()}`,\n                    {
+                    `audit_${monthId}_${Date.now()}`,
+                    {
                         timestamp: new Date(),
                         month: monthYear.month,
                         year: monthYear.year,
@@ -2386,7 +2771,13 @@
                         reportId: reportId
                     }
                 );
-                \n                alert(`âœ… Report saved successfully!\n\n${summaryMsg}\n\n\nData saved to Firestore with full change history.`);                btn.textContent = 'â˜ï¸ Saved!';
+                
+                alert(`âœ… Report saved successfully!
+
+${summaryMsg}
+
+
+Data saved to Firestore with full change history.`);                btn.textContent = 'â˜ï¸ Saved!';
                 
                 // Refresh month dropdown to show new month if added
                 setTimeout(() => {
@@ -2439,7 +2830,16 @@
             saveBtn.style.cssText = 'background: #16a34a; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.3rem; cursor: pointer; font-weight: 600; margin-left: auto;';
             saveBtn.onclick = () => saveEmployeeChanges(empId, card);
             header.appendChild(saveBtn);
-            \n            alert(`âœï¸ Edit mode ON for ${emp.name}\n\nEditable fields:\nâ€¢ Hours\nâ€¢ Late Minutes\nâ€¢ Absences\n\n\nClick 'Save Changes' when done.`);        }
+            
+            alert(`âœï¸ Edit mode ON for ${emp.name}
+
+Editable fields:
+â€¢ Hours
+â€¢ Late Minutes
+â€¢ Absences
+
+
+Click 'Save Changes' when done.`);        }
         
         async function saveEmployeeChanges(empId, card) {
             const emp = filteredData.find(e => e.id.toString() === empId.toString());
@@ -2484,7 +2884,8 @@
                     changes: changes,
                     month: monthYear.month,
                     year: monthYear.year,
-                    monthId: `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`\n                };
+                    monthId: `${monthYear.year}_${String(monthYear.month).padStart(2, '0')}`
+                };
                 
                 // Add to edit history
                 empData.edits.push({
@@ -2494,7 +2895,13 @@
                 });
                 
                 await saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}_${empData.monthId}`, empData);
-                \n                alert(`âœ… Changes saved for ${emp.name}!\n\nModified fields:\n\n${changes.map(c => `â€¢ ${c.field}: ${c.oldValue} â†’ ${c.newValue}`).join('\n')}`);            } else {
+                
+                alert(`âœ… Changes saved for ${emp.name}!
+
+Modified fields:
+
+${changes.map(c => `â€¢ ${c.field}: ${c.oldValue} â†’ ${c.newValue}`).join('
+')}`);            } else {
                 alert(`â„¹ï¸ No changes made to ${emp.name}`);
             }
             
@@ -2521,7 +2928,14 @@
             let printHTML = '<div id="print-container" style="display: none;">';
             
             for (const [dept, employees] of Object.entries(grouped)) {
-                // Add department header page\n                printHTML += `\n                    <div class="dept-header-page">\n                        <div class="dept-header-title">${dept}</div>\n                    </div>\n\n                `;\n                                // Add employee cards for this department
+                // Add department header page
+                printHTML += `
+                    <div class="dept-header-page">
+                        <div class="dept-header-title">${dept}</div>
+                    </div>
+
+                `;
+                                // Add employee cards for this department
                 printHTML += '<div class="employees-grid">';
                 employees.forEach((emp) => {
                     const hoursNum = parseFloat(emp.hours) || 0;
@@ -2557,7 +2971,59 @@
                         tier = 'Good';
                         tierAttr = 'good';
                     }
-                    \n                    printHTML += `\n                        <div class="employee-card" data-tier="${tierAttr}">\n                            <div class="employee-header">\n                                <div class="employee-info">\n                                    <div class="employee-name">${emp.name}</div>\n                                    <div class="employee-meta">\n                                        <span class="employee-dept">${emp.dept}</span>\n                                        <span class="employee-id">ID: ${emp.id}</span>\n                                    </div>\n                                </div>\n                                <div class="tier-badge">${tier}</div>\n                            </div>\n                            <div class="visual-metrics">\n                                <div class="metrics-line">\n                                    <div class="metric-card rate-card">\n                                        <div class="metric-card-title">Attendance</div>\n                                        <div class="metric-card-value">${attendancePercent.toFixed(0)}%</div>\n                                    </div>\n                                    <div class="metric-card punctuality-card">\n                                        <div class="metric-card-title">Punctuality</div>\n                                        <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>\n                                    </div>\n                                    <div class="metric-card hours-card">\n                                        <div class="metric-card-title">Hours</div>\n                                        <div class="metric-card-value">${hoursNum.toFixed(2)}</div>\n                                        <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>\n                                        <div class="metric-card-sub">hrs</div>\n                                    </div>\n                                    <div class="metric-card late-card">\n                                        <div class="metric-card-title">Late Min</div>\n                                        <div class="metric-card-value">${emp.lateMin}</div>\n                                        <div class="metric-card-sub">min</div>\n                                    </div>\n                                    <div class="metric-card absence-card">\n                                        <div class="metric-card-title">Absences</div>\n                                        <div class="metric-card-value">${absences}</div>\n                                        <div class="metric-card-sub">days</div>\n                                    </div>\n                                    <div class="metric-card worked-card">\n                                        <div class="metric-card-title">Worked</div>\n                                        <div class="metric-card-value">${emp.daysWorked || '-'}</div>\n                                        <div class="metric-card-sub">days</div>\n                                    </div>\n                                </div>\n                            </div>\n                            <div class="daily-breakdown">\n                                ${renderDailyBreakdown(emp)}\n                            </div>\n                        </div>\n\n                    `;\n                });                printHTML += '</div>';
+                    
+                    printHTML += `
+                        <div class="employee-card" data-tier="${tierAttr}">
+                            <div class="employee-header">
+                                <div class="employee-info">
+                                    <div class="employee-name">${emp.name}</div>
+                                    <div class="employee-meta">
+                                        <span class="employee-dept">${emp.dept}</span>
+                                        <span class="employee-id">ID: ${emp.id}</span>
+                                    </div>
+                                </div>
+                                <div class="tier-badge">${tier}</div>
+                            </div>
+                            <div class="visual-metrics">
+                                <div class="metrics-line">
+                                    <div class="metric-card rate-card">
+                                        <div class="metric-card-title">Attendance</div>
+                                        <div class="metric-card-value">${attendancePercent.toFixed(0)}%</div>
+                                    </div>
+                                    <div class="metric-card punctuality-card">
+                                        <div class="metric-card-title">Punctuality</div>
+                                        <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
+                                    </div>
+                                    <div class="metric-card hours-card">
+                                        <div class="metric-card-title">Hours</div>
+                                        <div class="metric-card-value">${hoursNum.toFixed(2)}</div>
+                                        <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>
+                                        <div class="metric-card-sub">hrs</div>
+                                    </div>
+                                    <div class="metric-card late-card">
+                                        <div class="metric-card-title">Late Min</div>
+                                        <div class="metric-card-value">${emp.lateMin}</div>
+                                        <div class="metric-card-sub">min</div>
+                                    </div>
+                                    <div class="metric-card absence-card">
+                                        <div class="metric-card-title">Absences</div>
+                                        <div class="metric-card-value">${absences}</div>
+                                        <div class="metric-card-sub">days</div>
+                                    </div>
+                                    <div class="metric-card worked-card">
+                                        <div class="metric-card-title">Worked</div>
+                                        <div class="metric-card-value">${emp.daysWorked || '-'}</div>
+                                        <div class="metric-card-sub">days</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="daily-breakdown">
+                                ${renderDailyBreakdown(emp)}
+                            </div>
+                        </div>
+
+                    `;
+                });                printHTML += '</div>';
             }
             
             printHTML += '</div>';
@@ -2596,7 +3062,9 @@
             const employees = [];
             const titleCell = (data[0]?.[0] || '').toString().toLowerCase();
             
-            console.log('=== SMART PARSER STARTING ===\n\nDetected Title:', titleCell);            
+            console.log('=== SMART PARSER STARTING ===
+
+Detected Title:', titleCell);            
             // Extract date range from row 1 if available
             let dateRange = { start: null, end: null };
             const dateRangeStr = (data[1]?.[2] || '').toString().trim();
@@ -2727,7 +3195,8 @@
                                     hasMissedPunch: false
                                 };
                                 
-                                const times = cellContent.split(/[\n]+/).filter(t => t.trim() && /^\d{2}:\d{2}/.test(t.trim()));
+                                const times = cellContent.split(/[
+]+/).filter(t => t.trim() && /^\d{2}:\d{2}/.test(t.trim()));
                                 
                                 if (times.length === 0) {
                                     dayRecord.isMissed = true;
@@ -2869,8 +3338,12 @@
             
             rawData = employees;
             
-            console.log('\n\n========== DATA LOADED ==========');            console.log('Total Employees:', rawData.length);
-            console.log('==============================\n\n');            
+            console.log('
+
+========== DATA LOADED ==========');            console.log('Total Employees:', rawData.length);
+            console.log('==============================
+
+');            
             if (rawData.length > 0) {
                 renderDashboard(rawData);
                 document.getElementById('statsGrid').classList.remove('hidden');
@@ -2893,7 +3366,11 @@
             document.getElementById('statAbsence').textContent = Math.round(totalAbsences);
             document.getElementById('statLate').textContent = Math.round(totalLateMin);
             document.getElementById('statAvg').textContent = avgAttendance + '%';
-            \n            console.log(`\nðŸŽ¯ PUNCTUALITY CALCULATION DIAGNOSTICS:\n\n`);            
+            
+            console.log(`
+ðŸŽ¯ PUNCTUALITY CALCULATION DIAGNOSTICS:
+
+`);            
             renderTable(data);
             updateCharts(data);
         }
@@ -2969,13 +3446,78 @@
                             break;
                         }
                     }
-                    streakInfo = currentStreak > 0 ? `${currentStreak} day streak` : '';\n                }
+                    streakInfo = currentStreak > 0 ? `${currentStreak} day streak` : '';
+                }
                 
                 let tierAttr = 'excellent';
                 if (absences > 3 || emp.lateMin > 200) tierAttr = 'critical';
                 else if (absences > 1 || emp.lateMin > 100) tierAttr = 'warning';
                 else if (absences > 0 || emp.lateMin > 0) tierAttr = 'good';
-                \n                return `\n                    <div class="employee-card" data-tier="${tierAttr}" data-id="${emp.id}">\n                        <div class="employee-header">\n                            <input type="checkbox" class="employee-checkbox" data-id="${emp.id}" style="margin-right: 0.5rem; width: 18px; height: 18px; cursor: pointer;">\n                            <div class="employee-info">\n                                <div class="employee-name">${emp.name}</div>\n                                <div class="employee-meta">\n                                    <span class="employee-dept">${emp.dept}</span>\n                                    <span class="employee-id">ID: ${emp.id}</span>\n                                </div>\n                            </div>\n                            <div class="tier-badge">${tier}</div>\n                            <button onclick="enableEditMode('${emp.id}')" style="background: #3b82f6; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 0.3rem; cursor: pointer; font-size: 0.8rem; margin-left: 0.5rem; font-weight: 600;">âœï¸ Edit</button>\n                        </div>\n                        \n                        <div class="visual-metrics">\n                            <!-- All 6 Metrics in Single Line -->\n                            <div class="metrics-line">\n                                <div class="metric-card rate-card">\n                                    <div class="metric-card-title">Attendance</div>\n                                    <div class="metric-card-value">${attendancePercent.toFixed(0)}%</div>\n                                </div>\n                                <div class="metric-card punctuality-card">\n                                    <div class="metric-card-title">Punctuality</div>\n                                    <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>\n                                </div>\n                                <div class="metric-card hours-card">\n                                    <div class="metric-card-title">Hours</div>\n                                    <div class="metric-card-value">${hoursNum.toFixed(2)}</div>\n                                    <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>\n                                    <div class="metric-card-sub">hrs</div>\n                                </div>\n                                <div class="metric-card late-card">\n                                    <div class="metric-card-title">Late Min</div>\n                                    <div class="metric-card-value">${emp.lateMin}</div>\n                                    <div class="metric-card-sub">min</div>\n                                </div>\n                                <div class="metric-card absence-card">\n                                    <div class="metric-card-title">Absences</div>\n                                    <div class="metric-card-value">${absences}</div>\n                                    <div class="metric-card-sub">days</div>\n                                </div>\n                                <div class="metric-card worked-card">\n                                    <div class="metric-card-title">Worked</div>\n                                    <div class="metric-card-value">${emp.daysWorked || '-'}</div>\n                                    <div class="metric-card-sub">days</div>\n                                </div>\n                            </div>\n                        </div>\n                        \n                        <div class="status-bar">\n                            <div class="status-left">\n                                <div class="status-tier" style="color: ${tierColor};">${tier}</div>\n                                <div class="status-streak">${streakInfo}</div>\n                            </div>\n                        </div>\n                        \n                        <div class="daily-breakdown">\n                            ${renderDailyBreakdown(emp)}\n                        </div>\n                    </div>\n\n                `;\n            }).join('');            
+                
+                return `
+                    <div class="employee-card" data-tier="${tierAttr}" data-id="${emp.id}">
+                        <div class="employee-header">
+                            <input type="checkbox" class="employee-checkbox" data-id="${emp.id}" style="margin-right: 0.5rem; width: 18px; height: 18px; cursor: pointer;">
+                            <div class="employee-info">
+                                <div class="employee-name">${emp.name}</div>
+                                <div class="employee-meta">
+                                    <span class="employee-dept">${emp.dept}</span>
+                                    <span class="employee-id">ID: ${emp.id}</span>
+                                </div>
+                            </div>
+                            <div class="tier-badge">${tier}</div>
+                            <button onclick="enableEditMode('${emp.id}')" style="background: #3b82f6; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 0.3rem; cursor: pointer; font-size: 0.8rem; margin-left: 0.5rem; font-weight: 600;">âœï¸ Edit</button>
+                        </div>
+                        
+                        <div class="visual-metrics">
+                            <!-- All 6 Metrics in Single Line -->
+                            <div class="metrics-line">
+                                <div class="metric-card rate-card">
+                                    <div class="metric-card-title">Attendance</div>
+                                    <div class="metric-card-value">${attendancePercent.toFixed(0)}%</div>
+                                </div>
+                                <div class="metric-card punctuality-card">
+                                    <div class="metric-card-title">Punctuality</div>
+                                    <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
+                                </div>
+                                <div class="metric-card hours-card">
+                                    <div class="metric-card-title">Hours</div>
+                                    <div class="metric-card-value">${hoursNum.toFixed(2)}</div>
+                                    <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>
+                                    <div class="metric-card-sub">hrs</div>
+                                </div>
+                                <div class="metric-card late-card">
+                                    <div class="metric-card-title">Late Min</div>
+                                    <div class="metric-card-value">${emp.lateMin}</div>
+                                    <div class="metric-card-sub">min</div>
+                                </div>
+                                <div class="metric-card absence-card">
+                                    <div class="metric-card-title">Absences</div>
+                                    <div class="metric-card-value">${absences}</div>
+                                    <div class="metric-card-sub">days</div>
+                                </div>
+                                <div class="metric-card worked-card">
+                                    <div class="metric-card-title">Worked</div>
+                                    <div class="metric-card-value">${emp.daysWorked || '-'}</div>
+                                    <div class="metric-card-sub">days</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="status-bar">
+                            <div class="status-left">
+                                <div class="status-tier" style="color: ${tierColor};">${tier}</div>
+                                <div class="status-streak">${streakInfo}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="daily-breakdown">
+                            ${renderDailyBreakdown(emp)}
+                        </div>
+                    </div>
+
+                `;
+            }).join('');            
             document.getElementById('tableBody').innerHTML = cards;
             
             // Attach real-time edit listeners to all employee cards
@@ -2996,7 +3538,8 @@
             const period = hours >= 12 ? 'PM' : 'AM';
             hours = hours % 12 || 12;
             
-            return `${hours}:${mins} ${period}`;\n        }
+            return `${hours}:${mins} ${period}`;
+        }
         
         function parseTime(timeInput) {
             // Convert 12-hour or 24-hour format to 24-hour HH:MM
@@ -3019,7 +3562,8 @@
             }
             
             // Format as HH:MM
-            return `${String(hours).padStart(2, '0')}:${mins}`;\n        }
+            return `${String(hours).padStart(2, '0')}:${mins}`;
+        }
         // ========== SHIFT TIME ADJUSTMENT ==========
         function timeToMinutes(timeStr) {
             if (!timeStr) return 0;
@@ -3029,7 +3573,8 @@
         function minutesToTime(minutes) {
             const h = Math.floor(minutes / 60) % 24;
             const m = minutes % 60;
-            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;\n        }
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        }
         function adjustTimeForShift(actualTimeStr, shiftKey, isClockOut) {
             // Returns { displayTime, actualTime, wasAdjusted, adjustedReason }
             if (!actualTimeStr || !shiftKey || !shiftDefinitions[shiftKey]) {
@@ -3049,14 +3594,16 @@
                 if (actualMinutes > maxAllowedMinutes) {
                     displayMinutes = maxAllowedMinutes;
                     wasAdjusted = true;
-                    adjustedReason = `Beyond allowed 10-min buffer after shift end`;\n                }
+                    adjustedReason = `Beyond allowed 10-min buffer after shift end`;
+                }
             } else {
                 // Clock in: if more than 10 mins before shift start, lock to (shift start - 10 mins)
                 const minAllowedMinutes = shiftStartMinutes - bufferMinutes;
                 if (actualMinutes < minAllowedMinutes) {
                     displayMinutes = minAllowedMinutes;
                     wasAdjusted = true;
-                    adjustedReason = `Beyond allowed 10-min buffer before shift start`;\n                }
+                    adjustedReason = `Beyond allowed 10-min buffer before shift start`;
+                }
             }
             return {
                 displayTime: minutesToTime(displayMinutes),
@@ -3075,14 +3622,18 @@
             let outDisplay = formatTime(adjustedOut.displayTime);
             // Add actual times in parenthesis if adjusted
             if (adjustedIn.wasAdjusted) {
-                inDisplay += ` (actual: ${formatTime(adjustedIn.actualTime)})`;\n            }
+                inDisplay += ` (actual: ${formatTime(adjustedIn.actualTime)})`;
+            }
             if (adjustedOut.wasAdjusted) {
-                outDisplay += ` (actual: ${formatTime(adjustedOut.actualTime)})`;\n            }
-            return `${inDisplay} â†’ ${outDisplay || '(missing)'}`;\n        }
+                outDisplay += ` (actual: ${formatTime(adjustedOut.actualTime)})`;
+            }
+            return `${inDisplay} â†’ ${outDisplay || '(missing)'}`;
+        }
         
         function renderDailyBreakdown(emp) {
             if (!emp.dailyBreakdown) {
-                return `<div style="padding: 0.2rem; color: #64748b; font-size: 0.6rem; text-align: center;">No data</div>`;\n            }
+                return `<div style="padding: 0.2rem; color: #64748b; font-size: 0.6rem; text-align: center;">No data</div>`;
+            }
             
             const lateDates = emp.dailyBreakdown.filter(d => d.lateMin > 0).length;
             const missedPunchDates = emp.dailyBreakdown.filter(d => d.hasMissedPunch).length;
@@ -3106,18 +3657,82 @@
                     rowBorder = 'border-left: 3px solid #dc2626;';
                 }
                 
-                const rowStyle = `line-height: 1.2; background-color: ${rowColor}; ${rowBorder}`;\n                
+                const rowStyle = `line-height: 1.2; background-color: ${rowColor}; ${rowBorder}`;
+                
                 // If no punch pairs, show placeholder
-                if (hasNoPunches) {\n                    return `\n                        <tr style="${rowStyle}">\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};"><strong>${day.date}</strong></td>\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};"><strong>${day.dayName}</strong></td>\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;" colspan="2">â€”</td>\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">â€”</td>\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">â€”</td>\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};">\n                                <button onclick="openDayEditModal('${emp.id}', ${dayIdx})" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.7rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit punch times">âœŽ</button>\n                            </td>\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">âŒ</td>\n                        </tr>\n\n                    `;\n                }                
+                if (hasNoPunches) {
+                    return `
+                        <tr style="${rowStyle}">
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};"><strong>${day.date}</strong></td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};"><strong>${day.dayName}</strong></td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;" colspan="2">â€”</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">â€”</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">â€”</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};">
+                                <button onclick="openDayEditModal('${emp.id}', ${dayIdx})" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.7rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit punch times">âœŽ</button>
+                            </td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">âŒ</td>
+                        </tr>
+
+                    `;
+                }                
                 // Build rows for each punch pair
                 return day.punchPairs.map((pair, pairIdx) => {
                     const adjustedIn = adjustTimeForShift(pair.in, emp.shift, false);
                     const adjustedOut = adjustTimeForShift(pair.out, emp.shift, true);
-                    const inDisplay = `${formatTime(adjustedIn.displayTime)}${adjustedIn.wasAdjusted ? `<br><span style="font-size: 0.45rem; color: #e74c3c; font-weight: 600;" title="${adjustedIn.adjustedReason}">(actual: ${formatTime(adjustedIn.actualTime)})</span>` : ''}`;\n                    const outDisplay = `${formatTime(adjustedOut.displayTime)}${adjustedOut.wasAdjusted ? `<br><span style="font-size: 0.45rem; color: #e74c3c; font-weight: 600;" title="${adjustedOut.adjustedReason}">(actual: ${formatTime(adjustedOut.actualTime)})</span>` : ''}`;\n                    \n                    return `\n                    <tr style="${rowStyle}">\n\n                        ${pairIdx === 0 ? `\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.date}</strong></td>                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.dayName}</strong></td>\n                        ` : ''}\n                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${inDisplay}</td>\n                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${outDisplay}</td>\n                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times" data-hours-cell="true" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : 'â€”'}</td>\n\n                        ${pairIdx === 0 ? `\n                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; font-weight: ${day.lateMin > 0 ? '700' : '400'}; color: ${day.lateMin > 0 ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">
+                    const inDisplay = `${formatTime(adjustedIn.displayTime)}${adjustedIn.wasAdjusted ? `<br><span style="font-size: 0.45rem; color: #e74c3c; font-weight: 600;" title="${adjustedIn.adjustedReason}">(actual: ${formatTime(adjustedIn.actualTime)})</span>` : ''}`;
+                    const outDisplay = `${formatTime(adjustedOut.displayTime)}${adjustedOut.wasAdjusted ? `<br><span style="font-size: 0.45rem; color: #e74c3c; font-weight: 600;" title="${adjustedOut.adjustedReason}">(actual: ${formatTime(adjustedOut.actualTime)})</span>` : ''}`;
+                    
+                    return `
+                    <tr style="${rowStyle}">
+
+                        ${pairIdx === 0 ? `
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.date}</strong></td>                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.dayName}</strong></td>
+                        ` : ''}
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${inDisplay}</td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${outDisplay}</td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times" data-hours-cell="true" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : 'â€”'}</td>
+
+                        ${pairIdx === 0 ? `
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; font-weight: ${day.lateMin > 0 ? '700' : '400'}; color: ${day.lateMin > 0 ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">
                                 <button onclick="openDayEditModal('${emp.id}', ${dayIdx})" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.7rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit punch times">âœŽ</button>
                             </td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">${day.isMissed ? 'âŒ' : (day.hasMissedPunch ? 'âš ï¸' : 'âœ…')}</td>\n                        ` : ''}\n                    </tr>\n\n                `;\n                }).join('');            }).join('');
-            \n            return `\n                <div style="padding: 0.2rem; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 0.2rem;">\n                    <div style="padding: 0 0.2rem;">\n                        <div style="font-size: 0.55rem; color: #64748b;">\n                            <strong>Format:</strong> 9:30 AM or 09:30 | <strong style="color: #f3f4f6; background: #e0e0e0; padding: 0.1rem 0.3rem; border-radius: 2px;">No Punches (Gray)</strong> | <strong style="color: #dc2626; background: #fee2e2; padding: 0.1rem 0.3rem; border-radius: 2px;">Late (Red)</strong> | <strong style="background: white; padding: 0.1rem 0.3rem; border: 1px solid #e2e8f0; border-radius: 2px;">On-time (White)</strong>\n                        </div>\n                    </div>\n                    <!-- DAILY TABLE WITH PUNCH TIMES (Edit via modal button) -->\n                    <table style="width: 100%; font-size: 0.6rem; border-collapse: collapse; font-family: monospace; line-height: 1;">\n                        <thead>\n                            <tr style="background: #e2e8f0;">\n                                <th style="padding: 0.15rem 0.2rem; text-align: left; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Date</th>\n                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Day</th>\n                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #fef08a;">IN</th>\n                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #fef08a;">OUT</th>\n                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #dbeafe;">Hrs</th>\n                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Late</th>\n                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Edit</th>\n                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">S</th>\n                            </tr>\n                        </thead>\n                        <tbody>\n                            ${tableRows}\n                        </tbody>\n                    </table>\n                </div>\n\n            `;\n        }        
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">${day.isMissed ? 'âŒ' : (day.hasMissedPunch ? 'âš ï¸' : 'âœ…')}</td>
+                        ` : ''}
+                    </tr>
+
+                `;
+                }).join('');            }).join('');
+            
+            return `
+                <div style="padding: 0.2rem; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 0.2rem;">
+                    <div style="padding: 0 0.2rem;">
+                        <div style="font-size: 0.55rem; color: #64748b;">
+                            <strong>Format:</strong> 9:30 AM or 09:30 | <strong style="color: #f3f4f6; background: #e0e0e0; padding: 0.1rem 0.3rem; border-radius: 2px;">No Punches (Gray)</strong> | <strong style="color: #dc2626; background: #fee2e2; padding: 0.1rem 0.3rem; border-radius: 2px;">Late (Red)</strong> | <strong style="background: white; padding: 0.1rem 0.3rem; border: 1px solid #e2e8f0; border-radius: 2px;">On-time (White)</strong>
+                        </div>
+                    </div>
+                    <!-- DAILY TABLE WITH PUNCH TIMES (Edit via modal button) -->
+                    <table style="width: 100%; font-size: 0.6rem; border-collapse: collapse; font-family: monospace; line-height: 1;">
+                        <thead>
+                            <tr style="background: #e2e8f0;">
+                                <th style="padding: 0.15rem 0.2rem; text-align: left; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Date</th>
+                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Day</th>
+                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #fef08a;">IN</th>
+                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #fef08a;">OUT</th>
+                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #dbeafe;">Hrs</th>
+                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Late</th>
+                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Edit</th>
+                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">S</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                </div>
+
+            `;
+        }        
         
         async function saveEmployeeChanges(empId) {
             const emp = filteredData.find(e => String(e.id) === String(empId));
@@ -3140,7 +3755,8 @@
                 emp.editHistory = cellEditHistory;
                 
                 // Update Firestore with the modified employee data
-                const docId = `emp_${emp.id}_${currentMonth}`;\n                await saveToFirestore(EMPLOYEES_COLLECTION, docId, emp);
+                const docId = `emp_${emp.id}_${currentMonth}`;
+                await saveToFirestore(EMPLOYEES_COLLECTION, docId, emp);
                 
                 console.log(`âœ… Saved to Firestore: ${docId}`);
                 
@@ -3158,7 +3774,11 @@
                     // Visual feedback
                     card.style.borderColor = '#10b981';
                     setTimeout(() => { card.style.borderColor = '#e2e8f0'; }, 2000);
-                    \n                    alert(`âœ… Changes saved for ${emp.name}!\n\n\nMetrics updated live.`);                } else {
+                    
+                    alert(`âœ… Changes saved for ${emp.name}!
+
+
+Metrics updated live.`);                } else {
                     alert(`âœ… Changes saved for ${emp.name}!`);
                 }
             } catch (error) {
@@ -3184,12 +3804,71 @@
                 // Parse existing time values
                 const [inHour, inMin] = pair.in ? pair.in.split(':') : ['', ''];
                 const [outHour, outMin] = pair.out ? pair.out.split(':') : ['', ''];
-                \n                return `\n                    <div style="margin-bottom: 20px; padding: 16px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 6px;">\n                        <div style="font-weight: 700; color: #1e293b; font-size: 1.05rem; margin-bottom: 16px;">Pair ${pairIdx + 1}</div>\n                        \n                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">\n                            <div>\n                                <label style="display: block; font-size: 0.8rem; color: #475569; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">IN Time</label>\n                                <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">\n                                    <input type="number" min="0" max="23" class="modal-punch-in-hour-${pairIdx}" value="${inHour}" \n                                        placeholder="HH" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #0369a1; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">\n                                    <span style="color: #1e293b; font-weight: bold; font-size: 1.3rem;">:</span>\n                                    <input type="number" min="0" max="59" class="modal-punch-in-min-${pairIdx}" value="${inMin}" \n                                        placeholder="MM" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #0369a1; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">\n                                </div>\n                            </div>\n                            \n                            <div>\n                                <label style="display: block; font-size: 0.8rem; color: #475569; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">OUT Time</label>\n                                <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">\n                                    <input type="number" min="0" max="23" class="modal-punch-out-hour-${pairIdx}" value="${outHour}" \n                                        placeholder="HH" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #dc2626; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">\n                                    <span style="color: #1e293b; font-weight: bold; font-size: 1.3rem;">:</span>\n                                    <input type="number" min="0" max="59" class="modal-punch-out-min-${pairIdx}" value="${outMin}" \n                                        placeholder="MM" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #dc2626; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n\n                `;\n            }).join('');            
+                
+                return `
+                    <div style="margin-bottom: 20px; padding: 16px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 6px;">
+                        <div style="font-weight: 700; color: #1e293b; font-size: 1.05rem; margin-bottom: 16px;">Pair ${pairIdx + 1}</div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div>
+                                <label style="display: block; font-size: 0.8rem; color: #475569; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">IN Time</label>
+                                <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">
+                                    <input type="number" min="0" max="23" class="modal-punch-in-hour-${pairIdx}" value="${inHour}" 
+                                        placeholder="HH" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #0369a1; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
+                                    <span style="color: #1e293b; font-weight: bold; font-size: 1.3rem;">:</span>
+                                    <input type="number" min="0" max="59" class="modal-punch-in-min-${pairIdx}" value="${inMin}" 
+                                        placeholder="MM" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #0369a1; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; font-size: 0.8rem; color: #475569; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">OUT Time</label>
+                                <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">
+                                    <input type="number" min="0" max="23" class="modal-punch-out-hour-${pairIdx}" value="${outHour}" 
+                                        placeholder="HH" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #dc2626; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
+                                    <span style="color: #1e293b; font-weight: bold; font-size: 1.3rem;">:</span>
+                                    <input type="number" min="0" max="59" class="modal-punch-out-min-${pairIdx}" value="${outMin}" 
+                                        placeholder="MM" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #dc2626; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                `;
+            }).join('');            
             const editHistoryHtml = buildModalEditHistory(emp, dayIdx);
-            \n            const modalHtml = `\n                <div id="dayEditModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 16px;" onclick="if(event.target.id === 'dayEditModal') closeDayEditModal()">\n                    <div style="background: white; border-radius: 8px; padding: 20px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);" onclick="event.stopPropagation()">\n                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; gap: 12px;">\n                            <h2 style="margin: 0; color: #1e293b; font-size: 1.2rem; line-height: 1.3;">${emp.name}<br><span style="font-size: 0.95rem; color: #64748b; font-weight: 400;">${day.date} (${day.dayName})</span></h2>\n                            <button onclick="closeDayEditModal()" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #94a3b8; padding: 0; min-width: 40px;">âœ•</button>\n                        </div>\n                        \n                        <div style="margin-bottom: 24px;">\n                            <h3 style="margin: 0 0 16px 0; color: #475569; font-size: 1.05rem; font-weight: 700;">Punch Times</h3>\n\n                            ${emp.shift && shiftDefinitions[emp.shift] ? `\n                                <div style="padding: 12px; background: #e0f2fe; border-left: 4px solid #0369a1; border-radius: 4px; margin-bottom: 16px; font-size: 0.9rem;">                                    <strong>ðŸ“… Shift: ${emp.shift.toUpperCase()}</strong> 
+            
+            const modalHtml = `
+                <div id="dayEditModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 16px;" onclick="if(event.target.id === 'dayEditModal') closeDayEditModal()">
+                    <div style="background: white; border-radius: 8px; padding: 20px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);" onclick="event.stopPropagation()">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; gap: 12px;">
+                            <h2 style="margin: 0; color: #1e293b; font-size: 1.2rem; line-height: 1.3;">${emp.name}<br><span style="font-size: 0.95rem; color: #64748b; font-weight: 400;">${day.date} (${day.dayName})</span></h2>
+                            <button onclick="closeDayEditModal()" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #94a3b8; padding: 0; min-width: 40px;">âœ•</button>
+                        </div>
+                        
+                        <div style="margin-bottom: 24px;">
+                            <h3 style="margin: 0 0 16px 0; color: #475569; font-size: 1.05rem; font-weight: 700;">Punch Times</h3>
+
+                            ${emp.shift && shiftDefinitions[emp.shift] ? `
+                                <div style="padding: 12px; background: #e0f2fe; border-left: 4px solid #0369a1; border-radius: 4px; margin-bottom: 16px; font-size: 0.9rem;">                                    <strong>ðŸ“… Shift: ${emp.shift.toUpperCase()}</strong> 
                                     ${formatTime(shiftDefinitions[emp.shift].start)} - ${formatTime(shiftDefinitions[emp.shift].end)}
                                     <br><span style="font-size: 0.85rem; color: #475569;">â³ Times beyond Â±10 min buffer will auto-lock to shift boundary</span>
-                                </div>\n                            ` : ''}\n                            ${pairRows}\n                        </div>\n                        \n                        ${editHistoryHtml}\n                        \n                        <div style="display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; flex-wrap: wrap;">\n                            <button onclick="closeDayEditModal()" style="padding: 12px 24px; background: #e2e8f0; color: #1e293b; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1rem;">Cancel</button>\n                            <button onclick="saveDayPunchTimes('${empId}', ${dayIdx})" style="padding: 12px 24px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1rem;">ðŸ’¾ Save</button>\n                        </div>\n                    </div>\n                </div>\n\n            `;\n                        document.body.insertAdjacentHTML('beforeend', modalHtml);
+                                </div>
+                            ` : ''}
+                            ${pairRows}
+                        </div>
+                        
+                        ${editHistoryHtml}
+                        
+                        <div style="display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; flex-wrap: wrap;">
+                            <button onclick="closeDayEditModal()" style="padding: 12px 24px; background: #e2e8f0; color: #1e293b; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1rem;">Cancel</button>
+                            <button onclick="saveDayPunchTimes('${empId}', ${dayIdx})" style="padding: 12px 24px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1rem;">ðŸ’¾ Save</button>
+                        </div>
+                    </div>
+                </div>
+
+            `;
+                        document.body.insertAdjacentHTML('beforeend', modalHtml);
             
             // Add ESC key support
             document.addEventListener('keydown', function closeOnEsc(e) {
@@ -3207,7 +3886,8 @@
             
             // Collect all edits for this day
             Object.keys(cellEditHistory).forEach(key => {
-                if (key.startsWith(`${emp.id}_${dayIdx}_`)) {\n                    const edits = cellEditHistory[key];
+                if (key.startsWith(`${emp.id}_${dayIdx}_`)) {
+                    const edits = cellEditHistory[key];
                     edits.forEach(edit => {
                         historyEntries.push({
                             timestamp: edit.timestamp,
@@ -3220,7 +3900,8 @@
             historyEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             
             if (historyEntries.length === 0) {
-                return `<div style="padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; color: #94a3b8; font-size: 0.85rem; text-align: center;">No edit history for this day</div>`;\n            }
+                return `<div style="padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; color: #94a3b8; font-size: 0.85rem; text-align: center;">No edit history for this day</div>`;
+            }
             
             const historyHtml = historyEntries.slice(0, 10).map((edit, idx) => {
                 const timestamp = new Date(edit.timestamp);
@@ -3234,13 +3915,40 @@
                     const days = Math.floor(diff / 86400000);
                     
                     if (minutes < 1) timeDisplay = 'Just now';
-                    else if (minutes < 60) timeDisplay = `${minutes}m ago`;\n                    else if (hours < 24) timeDisplay = `${hours}h ago`;\n                    else if (days < 7) timeDisplay = `${days}d ago`;\n                    else timeDisplay = timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    else if (minutes < 60) timeDisplay = `${minutes}m ago`;
+                    else if (hours < 24) timeDisplay = `${hours}h ago`;
+                    else if (days < 7) timeDisplay = `${days}d ago`;
+                    else timeDisplay = timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                 }
                 
                 // Handle fieldType - may be 'in', 'out', or extracted from key
                 const fieldType = edit.fieldType || 'edit';
                 const fieldDisplay = fieldType.toUpperCase();
-                \n                return `\n                    <div style="padding: 8px; background: white; border: 1px solid #e2e8f0; border-radius: 3px; margin-bottom: 6px;">\n                        <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">\n                            <strong>${fieldDisplay}</strong> â€¢ ${timeDisplay}\n                        </div>\n                        <div style="display: flex; gap: 6px; font-family: monospace; font-size: 0.8rem;">\n                            <span style="color: #b45309; background: #fffbeb; padding: 2px 4px; border-radius: 2px;">${edit.original || '(empty)'}</span>\n                            <span style="color: #cbd5e1;">â†’</span>\n                            <span style="color: #059669; background: #ecfdf5; padding: 2px 4px; border-radius: 2px;">${edit.newValue}</span>\n                        </div>\n                    </div>\n\n                `;\n            }).join('');            \n            return `\n                <div>\n                    <h3 style="margin: 0 0 12px 0; color: #475569; font-size: 1rem;">Edit History (${historyEntries.length} ${historyEntries.length === 1 ? 'edit' : 'edits'})</h3>\n                    <div style="background: #f1f5f9; padding: 12px; border-radius: 4px;">\n                        ${historyHtml}\n                    </div>\n                </div>\n\n            `;\n        }        
+                
+                return `
+                    <div style="padding: 8px; background: white; border: 1px solid #e2e8f0; border-radius: 3px; margin-bottom: 6px;">
+                        <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">
+                            <strong>${fieldDisplay}</strong> â€¢ ${timeDisplay}
+                        </div>
+                        <div style="display: flex; gap: 6px; font-family: monospace; font-size: 0.8rem;">
+                            <span style="color: #b45309; background: #fffbeb; padding: 2px 4px; border-radius: 2px;">${edit.original || '(empty)'}</span>
+                            <span style="color: #cbd5e1;">â†’</span>
+                            <span style="color: #059669; background: #ecfdf5; padding: 2px 4px; border-radius: 2px;">${edit.newValue}</span>
+                        </div>
+                    </div>
+
+                `;
+            }).join('');            
+            return `
+                <div>
+                    <h3 style="margin: 0 0 12px 0; color: #475569; font-size: 1rem;">Edit History (${historyEntries.length} ${historyEntries.length === 1 ? 'edit' : 'edits'})</h3>
+                    <div style="background: #f1f5f9; padding: 12px; border-radius: 4px;">
+                        ${historyHtml}
+                    </div>
+                </div>
+
+            `;
+        }        
         // Save punch times from modal
         function saveDayPunchTimes(empId, dayIdx) {
             const emp = filteredData.find(e => String(e.id) === String(empId));
@@ -3255,7 +3963,11 @@
             // Collect and validate all inputs from number fields
             const updates = [];
             for (let pairIdx = 0; pairIdx < pairCount; pairIdx++) {
-                let inHour = document.querySelector(`.modal-punch-in-hour-${pairIdx}`).value;\n                let inMin = document.querySelector(`.modal-punch-in-min-${pairIdx}`).value;\n                let outHour = document.querySelector(`.modal-punch-out-hour-${pairIdx}`).value;\n                let outMin = document.querySelector(`.modal-punch-out-min-${pairIdx}`).value;\n                
+                let inHour = document.querySelector(`.modal-punch-in-hour-${pairIdx}`).value;
+                let inMin = document.querySelector(`.modal-punch-in-min-${pairIdx}`).value;
+                let outHour = document.querySelector(`.modal-punch-out-hour-${pairIdx}`).value;
+                let outMin = document.querySelector(`.modal-punch-out-min-${pairIdx}`).value;
+                
                 // Validate and format numbers
                 if (inHour) {
                     const h = parseInt(inHour);
@@ -3294,7 +4006,9 @@
                 }
                 
                 // Build time strings
-                const inTime = (inHour && inMin) ? `${inHour}:${inMin}` : '';\n                const outTime = (outHour && outMin) ? `${outHour}:${outMin}` : '';\n                
+                const inTime = (inHour && inMin) ? `${inHour}:${inMin}` : '';
+                const outTime = (outHour && outMin) ? `${outHour}:${outMin}` : '';
+                
                 if (inTime || outTime) {
                     updates.push({
                         pairIdx: pairIdx,
@@ -3340,7 +4054,8 @@
             
             // Save to Firestore
             emp.editHistory = cellEditHistory;
-            saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}`, emp).then(() => {\n                console.log(`âœ… Saved punch times for ${emp.name} to Firestore`);
+            saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}`, emp).then(() => {
+                console.log(`âœ… Saved punch times for ${emp.name} to Firestore`);
             }).catch(err => {
                 console.error(`âŒ Failed to save to Firestore:`, err);
                 alert(`âš ï¸ Changes saved locally but failed to sync to server. Please try again.`);
@@ -3351,7 +4066,8 @@
         
         // Record punch edit with timestamp
         function recordPunchEdit(empId, dayIdx, pairIdx, fieldType, original, newValue) {
-            const historyKey = `${empId}_${dayIdx}_${pairIdx}_${fieldType}`;\n            if (!cellEditHistory[historyKey]) {
+            const historyKey = `${empId}_${dayIdx}_${pairIdx}_${fieldType}`;
+            if (!cellEditHistory[historyKey]) {
                 cellEditHistory[historyKey] = [];
             }
             cellEditHistory[historyKey].push({
@@ -3393,7 +4109,9 @@
                 });
             }
             
-            emp.hours = `${totalHours.toFixed(2)} hrs`;\n            emp.late = `${totalLateMin} min`;\n        }
+            emp.hours = `${totalHours.toFixed(2)} hrs`;
+            emp.late = `${totalLateMin} min`;
+        }
         
         // Close day edit modal
         function closeDayEditModal() {
@@ -3410,7 +4128,18 @@
             const display = cell.querySelector('.punch-display');
             const currentValue = display.textContent.trim() === 'â€”' ? '' : display.textContent.trim();
             
-            // Replace with editable input\n            cell.innerHTML = `\n                <input type="text" class="punch-edit-input" value="${currentValue}" \n                    style="width: 100%; padding: 2px 4px; font-size: 0.6rem; border: 2px solid #8b5cf6; border-radius: 3px; text-align: center;" \n                    placeholder="9:30 AM" onkeydown="if(event.key==='Enter') savePunchTime(this); if(event.key==='Escape') cancelEdit(this)">\n                <div style="display: flex; gap: 2px; margin-top: 4px; justify-content: center;">\n                    <button onclick="savePunchTime(this)" style="padding: 2px 6px; background: #10b981; color: white; border: none; border-radius: 2px; font-size: 0.5rem; cursor: pointer; font-weight: bold;">âœ“ Save</button>\n                    <button onclick="cancelEdit(this)" style="padding: 2px 6px; background: #ef4444; color: white; border: none; border-radius: 2px; font-size: 0.5rem; cursor: pointer; font-weight: bold;">âœ• Cancel</button>\n                </div>\n\n            `;\n                        // Focus and select input
+            // Replace with editable input
+            cell.innerHTML = `
+                <input type="text" class="punch-edit-input" value="${currentValue}" 
+                    style="width: 100%; padding: 2px 4px; font-size: 0.6rem; border: 2px solid #8b5cf6; border-radius: 3px; text-align: center;" 
+                    placeholder="9:30 AM" onkeydown="if(event.key==='Enter') savePunchTime(this); if(event.key==='Escape') cancelEdit(this)">
+                <div style="display: flex; gap: 2px; margin-top: 4px; justify-content: center;">
+                    <button onclick="savePunchTime(this)" style="padding: 2px 6px; background: #10b981; color: white; border: none; border-radius: 2px; font-size: 0.5rem; cursor: pointer; font-weight: bold;">âœ“ Save</button>
+                    <button onclick="cancelEdit(this)" style="padding: 2px 6px; background: #ef4444; color: white; border: none; border-radius: 2px; font-size: 0.5rem; cursor: pointer; font-weight: bold;">âœ• Cancel</button>
+                </div>
+
+            `;
+                        // Focus and select input
             const input = cell.querySelector('.punch-edit-input');
             input.focus();
             input.select();
@@ -3435,7 +4164,14 @@
             // Parse and validate time
             const parsedTime = parseTime(newValue);
             if (!parsedTime) {
-                alert('âŒ Invalid time format.\\n\n\\nAccepted formats:\\nâ€¢ 9:30 AM\\nâ€¢ 2:45 PM\\nâ€¢ 09:30\\nâ€¢ 14:45');                input.focus();
+                alert('âŒ Invalid time format.\
+
+\
+Accepted formats:\
+â€¢ 9:30 AM\
+â€¢ 2:45 PM\
+â€¢ 09:30\
+â€¢ 14:45');                input.focus();
                 return;
             }
             
@@ -3466,12 +4202,23 @@
             const pair = day.punchPairs[pairIdx];
             const value = type === 'in' ? pair.in : pair.out;
             const display = formatTime(value) || 'â€”';
-            \n            cell.innerHTML = `\n                <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">\n                    <span class="punch-display">${display}</span>\n                    <button class="punch-edit-btn" onclick="enterEditMode(this)" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.5rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit ${type} time">âœï¸</button>\n                </div>\n\n            `;\n        }        function updatePunchTime(cell, type, parsedTime) {
+            
+            cell.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                    <span class="punch-display">${display}</span>
+                    <button class="punch-edit-btn" onclick="enterEditMode(this)" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.5rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit ${type} time">âœï¸</button>
+                </div>
+
+            `;
+        }        function updatePunchTime(cell, type, parsedTime) {
             const empId = parseInt(cell.dataset.empId);
             const dayIdx = parseInt(cell.dataset.dayIdx);
             const pairIdx = parseInt(cell.dataset.pairIdx);
             const newTime = parsedTime;
-            \n            console.log(`\n\nâœˆï¸ UPDATE PUNCH TIME CALLED`);            console.log(`   Type: ${type}, empId: ${empId}, dayIdx: ${dayIdx}, pairIdx: ${pairIdx}`);
+            
+            console.log(`
+
+âœˆï¸ UPDATE PUNCH TIME CALLED`);            console.log(`   Type: ${type}, empId: ${empId}, dayIdx: ${dayIdx}, pairIdx: ${pairIdx}`);
             console.log(`   New value: '${newTime}'`);
             
             const emp = filteredData.find(e => e.id == empId);  // Use == for string/number compatibility
@@ -3502,7 +4249,8 @@
             
             // Store original value for edit history
             const originalValue = type === 'in' ? pair.in : pair.out;
-            const historyKey = `${empId}_${dayIdx}_${pairIdx}_${type}`;\n            
+            const historyKey = `${empId}_${dayIdx}_${pairIdx}_${type}`;
+            
             if (!cellEditHistory[historyKey]) {
                 cellEditHistory[historyKey] = [];
             }
@@ -3613,7 +4361,8 @@
                     console.log(`   âž¡ï¸ Hours cells with data-hours-cell="true": ${hoursCells.length}`);
                     
                     // Try the selector
-                    const selector = `[data-hours-cell="true"][data-day-idx="${dayIdx}"][data-pair-idx="${pairIdx}"]`;\n                    console.log(`   âž¡ï¸ Using selector: ${selector}`);
+                    const selector = `[data-hours-cell="true"][data-day-idx="${dayIdx}"][data-pair-idx="${pairIdx}"]`;
+                    console.log(`   âž¡ï¸ Using selector: ${selector}`);
                     const hoursCell = breakdownDiv.querySelector(selector);
                     console.log(`   âž¡ï¸ Hours cell found: ${hoursCell ? 'YES' : 'NO'}`);
                     
@@ -3644,7 +4393,26 @@
             // Create subtle badge
             const badge = document.createElement('span');
             badge.className = 'edit-badge';
-            badge.textContent = 'âœŽ';\n            badge.title = `Edited ${editCount} time${editCount > 1 ? 's' : ''} - Click to view history`;\n            badge.style.cssText = `\n                position: absolute;\n                top: 1px;\n                right: 2px;\n                background: transparent;\n                color: #8b5cf6;\n                font-size: 0.7rem;\n                padding: 0;\n                border-radius: 50%;\n                cursor: help;\n                font-weight: bold;\n                white-space: nowrap;\n                z-index: 500;\n                opacity: 0.7;\n                transition: all 0.2s ease;\n\n            `;\n                        // Hover effect
+            badge.textContent = 'âœŽ';
+            badge.title = `Edited ${editCount} time${editCount > 1 ? 's' : ''} - Click to view history`;
+            badge.style.cssText = `
+                position: absolute;
+                top: 1px;
+                right: 2px;
+                background: transparent;
+                color: #8b5cf6;
+                font-size: 0.7rem;
+                padding: 0;
+                border-radius: 50%;
+                cursor: help;
+                font-weight: bold;
+                white-space: nowrap;
+                z-index: 500;
+                opacity: 0.7;
+                transition: all 0.2s ease;
+
+            `;
+                        // Hover effect
             badge.onmouseover = () => { badge.style.opacity = '1'; badge.style.color = '#a78bfa'; };
             badge.onmouseout = () => { badge.style.opacity = '0.7'; badge.style.color = '#8b5cf6'; };
             
@@ -3667,8 +4435,16 @@
             
             const edits = cellEditHistory[historyKey] || [];
             
-            // Build clean tooltip content\n            let content = `\n                <div style="margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">\n                    <div style="font-weight: 600; color: #0f172a; font-size: 0.85rem;">Edit History</div>\n                    <div style="font-size: 0.7rem; color: #64748b; margin-top: 2px;">${empName} â€¢ ${fieldType.toUpperCase()} edits</div>\n\n                </div>`;\n                        if (edits.length === 0) {
-                content += `<div style="color: #94a3b8; font-size: 0.75rem; font-style: italic;">No edits recorded</div>`;\n            } else {
+            // Build clean tooltip content
+            let content = `
+                <div style="margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+                    <div style="font-weight: 600; color: #0f172a; font-size: 0.85rem;">Edit History</div>
+                    <div style="font-size: 0.7rem; color: #64748b; margin-top: 2px;">${empName} â€¢ ${fieldType.toUpperCase()} edits</div>
+
+                </div>`;
+                        if (edits.length === 0) {
+                content += `<div style="color: #94a3b8; font-size: 0.75rem; font-style: italic;">No edits recorded</div>`;
+            } else {
                 edits.forEach((edit, idx) => {
                     const timestamp = new Date(edit.timestamp);
                     const isValidDate = !isNaN(timestamp.getTime());
@@ -3682,19 +4458,51 @@
                         const days = Math.floor(diff / 86400000);
                         
                         if (minutes < 1) timeDisplay = 'Just now';
-                        else if (minutes < 60) timeDisplay = `${minutes}m ago`;\n                        else if (hours < 24) timeDisplay = `${hours}h ago`;\n                        else if (days < 7) timeDisplay = `${days}d ago`;\n                        else {
+                        else if (minutes < 60) timeDisplay = `${minutes}m ago`;
+                        else if (hours < 24) timeDisplay = `${hours}h ago`;
+                        else if (days < 7) timeDisplay = `${days}d ago`;
+                        else {
                             const dateStr = timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                             timeDisplay = dateStr;
                         }
                     }
                     
                     const originalDisplay = edit.original ? edit.original : '(empty)';
-                    \n                    content += `\n                        <div style="margin: 10px 0; padding: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 0.75rem;">\n                            <div style="color: #64748b; margin-bottom: 6px; font-weight: 500; font-size: 0.7rem;">Edit ${idx + 1} â€¢ ${timeDisplay}</div>\n                            <div style="display: flex; align-items: center; gap: 8px; font-family: 'Courier New', monospace; font-weight: 500;">\n                                <span style="color: #b45309; background: #fffbeb; padding: 3px 6px; border-radius: 2px; flex-shrink: 0;">${originalDisplay}</span>\n                                <span style="color: #cbd5e1; font-size: 0.8rem;">â†’</span>\n                                <span style="color: #059669; background: #ecfdf5; padding: 3px 6px; border-radius: 2px; flex-shrink: 0;">${edit.newValue}</span>\n                            </div>\n                        </div>\n\n                    `;\n                });            }
+                    
+                    content += `
+                        <div style="margin: 10px 0; padding: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 0.75rem;">
+                            <div style="color: #64748b; margin-bottom: 6px; font-weight: 500; font-size: 0.7rem;">Edit ${idx + 1} â€¢ ${timeDisplay}</div>
+                            <div style="display: flex; align-items: center; gap: 8px; font-family: 'Courier New', monospace; font-weight: 500;">
+                                <span style="color: #b45309; background: #fffbeb; padding: 3px 6px; border-radius: 2px; flex-shrink: 0;">${originalDisplay}</span>
+                                <span style="color: #cbd5e1; font-size: 0.8rem;">â†’</span>
+                                <span style="color: #059669; background: #ecfdf5; padding: 3px 6px; border-radius: 2px; flex-shrink: 0;">${edit.newValue}</span>
+                            </div>
+                        </div>
+
+                    `;
+                });            }
             
             // Create tooltip element
             const tooltip = document.createElement('div');
             tooltip.className = 'edit-history-tooltip';
-            tooltip.innerHTML = content;\n            tooltip.style.cssText = `\n                position: fixed;\n                background: white;\n                border: 1px solid #cbd5e1;\n                border-radius: 6px;\n                padding: 14px;\n                font-size: 0.8rem;\n                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);\n\n                z-index: 10000;\n                max-width: 380px;\n                max-height: 500px;\n                overflow-y: auto;\n                animation: slideIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);\n                pointer-events: auto;\n            `;\n                        document.body.appendChild(tooltip);
+            tooltip.innerHTML = content;
+            tooltip.style.cssText = `
+                position: fixed;
+                background: white;
+                border: 1px solid #cbd5e1;
+                border-radius: 6px;
+                padding: 14px;
+                font-size: 0.8rem;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+                z-index: 10000;
+                max-width: 380px;
+                max-height: 500px;
+                overflow-y: auto;
+                animation: slideIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+                pointer-events: auto;
+            `;
+                        document.body.appendChild(tooltip);
             
             // Position tooltip near the badge
             const rect = cellElement.getBoundingClientRect();
@@ -3749,11 +4557,24 @@
         if (!document.querySelector('style[data-edit-history]')) {
             const style = document.createElement('style');
             style.setAttribute('data-edit-history', 'true');
-            style.textContent = `\n                @keyframes slideIn {\n                    from { opacity: 0; transform: translateY(-5px); }\n                    to { opacity: 1; transform: translateY(0); }\n                }\n                @keyframes slideOut {\n                    from { opacity: 1; transform: translateY(0); }\n                    to { opacity: 0; transform: translateY(-5px); }\n                }\n\n            `;\n            document.head.appendChild(style);        }
+            style.textContent = `
+                @keyframes slideIn {
+                    from { opacity: 0; transform: translateY(-5px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes slideOut {
+                    from { opacity: 1; transform: translateY(0); }
+                    to { opacity: 0; transform: translateY(-5px); }
+                }
+
+            `;
+            document.head.appendChild(style);        }
         
         // Attach event listeners for real-time editing
         function attachPunchEditListeners(card) {
-            // The onblur handlers are already in the HTML, so we don't need to do anything\n\n            // Just verify they're there            const punchCells = card.querySelectorAll('[contenteditable="true"]');
+            // The onblur handlers are already in the HTML, so we don't need to do anything
+
+            // Just verify they're there            const punchCells = card.querySelectorAll('[contenteditable="true"]');
             console.log(`ðŸ”— Found ${punchCells.length} editable punch cells with onblur handlers`);
         }
         
