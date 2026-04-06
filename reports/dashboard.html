@@ -3555,8 +3555,8 @@
                 return day.punchPairs.map((pair, pairIdx) => {
                     const adjustedIn = adjustTimeForShift(pair.in, emp.shift, false);
                     const adjustedOut = adjustTimeForShift(pair.out, emp.shift, true);
-                    const inDisplay = formatTime(adjustedIn.displayTime) + (adjustedIn.wasAdjusted ? ` <span style="font-size: 0.5rem; color: #dc2626;" title="${adjustedIn.adjustedReason}">(${formatTime(adjustedIn.actualTime)})</span>` : '');
-                    const outDisplay = formatTime(adjustedOut.displayTime) + (adjustedOut.wasAdjusted ? ` <span style="font-size: 0.5rem; color: #dc2626;" title="${adjustedOut.adjustedReason}">(${formatTime(adjustedOut.actualTime)})</span>` : '');
+                    const inDisplay = formatTime(adjustedIn.displayTime) + (adjustedIn.wasAdjusted ? ` <span style="font-size: 0.5rem; color: #e74c3c; font-weight: 600;" title="${adjustedIn.adjustedReason}">(actual: ${formatTime(adjustedIn.actualTime)})</span>` : '');
+                    const outDisplay = formatTime(adjustedOut.displayTime) + (adjustedOut.wasAdjusted ? ` <span style="font-size: 0.5rem; color: #e74c3c; font-weight: 600;" title="${adjustedOut.adjustedReason}">(actual: ${formatTime(adjustedOut.actualTime)})</span>` : '');
                     
                     return `
                     <tr style="${rowStyle}">
@@ -3910,12 +3910,14 @@
                     recordPunchEdit(emp.id, dayIdx, update.pairIdx, 'out', oldOut, update.out);
                 }
                 
-                // Recalculate hours
+                // Recalculate hours using ADJUSTED (shift-locked) times
                 if (update.in && update.out) {
-                    const inTime = parseTimeToMinutes(update.in);
-                    const outTime = parseTimeToMinutes(update.out);
-                    const hours = (outTime - inTime) / 60;
-                    day.punchPairs[update.pairIdx].pairHours = Math.max(0, hours);
+                    const adjustedIn = adjustTimeForShift(update.in, emp.shift, false);
+                    const adjustedOut = adjustTimeForShift(update.out, emp.shift, true);
+                    const inMinutes = parseTimeToMinutes(adjustedIn.displayTime);
+                    const outMinutes = parseTimeToMinutes(adjustedOut.displayTime);
+                    const hours = (outMinutes - inMinutes) / 60;
+                    day.punchPairs[update.pairIdx].pairHours = Math.max(0, parseFloat(hours.toFixed(2)));
                 }
             });
             
