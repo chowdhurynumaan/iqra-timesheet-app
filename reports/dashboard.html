@@ -1338,7 +1338,7 @@
                     
                     if (isExcel) {
                         const reader = new FileReader();
-                        reader.onload = (ev) => {
+                        reader.onload = async (ev) => {
                             try {
                                 const data = new Uint8Array(ev.target.result);
                                 const workbook = XLSX.read(data, { type: 'array' });
