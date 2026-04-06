@@ -3612,13 +3612,19 @@
         // Attach event listeners for real-time editing
         function attachPunchEditListeners(card) {
             // Attach click handlers to calculate buttons
-            const calcButtons = card.querySelectorAll('[class*="calc-hours-btn"]');
+            const calcButtons = card.querySelectorAll('.calc-hours-btn');
+            console.log(`🔗 Found ${calcButtons.length} calc buttons in card`);
+            
             calcButtons.forEach(btn => {
                 const empId = parseInt(btn.dataset.empId);
                 const dayIdx = parseInt(btn.dataset.dayIdx);
                 
+                console.log(`   ➜ Attaching click handler to button: empId=${empId}, dayIdx=${dayIdx}`);
+                
                 btn.addEventListener('click', (event) => {
                     event.preventDefault();
+                    event.stopPropagation();
+                    console.log(`✅ CALC BUTTON CLICKED: empId=${empId}, dayIdx=${dayIdx}`);
                     calculateHoursForDay(card, empId, dayIdx);
                 });
             });
