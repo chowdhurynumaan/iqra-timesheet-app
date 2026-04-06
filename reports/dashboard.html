@@ -746,7 +746,7 @@
             }
         }
         
-        // Dynamic UI rendering for shift definitions
+        // Dynamic UI rendering for shift definitions - TABLE FORMAT
         function renderShiftDefinitionsUI() {
             const editor = document.getElementById('deptShiftEditor');
             if (!editor) return;
@@ -754,47 +754,73 @@
             // Clear existing content
             editor.innerHTML = '';
             
-            // Create input fields for each shift in shiftDefinitions
-            Object.entries(shiftDefinitions).forEach(([deptName, times]) => {
-                const shiftDiv = document.createElement('div');
-                shiftDiv.style.cssText = 'display: flex; align-items: center; gap: 0.5rem;';
+            // Create table
+            const table = document.createElement('table');
+            table.style.cssText = 'width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 0.9rem;';
+            
+            // Create table header
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            headerRow.style.cssText = 'background: #f0f4f8; border-bottom: 2px solid #cbd5e1;';
+            
+            const headers = ['Shift', 'In Time', 'Out Time'];
+            headers.forEach(headerText => {
+                const th = document.createElement('th');
+                th.textContent = headerText;
+                th.style.cssText = 'padding: 0.75rem; text-align: left; font-weight: 600; border: 1px solid #cbd5e1;';
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            
+            // Create table body
+            const tbody = document.createElement('tbody');
+            Object.entries(shiftDefinitions).forEach(([deptName, times], idx) => {
+                const row = document.createElement('tr');
+                row.style.cssText = idx % 2 === 0 ? 'background: #fff;' : 'background: #f8fafc;';
                 
-                const label = document.createElement('label');
-                label.style.cssText = 'margin: 0; font-size: 0.85rem; min-width: 80px; font-weight: 600;';
-                label.textContent = `${deptName}:`;
+                // Shift Name
+                const nameCell = document.createElement('td');
+                nameCell.textContent = deptName;
+                nameCell.style.cssText = 'padding: 0.75rem; border: 1px solid #cbd5e1; font-weight: 600;';
+                row.appendChild(nameCell);
                 
+                // In Time Input
+                const startCell = document.createElement('td');
+                startCell.style.cssText = 'padding: 0.5rem; border: 1px solid #cbd5e1;';
                 const startInput = document.createElement('input');
                 startInput.type = 'time';
                 startInput.id = `shift${deptName}_start`;
                 startInput.value = times.start || '09:00';
-                startInput.style.cssText = 'padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;';
+                startInput.style.cssText = 'width: 90%; padding: 0.4rem; border: 1px solid #cbd5e1; border-radius: 3px; font-size: 0.9rem;';
+                startCell.appendChild(startInput);
+                row.appendChild(startCell);
                 
-                const toSpan = document.createElement('span');
-                toSpan.textContent = 'to';
-                toSpan.style.cssText = 'font-size: 0.85rem;';
-                
+                // Out Time Input
+                const endCell = document.createElement('td');
+                endCell.style.cssText = 'padding: 0.5rem; border: 1px solid #cbd5e1;';
                 const endInput = document.createElement('input');
                 endInput.type = 'time';
                 endInput.id = `shift${deptName}_end`;
                 endInput.value = times.end || '17:30';
-                endInput.style.cssText = 'padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;';
+                endInput.style.cssText = 'width: 90%; padding: 0.4rem; border: 1px solid #cbd5e1; border-radius: 3px; font-size: 0.9rem;';
+                endCell.appendChild(endInput);
+                row.appendChild(endCell);
                 
-                shiftDiv.appendChild(label);
-                shiftDiv.appendChild(startInput);
-                shiftDiv.appendChild(toSpan);
-                shiftDiv.appendChild(endInput);
-                
-                editor.appendChild(shiftDiv);
+                tbody.appendChild(row);
             });
+            table.appendChild(tbody);
             
-            // Re-add the Save Shifts button at the end
+            editor.appendChild(table);
+            
+            // Re-add the Save Shifts button
             const saveButton = document.createElement('button');
             saveButton.textContent = 'Save Shifts';
             saveButton.onclick = saveShiftDefinitions;
-            saveButton.style.cssText = 'padding: 0.35rem 1rem; background: #059669; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.85rem; margin-top: 0.5rem;';
+            saveButton.style.cssText = 'padding: 0.5rem 1.5rem; background: #059669; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem;';
             editor.appendChild(saveButton);
             
-            console.log(`🎯 Shift UI rendered for ${Object.keys(shiftDefinitions).length} shifts`);
+            console.log(`🎯 Shift table rendered for ${Object.keys(shiftDefinitions).length} shifts`);
         }
         
         async function saveShiftDefinitions() {
