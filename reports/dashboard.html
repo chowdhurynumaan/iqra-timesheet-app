@@ -516,25 +516,32 @@
             </div>
         </div>
 
-        <div class="charts-section" id="chartSection" style="display: none;">
-            <div class="chart-card" id="lateChartWrapper">
-                <div class="chart-title">⏰ Top 15 Late Arrivals</div>
-                <div class="chart-container">
-                    <canvas id="lateChart"></canvas>
-                </div>
+        <div id="chartsSection" style="background: white; border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;" onclick="toggleChartsSection()">
+                <span id="chartsCollapseIcon" style="font-size: 0.9rem; transition: transform 0.3s; transform: rotate(180deg);">▼</span>
+                <h2 style="margin: 0; font-size: 1.2rem; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em;">📊 Analytics</h2>
             </div>
-
-            <div class="chart-card" id="deptChartWrapper">
-                <div class="chart-title">📈 Attendance by Department</div>
-                <div class="chart-container">
-                    <canvas id="deptChart"></canvas>
+            
+            <div id="chartsContainer" class="charts-section" style="display: none; margin-top: 1.5rem;">
+                <div class="chart-card" id="lateChartWrapper">
+                    <div class="chart-title">⏰ Top 15 Late Arrivals</div>
+                    <div class="chart-container">
+                        <canvas id="lateChart"></canvas>
+                    </div>
                 </div>
-            </div>
 
-            <div class="chart-card" id="deptLateChartWrapper">
-                <div class="chart-title">⏱️ Late Minutes by Department</div>
-                <div class="chart-container">
-                    <canvas id="deptLateChart"></canvas>
+                <div class="chart-card" id="deptChartWrapper">
+                    <div class="chart-title">📈 Attendance by Department</div>
+                    <div class="chart-container">
+                        <canvas id="deptChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card" id="deptLateChartWrapper">
+                    <div class="chart-title">⏱️ Late Minutes by Department</div>
+                    <div class="chart-container">
+                        <canvas id="deptLateChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -791,6 +798,19 @@
             
             if (container.style.display === 'none' || container.style.display === '') {
                 container.style.display = 'flex';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                container.style.display = 'none';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+        
+        function toggleChartsSection() {
+            const container = document.getElementById('chartsContainer');
+            const icon = document.getElementById('chartsCollapseIcon');
+            
+            if (container.style.display === 'none' || container.style.display === '') {
+                container.style.display = 'grid';
                 icon.style.transform = 'rotate(0deg)';
             } else {
                 container.style.display = 'none';
@@ -1236,7 +1256,7 @@
                     
                     // Show data panels
                     document.getElementById('statsGrid').style.display = 'grid';
-                    document.getElementById('chartSection').style.display = 'grid';
+                    document.getElementById('chartsSection').style.display = 'block';
                     
                     // Initialize department filter & shift settings
                     initializeControlPanel();
@@ -1646,8 +1666,7 @@
             renderDashboard(filteredData);
             displayEmployeeData(filteredData);
             document.getElementById('statsGrid').classList.remove('hidden');
-            document.getElementById('chartSection').style.display = 'grid';
-            document.getElementById('chartSection').classList.remove('hidden');
+            document.getElementById('chartsSection').style.display = 'block';
             document.getElementById('controlPanel').classList.remove('hidden');
         }
 
