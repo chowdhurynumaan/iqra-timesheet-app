@@ -2323,7 +2323,7 @@
                         const rowClass = day.lateMin > 0 ? 'late-row' : '';
                         const status = day.isMissed ? '❌' : (day.hasMissedPunch ? '⚠️' : '✅');
                         const punches = day.punchPairs && day.punchPairs.length > 0 
-                            ? day.punchPairs.map(p => `${formatTime(p.in)} → ${p.out ? formatTime(p.out) : '(missing)'}`).join('<br>') 
+                            ? day.punchPairs.map(p => formatTimeWithShiftAdjustment(p.in, p.out, emp.shift)).join('<br>') 
                             : '—';
                         
                         // Calculate hours from punchPairs if day.hours not available
@@ -3427,6 +3427,82 @@
             // Format as HH:MM
             return `${String(hours).padStart(2, '0')}:${mins}`;
         }
+
+        // ========== SHIFT TIME ADJUSTMENT ==========
+        function timeToMinutes(timeStr) {
+            if (!timeStr) return 0;
+            const [h, m] = timeStr.split(':').map(Number);
+            return h * 60 + (m || 0);
+        }
+
+        function minutesToTime(minutes) {
+            const h = Math.floor(minutes / 60) % 24;
+            const m = minutes % 60;
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        }
+
+        function adjustTimeForShift(actualTimeStr, shiftKey, isClockOut) {
+            // Returns { displayTime, actualTime, wasAdjusted, adjustedReason }
+            if (!actualTimeStr || !shiftKey || !shiftDefinitions[shiftKey]) {
+                return { displayTime: actualTimeStr, actualTime: actualTimeStr, wasAdjusted: false };
+            }
+
+            const shift = shiftDefinitions[shiftKey];
+            const bufferMinutes = 10;
+            const actualMinutes = timeToMinutes(actualTimeStr);
+            const shiftStartMinutes = timeToMinutes(shift.start);
+            const shiftEndMinutes = timeToMinutes(shift.end);
+
+            let displayMinutes = actualMinutes;
+            let wasAdjusted = false;
+            let adjustedReason = '';
+
+            if (isClockOut) {
+                // Clock out: if more than 10 mins after shift end, lock to (shift end + 10 mins)
+                const maxAllowedMinutes = shiftEndMinutes + bufferMinutes;
+                if (actualMinutes > maxAllowedMinutes) {
+                    displayMinutes = maxAllowedMinutes;
+                    wasAdjusted = true;
+                    adjustedReason = `Beyond allowed 10-min buffer after shift end`;
+                }
+            } else {
+                // Clock in: if more than 10 mins before shift start, lock to (shift start - 10 mins)
+                const minAllowedMinutes = shiftStartMinutes - bufferMinutes;
+                if (actualMinutes < minAllowedMinutes) {
+                    displayMinutes = minAllowedMinutes;
+                    wasAdjusted = true;
+                    adjustedReason = `Beyond allowed 10-min buffer before shift start`;
+                }
+            }
+
+            return {
+                displayTime: minutesToTime(displayMinutes),
+                actualTime: actualTimeStr,
+                wasAdjusted,
+                adjustedReason
+            };
+        }
+
+        function formatTimeWithShiftAdjustment(actualIn, actualOut, shiftKey) {
+            // Format punch pair with shift adjustment and actual times in parenthesis
+            if (!actualIn && !actualOut) return '—';
+            
+            const adjustedIn = adjustTimeForShift(actualIn, shiftKey, false);
+            const adjustedOut = adjustTimeForShift(actualOut, shiftKey, true);
+
+            let inDisplay = formatTime(adjustedIn.displayTime);
+            let outDisplay = formatTime(adjustedOut.displayTime);
+
+            // Add actual times in parenthesis if adjusted
+            if (adjustedIn.wasAdjusted) {
+                inDisplay += ` (actual: ${formatTime(adjustedIn.actualTime)})`;
+            }
+            if (adjustedOut.wasAdjusted) {
+                outDisplay += ` (actual: ${formatTime(adjustedOut.actualTime)})`;
+            }
+
+            return `${inDisplay} → ${outDisplay || '(missing)'}`;
+        }
         
 
         function renderDailyBreakdown(emp) {
@@ -3476,14 +3552,20 @@
                 }
                 
                 // Build rows for each punch pair
-                return day.punchPairs.map((pair, pairIdx) => `
+                return day.punchPairs.map((pair, pairIdx) => {
+                    const adjustedIn = adjustTimeForShift(pair.in, emp.shift, false);
+                    const adjustedOut = adjustTimeForShift(pair.out, emp.shift, true);
+                    const inDisplay = formatTime(adjustedIn.displayTime) + (adjustedIn.wasAdjusted ? ` <span style="font-size: 0.5rem; color: #dc2626;" title="${adjustedIn.adjustedReason}">(${formatTime(adjustedIn.actualTime)})</span>` : '');
+                    const outDisplay = formatTime(adjustedOut.displayTime) + (adjustedOut.wasAdjusted ? ` <span style="font-size: 0.5rem; color: #dc2626;" title="${adjustedOut.adjustedReason}">(${formatTime(adjustedOut.actualTime)})</span>` : '');
+                    
+                    return `
                     <tr style="${rowStyle}">
                         ${pairIdx === 0 ? `
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.date}</strong></td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.dayName}</strong></td>
                         ` : ''}
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${formatTime(pair.in)}</td>
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${formatTime(pair.out)}</td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${inDisplay}</td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${outDisplay}</td>
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times" data-hours-cell="true" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : '—'}</td>
                         ${pairIdx === 0 ? `
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; font-weight: ${day.lateMin > 0 ? '700' : '400'}; color: ${day.lateMin > 0 ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>
@@ -3493,7 +3575,9 @@
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">${day.isMissed ? '❌' : (day.hasMissedPunch ? '⚠️' : '✅')}</td>
                         ` : ''}
                     </tr>
-                `).join('');
+                `;
+                }).join('');
+            }
             }).join('');
             
             return `
@@ -3626,22 +3710,6 @@
                     </div>
                 `;
             }).join('');
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label style="display: block; font-size: 0.75rem; color: #64748b; font-weight: 600; margin-bottom: 6px; text-transform: uppercase;">OUT Time</label>
-                            <div style="display: flex; gap: 4px; align-items: center; justify-content: space-between;">
-                                <input type="number" min="0" max="23" class="modal-punch-out-hour-${pairIdx}" value="${outHour}" 
-                                    placeholder="HH" style="width: 50px; padding: 8px 6px; font-size: 0.9rem; border: 2px solid #dc2626; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
-                                <span style="color: #1e293b; font-weight: bold; font-size: 1.1rem;">:</span>
-                                <input type="number" min="0" max="59" class="modal-punch-out-min-${pairIdx}" value="${outMin}" 
-                                    placeholder="MM" style="width: 50px; padding: 8px 6px; font-size: 0.9rem; border: 2px solid #dc2626; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
             
             const editHistoryHtml = buildModalEditHistory(emp, dayIdx);
             
@@ -3655,6 +3723,13 @@
                         
                         <div style="margin-bottom: 24px;">
                             <h3 style="margin: 0 0 16px 0; color: #475569; font-size: 1.05rem; font-weight: 700;">Punch Times</h3>
+                            ${emp.shift && shiftDefinitions[emp.shift] ? `
+                                <div style="padding: 12px; background: #e0f2fe; border-left: 4px solid #0369a1; border-radius: 4px; margin-bottom: 16px; font-size: 0.9rem;">
+                                    <strong>📅 Shift: ${emp.shift.toUpperCase()}</strong> 
+                                    ${formatTime(shiftDefinitions[emp.shift].start)} - ${formatTime(shiftDefinitions[emp.shift].end)}
+                                    <br><span style="font-size: 0.85rem; color: #475569;">⏳ Times beyond ±10 min buffer will auto-lock to shift boundary</span>
+                                </div>
+                            ` : ''}
                             ${pairRows}
                         </div>
                         
