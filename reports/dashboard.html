@@ -147,6 +147,18 @@
             .employees-grid { grid-template-columns: 1fr; }
             h1 { font-size: 1.75rem; }
             .stat-value { font-size: 2rem; }
+            
+            /* Compact metrics row on mobile */
+            .metrics-line { grid-template-columns: repeat(4, 1fr); gap: 0.15rem; margin-top: 0.15rem; }
+            .metrics-line-secondary { grid-template-columns: repeat(4, 1fr); gap: 0.15rem; margin-top: 0.15rem; }
+            .metric-card { padding: 0.2rem 0.1rem; }
+            .metric-card-title { font-size: 0.35rem; margin-bottom: 0.08rem; }
+            .metric-card-value { font-size: 0.7rem; }
+            .metric-card-sub { font-size: 0.3rem; margin-top: 0.02rem; }
+            .metric-card-small { padding: 0.15rem 0.08rem; }
+            .metric-card-small-value { font-size: 0.55rem; }
+            .metric-card-small-sub { font-size: 0.25rem; margin-top: 0.02rem; }
+            .visual-metrics { padding: 0.2rem 0.3rem; }
         }
         
         @media print {
