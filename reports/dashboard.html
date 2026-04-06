@@ -3166,7 +3166,10 @@
             
             // DEBUG: Check if emp.id exists
             console.log('DEBUG: First 3 employees at renderTable time:');
-            console.log(data.slice(0, 3).map(e => ({name: e.name, id: e.id, hasId: !!e.id})));
+            const first3 = data.slice(0, 3);
+            first3.forEach((e, i) => {
+                console.log(`  [${i}] name="${e.name}", id="${e.id}", keys=${Object.keys(e)}`);
+            });
             
             const cards = data.map((emp) => {
                 // Calculate metrics
