@@ -953,70 +953,34 @@
                     const shiftRow = attendRulesSheet[row] || [];
                     if (shiftRow.length < 9) continue;
                     
-                    // Extract columns: In(1), Out(2), In2(3), Out2(4), ..., Dept(8)
+                    // Extract columns: In(1), Out(2), Dept(8)
                     const inTime1 = shiftRow[1];   // First time block - in
                     const outTime1 = shiftRow[2];  // First time block - out
-                    const inTime2 = shiftRow[3];   // Second time block - in (e.g., for WK/EV)
-                    const outTime2 = shiftRow[4];  // Second time block - out
-                    const deptName = shiftRow[8];  // Department name(s)
+                    const deptName = shiftRow[8];  // Department name
                     
                     // Skip if no valid department name or if it's the header
                     if (!deptName || String(deptName).trim() === 'Department') continue;
                     
                     const dept = String(deptName).trim();
+                    
+                    // SKIP compound names (WK/EV, FT/EV, etc.) - only extract atomic shifts
+                    if (dept.includes('/')) {
+                        console.log(`   ⊘ Skipping compound: ${dept}`);
+                        continue;
+                    }
+                    
                     const t1in = normalizeTime(inTime1);
                     const t1out = normalizeTime(outTime1);
-                    const t2in = normalizeTime(inTime2);
-                    const t2out = normalizeTime(outTime2);
                     
                     // Skip if no valid times
                     if (!t1in || !t1out) continue;
                     
-                    // Handle compound department names (e.g., "WK/EV" → extract as separate shifts)
-                    if (dept.includes('/')) {
-                        const parts = dept.split('/').map(p => p.trim());
-                        
-                        // First part gets first time block
-                        newShifts[parts[0]] = {
-                            start: t1in,
-                            end: t1out
-                        };
-                        console.log(`   ✓ Shift: ${parts[0]} = ${t1in} to ${t1out}`);
-                        
-                        // If second part exists and has second time block, use it
-                        if (parts.length > 1) {
-                            if (t2in && t2out) {
-                                newShifts[parts[1]] = {
-                                    start: t2in,
-                                    end: t2out
-                                };
-                                console.log(`   ✓ Shift: ${parts[1]} = ${t2in} to ${t2out}`);
-                            } else {
-                                // Otherwise use same time block as first
-                                newShifts[parts[1]] = {
-                                    start: t1in,
-                                    end: t1out
-                                };
-                                console.log(`   ✓ Shift: ${parts[1]} = ${t1in} to ${t1out}`);
-                            }
-                        }
-                        
-                        // Handle additional parts (e.g., WK/EV/FT)
-                        for (let i = 2; i < parts.length; i++) {
-                            newShifts[parts[i]] = {
-                                start: t1in,
-                                end: t1out
-                            };
-                            console.log(`   ✓ Shift: ${parts[i]} = ${t1in} to ${t1out}`);
-                        }
-                    } else {
-                        // Single department name
-                        newShifts[dept] = {
-                            start: t1in,
-                            end: t1out
-                        };
-                        console.log(`   ✓ Shift: ${dept} = ${t1in} to ${t1out}`);
-                    }
+                    // Extract only single-name departments
+                    newShifts[dept] = {
+                        start: t1in,
+                        end: t1out
+                    };
+                    console.log(`   ✓ Shift: ${dept} = ${t1in} to ${t1out}`);
                 }
                 
                 if (Object.keys(newShifts).length > 0) {
