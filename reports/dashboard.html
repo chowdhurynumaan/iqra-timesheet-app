@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-family='system-ui'>📊</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-family='system-ui'>ðŸ“Š</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,19 +29,49 @@
         .btn-upload:hover { background: #1d4ed8; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
         .btn-upload input { display: none; }
         
-        /* Control Panel */
-        .control-panel { background: white; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+        /* Control Panel - Compact top bar */
+        .control-panel { background: white; padding: 1rem 1.5rem; border-radius: 0; margin-bottom: 0; display: flex; flex-wrap: wrap; gap: 2rem; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-bottom: 1px solid #e2e8f0; }
         .control-section { display: flex; flex-direction: column; gap: 0.5rem; }
         .control-section label { font-size: 0.75rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; }
         .control-section select, .control-section input { padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 1rem; transition: all 0.2s; }
         .control-section select:focus, .control-section input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); outline: none; }
+        
+        /* Departments radio buttons section */
+        .dept-radios { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; }
+        .dept-radios label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; font-weight: 500; color: #1e293b; text-transform: none; letter-spacing: 0; cursor: pointer; margin: 0; }
+        .dept-radios input[type="radio"] { cursor: pointer; width: 18px; height: 18px; }
+        
+        /* Hamburger menu styles */
+        .hamburger-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; padding: 0.5rem; margin-left: auto; color: #1e293b; transition: all 0.2s; }
+        .hamburger-btn:hover { color: #2563eb; }
+        
+        /* Sidebar menu */
+        .sidebar-menu { position: fixed; top: 0; right: -350px; width: 350px; height: 100vh; background: white; box-shadow: -2px 0 10px rgba(0,0,0,0.1); overflow-y: auto; z-index: 1000; transition: right 0.3s ease; }
+        .sidebar-menu.active { right: 0; }
+        .sidebar-header { background: #2563eb; color: white; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; font-weight: 700; }
+        .sidebar-close { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0; }
+        .sidebar-content { padding: 1.5rem; }
+        .sidebar-section { margin-bottom: 2rem; }
+        .sidebar-section-title { font-size: 0.85rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+        .sidebar-section input, .sidebar-section select { display: block; width: 100%; margin-bottom: 0.75rem; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 0.95rem; }
+        .sidebar-btn { display: block; width: 100%; margin-bottom: 0.75rem; padding: 0.75rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+        .sidebar-btn.primary { background: #2563eb; color: white; }
+        .sidebar-btn.primary:hover { background: #1d4ed8; }
+        .sidebar-btn.secondary { background: #7c3aed; color: white; }
+        .sidebar-btn.secondary:hover { background: #6d28d9; }
+        .sidebar-btn.green { background: #059669; color: white; }
+        .sidebar-btn.green:hover { background: #047857; }
+        
+        /* Menu overlay */
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
+        .menu-overlay.active { display: block; }
         .btn-filter, .btn-export { background: #2563eb; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: all 0.2s; }
         .btn-filter:hover, .btn-export:hover { background: #1d4ed8; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
         .btn-export { background: #7c3aed; }
         .btn-export:hover { background: #6d28d9; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
         
-        /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        /* Stats Grid - Hidden */
+        .stats-grid { display: none !important; }
         .stat-card { background: white; padding: 2rem; border-radius: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid; }
         .stat-card.primary { border-color: #2563eb; }
         .stat-card.red { border-color: #dc2626; }
@@ -54,8 +84,8 @@
         .stat-card.green .stat-value { color: #16a34a; }
         .stat-card.amber .stat-value { color: #f59e0b; }
         
-        /* Charts */
-        .charts-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        /* Charts - Hidden */
+        .charts-section { display: none !important; }
         .chart-card { background: white; padding: 2rem; border-radius: 1.5rem; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
         .chart-title { font-size: 1.25rem; font-weight: 700; color: #1e293b; margin-bottom: 1.5rem; }
         .chart-container { height: 300px; position: relative; }
@@ -127,7 +157,10 @@
         .metric-card-small.missed-small .metric-card-small-value { color: #dc2626; }
         
         /* Status Indicators */
-        .status-bar { padding: 0.25rem 0.6rem; border-top: 1px solid #e2e8f0; background: #fafbfc; }\n        .status-left { display: flex; flex-direction: column; gap: 0.1rem; }\n        .status-tier { font-size: 0.65rem; font-weight: 700; color: #1e293b; }\n        .status-streak { font-size: 0.55rem; color: #64748b; font-weight: 500; }
+        .status-bar { padding: 0.25rem 0.6rem; border-top: 1px solid #e2e8f0; background: #fafbfc; }
+        .status-left { display: flex; flex-direction: column; gap: 0.1rem; }
+        .status-tier { font-size: 0.65rem; font-weight: 700; color: #1e293b; }
+        .status-streak { font-size: 0.55rem; color: #64748b; font-weight: 500; }
         
         /* Daily breakdown - ultra compact */
         .daily-breakdown { display: block; padding: 0.15rem; background: #f8fafc; border-top: 1px solid #e2e8f0; max-height: 900px; overflow-y: auto; }
@@ -140,6 +173,10 @@
         .no-data svg { width: 100px; height: 100px; opacity: 0.3; margin-bottom: 1rem; }
         
         .hidden { display: none; }
+        .control-section:nth-child(3),
+        .control-section:nth-child(4),
+        .control-section:nth-child(5),
+        .control-section:nth-child(6) { display: none; }
         
         @media (max-width: 768px) {
             .stats-grid { grid-template-columns: 1fr; }
@@ -424,7 +461,7 @@
             </div>
             <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                 <label class="btn-upload">
-                    <span>📋 Upload Employee Form</span>
+                    <span>ðŸ“‹ Upload Employee Form</span>
                     <input type="file" id="employeeFormFile" accept=".csv,.xlsx,.xls">
                 </label>
                 <label class="btn-upload">
@@ -434,65 +471,95 @@
             </div>
         </div>
 
+        <!-- Top Control Bar: Month + Department Radios -->
         <div id="controlPanel" class="control-panel">
             <div class="control-section">
-                <label>📅 Uploaded Months:</label>
-                <select id="monthSelector" onchange="loadMonthData()">
+                <label>ðŸ“… Month:</label>
+                <select id="monthSelector" onchange="loadMonthData()" style="min-width: 200px;">
                     <option value="">Loading months...</option>
                 </select>
             </div>
-            
-            <!-- NEW: Department/Shift Settings -->
-            <div class="control-section" id="deptShiftSection">
-                <label>🏢 Shift Settings:</label>
-                <div id="deptShiftEditor" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
-                    <!-- Departments will be populated here -->
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <label style="margin: 0; font-size: 0.85rem;">WK (9AM):</label>
-                        <input type="time" id="shiftWK_start" value="09:00" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
-                        <span>to</span>
-                        <input type="time" id="shiftWK_end" value="17:30" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <label style="margin: 0; font-size: 0.85rem;">FT (9AM):</label>
-                        <input type="time" id="shiftFT_start" value="09:00" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
-                        <span>to</span>
-                        <input type="time" id="shiftFT_end" value="17:30" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <label style="margin: 0; font-size: 0.85rem;">EV (6PM):</label>
-                        <input type="time" id="shiftEV_start" value="18:00" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
-                        <span>to</span>
-                        <input type="time" id="shiftEV_end" value="02:30" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
-                    </div>
-                    <button onclick="saveShiftDefinitions()" style="padding: 0.35rem 1rem; background: #059669; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">Save Shifts</button>
+
+            <!-- Department Selection as Radio Buttons -->
+            <div class="dept-radios" id="deptRadiosContainer">
+                <label><input type="radio" name="dept" value="" checked onchange="filterByDept('')"> All</label>
+            </div>
+
+            <!-- Hamburger Menu Button -->
+            <button class="hamburger-btn" onclick="toggleSidebar()">â˜°</button>
+        </div>
+
+        <!-- Sidebar Menu (Hidden by default) -->
+        <div class="menu-overlay" id="menuOverlay" onclick="toggleSidebar()"></div>
+        <div class="sidebar-menu" id="sidebarMenu">
+            <div class="sidebar-header">
+                <span>Menu</span>
+                <button class="sidebar-close" onclick="toggleSidebar()">âœ•</button>
+            </div>
+            <div class="sidebar-content">
+                <!-- Upload Section -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">ðŸ“Š Data Upload</div>
+                    <label class="btn-upload" style="display: block; padding: 0.75rem; background: #2563eb; color: white; border-radius: 0.5rem; text-align: center; cursor: pointer; font-weight: 600; margin-bottom: 0.75rem;">
+                        ðŸ“‹ Upload Employee Form
+                        <input type="file" id="employeeFormFile" accept=".csv,.xlsx,.xls" style="display: none;">
+                    </label>
+                    <label class="btn-upload" style="display: block; padding: 0.75rem; background: #2563eb; color: white; border-radius: 0.5rem; text-align: center; cursor: pointer; font-weight: 600;">
+                        ðŸ“ˆ Upload Report
+                        <input type="file" id="csvFile" accept=".csv,.xlsx,.xls" style="display: none;">
+                    </label>
                 </div>
-            </div>
-            
-            <div class="control-section">
-                <label>Data Source:</label>
-                <select id="sheetSelector">
-                    <option value="auto">Auto-Detect (Recommended)</option>
-                </select>
-            </div>
-            <div class="control-section">
-                <label>Department:</label>
-                <select id="deptFilter">
-                    <option value="">All Departments</option>
-                </select>
-            </div>
-            <div class="control-section">
-                <label>Date Range:</label>
-                <input type="date" id="startDate">
-                <span>to</span>
-                <input type="date" id="endDate">
-                <button class="btn-filter" onclick="filterByDateRange()">Apply</button>
-            </div>
-            <div class="control-section">
-                <button class="btn-export" onclick="exportToCSV()">Export CSV</button>
-                <button class="btn-export" onclick="exportToExcel()">Export Excel</button>
-                <button class="btn-export" onclick="saveReportToFirebase()">☁️ Save to Cloud</button>
-                <button class="btn-export" onclick="printSelected()" style="background: #059669;">Print Selected</button>
+
+                <!-- Shift Settings -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">â° Shift Settings</div>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem;">
+                            <label style="min-width: 50px;">WK:</label>
+                            <input type="time" id="shiftWK_start" value="09:00" style="flex: 1; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 4px;">
+                            <span style="font-size: 0.75rem;">to</span>
+                            <input type="time" id="shiftWK_end" value="17:30" style="flex: 1; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 4px;">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem;">
+                            <label style="min-width: 50px;">FT:</label>
+                            <input type="time" id="shiftFT_start" value="09:00" style="flex: 1; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 4px;">
+                            <span style="font-size: 0.75rem;">to</span>
+                            <input type="time" id="shiftFT_end" value="17:30" style="flex: 1; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 4px;">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem;">
+                            <label style="min-width: 50px;">EV:</label>
+                            <input type="time" id="shiftEV_start" value="18:00" style="flex: 1; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 4px;">
+                            <span style="font-size: 0.75rem;">to</span>
+                            <input type="time" id="shiftEV_end" value="02:30" style="flex: 1; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 4px;">
+                        </div>
+                    </div>
+                    <button class="sidebar-btn green" onclick="saveShiftDefinitions()">Save Shifts</button>
+                </div>
+
+                <!-- Data Source -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">ðŸ“‹ Data Source</div>
+                    <select id="sheetSelector" class="sidebar-section" style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 0.95rem;">
+                        <option value="auto">Auto-Detect (Recommended)</option>
+                    </select>
+                </div>
+
+                <!-- Date Range Filter -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">ðŸ“… Date Range</div>
+                    <input type="date" id="startDate" style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 0.95rem; margin-bottom: 0.75rem;">
+                    <input type="date" id="endDate" style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 0.95rem; margin-bottom: 0.75rem;">
+                    <button class="sidebar-btn primary" onclick="filterByDateRange()">Apply Filter</button>
+                </div>
+
+                <!-- Export Options -->
+                <div class="sidebar-section">
+                    <div class="sidebar-section-title">ðŸ’¾ Export</div>
+                    <button class="sidebar-btn secondary" onclick="exportToCSV()">Export CSV</button>
+                    <button class="sidebar-btn secondary" onclick="exportToExcel()">Export Excel</button>
+                    <button class="sidebar-btn primary" onclick="saveReportToFirebase()">â˜ï¸ Save to Cloud</button>
+                    <button class="sidebar-btn green" onclick="printSelected()">Print Selected</button>
+                </div>
             </div>
         </div>
 
@@ -517,21 +584,21 @@
 
         <div class="charts-section" id="chartSection" style="display: none;">
             <div class="chart-card" id="lateChartWrapper">
-                <div class="chart-title">⏰ Top 15 Late Arrivals</div>
+                <div class="chart-title">â° Top 15 Late Arrivals</div>
                 <div class="chart-container">
                     <canvas id="lateChart"></canvas>
                 </div>
             </div>
 
             <div class="chart-card" id="deptChartWrapper">
-                <div class="chart-title">📈 Attendance by Department</div>
+                <div class="chart-title">ðŸ“ˆ Attendance by Department</div>
                 <div class="chart-container">
                     <canvas id="deptChart"></canvas>
                 </div>
             </div>
 
             <div class="chart-card" id="deptLateChartWrapper">
-                <div class="chart-title">⏱️ Late Minutes by Department</div>
+                <div class="chart-title">â±ï¸ Late Minutes by Department</div>
                 <div class="chart-container">
                     <canvas id="deptLateChart"></canvas>
                 </div>
@@ -539,8 +606,8 @@
         </div>
 
         <div class="employees-section">
-            <div class="section-title">👤 Employee Performance Cards</div>
-            <input type="text" id="searchBox" placeholder="🔍 Search name or ID..." class="search-box" style="margin-bottom: 1.5rem; max-width: 500px;">
+            <div class="section-title">ðŸ‘¤ Employee Performance Cards</div>
+            <input type="text" id="searchBox" placeholder="ðŸ” Search name or ID..." class="search-box" style="margin-bottom: 1.5rem; max-width: 500px;">
             <div id="tableBody" class="employees-grid">
                 <div style="text-align: center; color: #94a3b8; font-style: italic; padding: 3rem 1.5rem; grid-column: 1/-1;">No data uploaded yet.</div>
             </div>
@@ -571,7 +638,7 @@
         
         // Enable anonymous authentication for public access
         auth.signInAnonymously().catch((error) => {
-            console.error('❌ Anonymous auth error:', error);
+            console.error('âŒ Anonymous auth error:', error);
         });
         
         // TimeSheet App Namespace (isolated from other apps) - use flat collections
@@ -581,8 +648,8 @@
         const EMPLOYEES_COLLECTION = 'timesheet_app_employees'; // Stores employee data
         const AUDIT_COLLECTION = 'timesheet_app_audit';         // Stores audit trail
         
-        console.log('✅ Firebase initialized safely for TimeSheet App');
-        console.log('📦 Using collections: months, employees, audit');
+        console.log('âœ… Firebase initialized safely for TimeSheet App');
+        console.log('ðŸ“¦ Using collections: months, employees, audit');
         
         // ========== FIREBASE UTILITY FUNCTIONS ==========
         // Remove undefined values from objects (Firestore doesn't allow undefined)
@@ -604,10 +671,10 @@
             try {
                 const cleanData = cleanUndefined(data);
                 await db.collection(collectionPath).doc(docId).set(cleanData, { merge: true });
-                console.log(`✅ Saved to Firestore: ${collectionPath}/${docId}`);
+                console.log(`âœ… Saved to Firestore: ${collectionPath}/${docId}`);
                 return true;
             } catch (error) {
-                console.error('❌ Firestore save error:', error);
+                console.error('âŒ Firestore save error:', error);
                 return false;
             }
         }
@@ -616,12 +683,12 @@
             try {
                 const doc = await db.collection(collectionPath).doc(docId).get();
                 if (doc.exists) {
-                    console.log(`✅ Loaded from Firestore: ${collectionPath}/${docId}`);
+                    console.log(`âœ… Loaded from Firestore: ${collectionPath}/${docId}`);
                     return doc.data();
                 }
                 return null;
             } catch (error) {
-                console.error('❌ Firestore load error:', error);
+                console.error('âŒ Firestore load error:', error);
                 return null;
             }
         }
@@ -629,10 +696,10 @@
         async function deleteFromFirestore(collectionPath, docId) {
             try {
                 await db.collection(collectionPath).doc(docId).delete();
-                console.log(`✅ Deleted from Firestore: ${collectionPath}/${docId}`);
+                console.log(`âœ… Deleted from Firestore: ${collectionPath}/${docId}`);
                 return true;
             } catch (error) {
-                console.error('❌ Firestore delete error:', error);
+                console.error('âŒ Firestore delete error:', error);
                 return false;
             }
         }
@@ -678,10 +745,10 @@
                     reports.push(doc.data());
                 });
                 
-                console.log(`✅ Loaded ${reports.length} previous reports from Firestore`);
+                console.log(`âœ… Loaded ${reports.length} previous reports from Firestore`);
                 return reports;
             } catch (error) {
-                console.error('❌ Error loading reports:', error);
+                console.error('âŒ Error loading reports:', error);
                 return [];
             }
         }
@@ -699,7 +766,6 @@
                         id: doc.id,
                         data: doc.data()
                     });
-                });
                 
                 // Sort by year and month (descending - newest first)
                 uploadedMonths.sort((a, b) => {
@@ -709,7 +775,7 @@
                     return bMonth - aMonth;
                 });
                 
-                console.log(`📅 Found ${uploadedMonths.length} uploaded months:`, uploadedMonths.map(m => m.id));
+                console.log(`ðŸ“… Found ${uploadedMonths.length} uploaded months:`, uploadedMonths.map(m => m.id));
                 populateMonthDropdown();
                 
                 // Auto-load latest month by default
@@ -717,10 +783,10 @@
                     const latestMonth = uploadedMonths[0]; // First in array is latest (sorted descending by year/month)
                     document.getElementById('monthSelector').value = latestMonth.id;
                     loadMonthData();
-                    console.log(`📅 Auto-loading latest month: ${latestMonth.id}`);
+                    console.log(`ðŸ“… Auto-loading latest month: ${latestMonth.id}`);
                 }
             } catch (error) {
-                console.error('❌ Error loading available months:', error);
+                console.error('âŒ Error loading available months:', error);
             }
         }
         
@@ -748,7 +814,7 @@
                 const docRef = await db.collection(TIMESHEET_COLLECTION).doc('shiftDefinitions').get();
                 if (docRef.exists) {
                     shiftDefinitions = docRef.data();
-                    console.log('✅ Loaded shift definitions:', shiftDefinitions);
+                    console.log('âœ… Loaded shift definitions:', shiftDefinitions);
                 } else {
                     // Default shift definitions
                     shiftDefinitions = {
@@ -756,7 +822,7 @@
                         FT: { start: '09:00', end: '17:30' },
                         EV: { start: '18:00', end: '02:30' }
                     };
-                    console.log('📋 Using default shift definitions');
+                    console.log('ðŸ“‹ Using default shift definitions');
                 }
                 
                 // Update UI with loaded values
@@ -767,7 +833,7 @@
                 document.getElementById('shiftEV_start').value = shiftDefinitions.EV?.start || '18:00';
                 document.getElementById('shiftEV_end').value = shiftDefinitions.EV?.end || '02:30';
             } catch (error) {
-                console.error('❌ Error loading shift definitions:', error);
+                console.error('âŒ Error loading shift definitions:', error);
             }
         }
         
@@ -782,11 +848,11 @@
                 shiftDefinitions = newDefs;
                 
                 await saveToFirestore(TIMESHEET_COLLECTION, 'shiftDefinitions', shiftDefinitions);
-                console.log('✅ Saved shift definitions to Firestore');
-                alert('✅ Shift definitions saved!');
+                console.log('âœ… Saved shift definitions to Firestore');
+                alert('âœ… Shift definitions saved!');
             } catch (error) {
-                console.error('❌ Error saving shift definitions:', error);
-                alert('❌ Failed to save shift definitions');
+                console.error('âŒ Error saving shift definitions:', error);
+                alert('âŒ Failed to save shift definitions');
             }
         }
         
@@ -798,18 +864,18 @@
                 const docRef = await db.collection(TIMESHEET_COLLECTION).doc('employeeFormMapping').get();
                 if (docRef.exists) {
                     employeeFormMapping = docRef.data();
-                    console.log('✅ Loaded employee form mapping:', employeeFormMapping);
+                    console.log('âœ… Loaded employee form mapping:', employeeFormMapping);
                 } else {
-                    console.log('📋 No employee form mapping found - waiting for upload');
+                    console.log('ðŸ“‹ No employee form mapping found - waiting for upload');
                 }
             } catch (error) {
-                console.error('❌ Error loading employee form mapping:', error);
+                console.error('âŒ Error loading employee form mapping:', error);
             }
         }
         
         function parseEmployeeFormStructure(data) {
             if (!data || data.length === 0) {
-                alert('❌ Empty file');
+                alert('âŒ Empty file');
                 return;
             }
             
@@ -817,7 +883,7 @@
             const mapping = {};
             const headerLower = headerRow.map(h => (h || '').toString().toLowerCase().trim());
             
-            console.log('📋 Employee Form Headers Found:');
+            console.log('ðŸ“‹ Employee Form Headers Found:');
             console.log(headerRow);
             
             // Detect columns by looking for key column headers
@@ -837,18 +903,23 @@
                         index: colIdx,
                         header: headerRow[colIdx]
                     };
-                    console.log(`   ✓ Found ${field} at column ${colIdx}: "${headerRow[colIdx]}"`);
+                    console.log(`   âœ“ Found ${field} at column ${colIdx}: "${headerRow[colIdx]}"`);
                 }
             });
             
             // If some columns detected, show them
             if (Object.keys(mapping).length > 0) {
-                console.log('✅ Detected Employee Form Columns:', mapping);
+                console.log('âœ… Detected Employee Form Columns:', mapping);
                 
                 // Show detected columns and allow user to save
-                const confirmMsg = `✅ Detected employee form columns:\n\n${
-                    Object.entries(mapping).map(([field, data]) => `• ${field}: "${data.header}"`).join('\n')
-                }\n\nSave this mapping to Firestore?`;
+                const confirmMsg = `âœ… Detected employee form columns:
+
+${
+                    Object.entries(mapping).map(([field, data]) => `â€¢ ${field}: "${data.header}"`).join('
+')
+                }
+
+Save this mapping to Firestore?`;
                 
                 if (confirm(confirmMsg)) {
                     saveEmployeeFormMapping(mapping);
@@ -858,9 +929,22 @@
             } else {
                 // No columns detected - show what was found and ask for manual help
                 const foundHeaders = headerRow.slice(0, 10).join(', ');
-                const msg = `⚠️ Could not automatically detect standard columns.\n\nHeaders found:\n${foundHeaders}\n\nPlease rename your columns to match one of these patterns:\n• ID: id, emp id, employee id, code\n• Name: name, employee name, full name\n• Department: department, dept, section\n• Shift: shift, schedule\n• Phone: phone, contact, mobile\n• Email: email, e-mail\n\nThen re-upload the file.`;
+                const msg = `âš ï¸ Could not automatically detect standard columns.
+
+Headers found:
+${foundHeaders}
+
+Please rename your columns to match one of these patterns:
+â€¢ ID: id, emp id, employee id, code
+â€¢ Name: name, employee name, full name
+â€¢ Department: department, dept, section
+â€¢ Shift: shift, schedule
+â€¢ Phone: phone, contact, mobile
+â€¢ Email: email, e-mail
+
+Then re-upload the file.`;
                 alert(msg);
-                console.log('❌ Could not auto-detect columns. Available headers:', headerRow);
+                console.log('âŒ Could not auto-detect columns. Available headers:', headerRow);
             }
         }
         
@@ -868,11 +952,11 @@
             try {
                 employeeFormMapping = mapping;
                 await saveToFirestore(TIMESHEET_COLLECTION, 'employeeFormMapping', mapping);
-                console.log('✅ Saved employee form mapping to Firestore');
-                alert('✅ Employee form structure saved! The system will now use these columns when processing data.');
+                console.log('âœ… Saved employee form mapping to Firestore');
+                alert('âœ… Employee form structure saved! The system will now use these columns when processing data.');
             } catch (error) {
-                console.error('❌ Error saving employee form mapping:', error);
-                alert('❌ Failed to save employee form mapping');
+                console.error('âŒ Error saving employee form mapping:', error);
+                alert('âŒ Failed to save employee form mapping');
             }
         }
         
@@ -908,7 +992,7 @@
                             ...emp,
                             shift: emp.shift || 'WK'
                         }));
-                        console.warn(`⚠️ No employees found in ${EMPLOYEES_COLLECTION}, using month document data`);
+                        console.warn(`âš ï¸ No employees found in ${EMPLOYEES_COLLECTION}, using month document data`);
                     }
                     
                     filteredData = [...rawData];
@@ -940,8 +1024,8 @@
                         }
                     });
                     
-                    console.log(`✅ Loaded ${rawData.length} employees from ${monthId}`);
-                    console.log(`📅 Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);
+                    console.log(`âœ… Loaded ${rawData.length} employees from ${monthId}`);
+                    console.log(`ðŸ“… Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);
                     
                     // Show data panels
                     document.getElementById('statsGrid').style.display = 'grid';
@@ -953,10 +1037,10 @@
                     // Display employee data in the table (with daily breakdown)
                     displayEmployeeData(rawData);
                 } else {
-                    console.warn(`⚠️ No data found for month: ${monthId}`);
+                    console.warn(`âš ï¸ No data found for month: ${monthId}`);
                 }
             } catch (error) {
-                console.error('❌ Error loading month data:', error);
+                console.error('âŒ Error loading month data:', error);
             }
         }
         
@@ -968,7 +1052,7 @@
                     Object.assign(cellEditHistory, emp.editHistory);
                 }
             });
-            console.log(`📝 Restored edit history:`, Object.keys(cellEditHistory).length, 'cells edited');
+            console.log(`ðŸ“ Restored edit history:`, Object.keys(cellEditHistory).length, 'cells edited');
         }
         
         // Re-display badges for all edited cells
@@ -1033,7 +1117,7 @@
         function displayEmployeeData(employees) {
             const tableBody = document.getElementById('tableBody');
             if (!tableBody) {
-                console.warn('⚠️ tableBody element not found');
+                console.warn('âš ï¸ tableBody element not found');
                 return;
             }
             
@@ -1092,8 +1176,8 @@
                 else if (absences > 0 || emp.lateMin > 0) tier = 'good';
                 
                 const name = emp.name || 'Unknown';
-                const id = emp.id || '—';
-                const dept = emp.dept || '—';
+                const id = emp.id || 'â€”';
+                const dept = emp.dept || 'â€”';
                 const hoursNum = parseFloat(emp.hours) || 0;
                 const lateMin = emp.lateMin || 0;
                 
@@ -1158,7 +1242,7 @@
                 tableBody.appendChild(card);
             });
             
-            console.log(`📊 Displayed ${employees.length} employees with complete metrics & daily breakdown`);
+            console.log(`ðŸ“Š Displayed ${employees.length} employees with complete metrics & daily breakdown`);
             
             // Restore edit badges after rendering
             reattachEditBadges();
@@ -1180,9 +1264,9 @@
 
         // Safety check for file input existence
         if (!fileInput) {
-            console.error('❌ File input element not found! Check HTML structure.');
+            console.error('âŒ File input element not found! Check HTML structure.');
         } else {
-            console.log('✅ File input element found, setting up listener...');
+            console.log('âœ… File input element found, setting up listener...');
             
             // Load available months from Firebase on page load
             loadAvailableMonths();
@@ -1192,13 +1276,15 @@
             fileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) {
-                    console.warn('⚠️ No file selected');
+                    console.warn('âš ï¸ No file selected');
                     return;
                 }
                 
                 const isExcel = /\.(xlsx?|xls)$/.test(file.name.toLowerCase());
                 
-                console.log('📥 FILE UPLOAD DETECTED\nFile Name:', file.name, '\nFile Type:', isExcel ? 'Excel' : 'CSV');
+                console.log('ðŸ“¥ FILE UPLOAD DETECTED
+File Name:', file.name, '
+File Type:', isExcel ? 'Excel' : 'CSV');
 
                 if (isExcel) {
                     const reader = new FileReader();
@@ -1206,30 +1292,29 @@
                         try {
                             const data = new Uint8Array(ev.target.result);
                             currentWorkbook = XLSX.read(data, { type: 'array' });
-                            console.log('📊 Sheet names in workbook:', currentWorkbook.SheetNames);
+                            console.log('ðŸ“Š Sheet names in workbook:', currentWorkbook.SheetNames);
                             
                             // Parse all sheets
                             allSheetData = {};
                             currentWorkbook.SheetNames.forEach(sheetName => {
                                 const sheet = currentWorkbook.Sheets[sheetName];
                                 allSheetData[sheetName] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-                            });
                             
                             processMultiSheetData(allSheetData);
                         } catch (err) {
-                            console.error('❌ Error parsing Excel:', err);
-                            alert('❌ Error parsing Excel file. Please ensure it\'s valid. Error: ' + err.message);
+                            console.error('âŒ Error parsing Excel:', err);
+                            alert('âŒ Error parsing Excel file. Please ensure it\'s valid. Error: ' + err.message);
                         }
                     };
                     reader.onerror = () => {
-                        console.error('❌ Error reading file');
-                        alert('❌ Error reading file');
+                        console.error('âŒ Error reading file');
+                        alert('âŒ Error reading file');
                     };
                     reader.readAsArrayBuffer(file);
                 } else {
                     if (typeof Papa === 'undefined') {
-                        console.error('❌ PapaParse library not loaded');
-                        alert('❌ CSV parser not loaded. Please refresh the page.');
+                        console.error('âŒ PapaParse library not loaded');
+                        alert('âŒ CSV parser not loaded. Please refresh the page.');
                         return;
                     }
                     
@@ -1237,13 +1322,13 @@
                         header: false,
                         skipEmptyLines: false,
                         complete: (results) => {
-                            console.log('📊 Parsed CSV data rows:', results.data.length);
+                            console.log('ðŸ“Š Parsed CSV data rows:', results.data.length);
                             allSheetData = { 'CSV Data': results.data };
                             processMultiSheetData(allSheetData);
                         },
                         error: (err) => {
-                            console.error('❌ Error parsing CSV:', err);
-                            alert('❌ Error parsing CSV file. Error: ' + err.message);
+                            console.error('âŒ Error parsing CSV:', err);
+                            alert('âŒ Error parsing CSV file. Error: ' + err.message);
                         }
                     });
                 }
@@ -1258,7 +1343,7 @@
                     if (!file) return;
                     
                     const isExcel = /\.(xlsx?|xls)$/.test(file.name.toLowerCase());
-                    console.log(`📋 Employee Form File Selected: ${file.name}`);
+                    console.log(`ðŸ“‹ Employee Form File Selected: ${file.name}`);
                     
                     if (isExcel) {
                         const reader = new FileReader();
@@ -1269,8 +1354,8 @@
                                 const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, defval: '' });
                                 parseEmployeeFormStructure(sheetData);
                             } catch (err) {
-                                console.error('❌ Error parsing employee form:', err);
-                                alert('❌ Error parsing employee form. Error: ' + err.message);
+                                console.error('âŒ Error parsing employee form:', err);
+                                alert('âŒ Error parsing employee form. Error: ' + err.message);
                             }
                         };
                         reader.readAsArrayBuffer(file);
@@ -1282,8 +1367,8 @@
                                 parseEmployeeFormStructure(results.data);
                             },
                             error: (err) => {
-                                console.error('❌ Error parsing employee form CSV:', err);
-                                alert('❌ Error parsing employee form. Error: ' + err.message);
+                                console.error('âŒ Error parsing employee form CSV:', err);
+                                alert('âŒ Error parsing employee form. Error: ' + err.message);
                             }
                         });
                     }
@@ -1302,7 +1387,7 @@
                     const data = sheets[priorityName];
                     const result = parseSheet(data, priorityName);
                     if (result.employees.length > 0 && priority < bestResult.priority) {
-                        console.log(`✓ Priority sheet "${priorityName}" found with ${result.employees.length} employees`);
+                        console.log(`âœ“ Priority sheet "${priorityName}" found with ${result.employees.length} employees`);
                         bestResult = { ...result, priority };
                     }
                 }
@@ -1310,7 +1395,7 @@
             
             // If no priority sheet found, check all sheets
             if (bestResult.employees.length === 0) {
-                console.log('⚠️ No priority sheets found, scanning all sheets...');
+                console.log('âš ï¸ No priority sheets found, scanning all sheets...');
                 Object.keys(sheets).forEach(sheetName => {
                     const data = sheets[sheetName];
                     const result = parseSheet(data, sheetName);
@@ -1322,15 +1407,16 @@
             }
 
             if (bestResult.employees.length === 0) {
-                alert('❌ Could not detect employee data. Please ensure the file format is valid.');
+                alert('âŒ Could not detect employee data. Please ensure the file format is valid.');
                 return;
             }
 
             rawData = bestResult.employees;
             filteredData = [...rawData];
             
-            console.log(`\n✅ DATA LOADED FROM: ${bestResult.source}`);
-            console.log(`📊 Total Employees: ${rawData.length}, Days: ${dateRange.actualDays}`);
+            console.log(`
+âœ… DATA LOADED FROM: ${bestResult.source}`);
+            console.log(`ðŸ“Š Total Employees: ${rawData.length}, Days: ${dateRange.actualDays}`);
             
             // Parse individual employee sheets for enhanced lateness data
             parseIndividualSheets(sheets, rawData);
@@ -1375,11 +1461,11 @@
             );
             
             if (individualSheetNames.length === 0) {
-                console.log('ℹ️ No individual employee sheets found');
+                console.log('â„¹ï¸ No individual employee sheets found');
                 return;
             }
             
-            console.log(`🔍 Parsing ${individualSheetNames.length} individual employee sheets for lateness data`);
+            console.log(`ðŸ” Parsing ${individualSheetNames.length} individual employee sheets for lateness data`);
             
             individualSheetNames.forEach(sheetName => {
                 const data = sheets[sheetName];
@@ -1450,7 +1536,7 @@
                 }
             });
             
-            console.log('✅ Individual sheet lateness data merged');
+            console.log('âœ… Individual sheet lateness data merged');
         }
 
         function detectDateRange(data) {
@@ -1464,7 +1550,7 @@
                         dateRange.start = new Date(dateMatch[3], parseInt(dateMatch[1]) - 1, parseInt(dateMatch[2]));
                         dateRange.end = new Date(dateMatch[6], parseInt(dateMatch[4]) - 1, parseInt(dateMatch[5]));
                         dateRange.actualDays = Math.floor((dateRange.end - dateRange.start) / (1000 * 60 * 60 * 24)) + 1;
-                        console.log(`📅 Date Range (from header): ${dateRange.start.toLocaleDateString()} to ${dateRange.end.toLocaleDateString()} (${dateRange.actualDays} days)`);
+                        console.log(`ðŸ“… Date Range (from header): ${dateRange.start.toLocaleDateString()} to ${dateRange.end.toLocaleDateString()} (${dateRange.actualDays} days)`);
                         return;
                     }
                 }
@@ -1490,7 +1576,7 @@
                 if (foundDates.length > 5) break;
             }
             
-            console.log(`📅 Found dates: ${foundDates.join(', ')}`);
+            console.log(`ðŸ“… Found dates: ${foundDates.join(', ')}`);
             
             // If we found a month, calculate the correct number of days in that month
             if (detectedYear && detectedMonth) {
@@ -1498,14 +1584,14 @@
                 // Get last day of the month
                 dateRange.end = new Date(detectedYear, detectedMonth, 0);
                 dateRange.actualDays = dateRange.end.getDate();
-                console.log(`📅 Detected Month/Year: ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][detectedMonth-1]} ${detectedYear} → ${dateRange.actualDays} days`);
-                console.log(`📅 dateRange.actualDays = ${dateRange.actualDays} (should be 31 for March)`);
+                console.log(`ðŸ“… Detected Month/Year: ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][detectedMonth-1]} ${detectedYear} â†’ ${dateRange.actualDays} days`);
+                console.log(`ðŸ“… dateRange.actualDays = ${dateRange.actualDays} (should be 31 for March)`);
                 return;
             }
             
             // Final fallback to 31 days
             dateRange.actualDays = 31;
-            console.log(`📅 Date Range: Using default 31 days`);
+            console.log(`ðŸ“… Date Range: Using default 31 days`);
         }
 
         function findColumnByHeader(row, searchTerms) {
@@ -1523,7 +1609,7 @@
         }
 
         function parseAttendanceLogs(data) {
-            console.log('🔍 Parsing Attendance Logs - Extracting IN/OUT times from Attend. Logs sheet');
+            console.log('ðŸ” Parsing Attendance Logs - Extracting IN/OUT times from Attend. Logs sheet');
             const employees = [];
             
             let i = 0;
@@ -1564,7 +1650,8 @@
                             // Try multiple parsing methods to handle different formats
                             if (cellContent) {
                                 // Method 1: Split by newlines or line breaks
-                                const lines = cellContent.split(/[\r\n]+/);
+                                const lines = cellContent.split(/[
+]+/);
                                 lines.forEach(line => {
                                     const matches = line.match(/(\d{1,2}):(\d{2})/g);
                                     if (matches) {
@@ -1722,7 +1809,7 @@
                             totalMinutes
                         });
                         
-                        console.log(`  ✓ Parsed: ${name} (ID: ${id}, Dept: ${dept}, Days: ${daysWorked})`);
+                        console.log(`  âœ“ Parsed: ${name} (ID: ${id}, Dept: ${dept}, Days: ${daysWorked})`);
                     }
                     
                     i += 4;
@@ -1736,7 +1823,7 @@
         }
 
         function parseAttendanceSummary(data) {
-            console.log('🔍 Parsing Attendance Summary');
+            console.log('ðŸ” Parsing Attendance Summary');
             const employees = [];
             
             // Attendance summary has fixed structure:
@@ -1809,7 +1896,7 @@
                     absences,
                     dailyBreakdown: null
                 });
-                console.log(`  ✓ Parsed: ${name} (ID: ${id}, Dept: ${dept}, Hours: ${hours}, Late: ${lateMin}, Absences: ${absences})`);
+                console.log(`  âœ“ Parsed: ${name} (ID: ${id}, Dept: ${dept}, Hours: ${hours}, Late: ${lateMin}, Absences: ${absences})`);
             }
             
             console.log(`  Total parsed: ${employees.length} employees`);
@@ -1817,7 +1904,7 @@
         }
 
         function parseAbnormal(data) {
-            console.log('🔍 Parsing Abnormal Records');
+            console.log('ðŸ” Parsing Abnormal Records');
             const empMap = {};
             
             for (let i = 3; i < data.length; i++) {
@@ -1859,7 +1946,7 @@
         }
 
         function parseScheduleInfo(data) {
-            console.log('🔍 Parsing Schedule Information');
+            console.log('ðŸ” Parsing Schedule Information');
             const employees = [];
             
             for (let i = 4; i < data.length; i++) {
@@ -1887,7 +1974,7 @@
         }
 
         function parseAttendReport(data) {
-            console.log('🔍 Parsing Attendance Report');
+            console.log('ðŸ” Parsing Attendance Report');
             const employees = [];
             const statsRow = data[6] || [];
             const blockSize = 8;
@@ -1934,6 +2021,24 @@
             return employees;
         }
 
+        // ========== HAMBURGER MENU FUNCTIONS ==========
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebarMenu');
+            const overlay = document.getElementById('menuOverlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+        
+        function filterByDept(dept) {
+            if (dept) {
+                filteredData = rawData.filter(emp => emp.dept === dept);
+            } else {
+                filteredData = [...rawData];
+            }
+            renderDashboard(filteredData);
+            displayEmployeeData(filteredData);
+        }
+        
         function initializeControlPanel() {
             // Populate sheet selector
             const sheetSelect = document.getElementById('sheetSelector');
@@ -1944,37 +2049,27 @@
                 sheetSelect.appendChild(option);
             });
             
-            // Populate department filter (clear existing, keep "All Departments")
+            // Populate department filter as radio buttons
             const depts = new Set(rawData.map(e => e.dept).filter(d => d && d !== 'undefined'));
-            const deptSelect = document.getElementById('deptFilter');
+            const deptRadiosContainer = document.getElementById('deptRadiosContainer');
             
-            // Keep only the "All Departments" option
-            deptSelect.innerHTML = '<option value="">All Departments</option>';
+            // Keep the "All" radio button, add others
+            deptRadiosContainer.innerHTML = '<label><input type="radio" name="dept" value="" checked onchange="filterByDept(\"\")"> All</label>';
             
-            // Add departments in sorted order
+            // Add departments in sorted order as radio buttons
             const sortedDepts = Array.from(depts).sort();
             sortedDepts.forEach(dept => {
-                const option = document.createElement('option');
-                option.value = dept;
-                option.textContent = dept;
-                deptSelect.appendChild(option);
+                const label = document.createElement('label');
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'dept';
+                radio.value = dept;
+                radio.onchange = () => filterByDept(dept);
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(` ${dept}`));
+                deptRadiosContainer.appendChild(label);
             });
-            
-            // Remove old listeners by cloning the element
-            const newDeptSelect = deptSelect.cloneNode(true);
-            deptSelect.parentNode.replaceChild(newDeptSelect, deptSelect);
-            
-            // Add fresh change event listener
-            newDeptSelect.addEventListener('change', (e) => {
-                const selectedDept = e.target.value;
-                if (selectedDept) {
-                    filteredData = rawData.filter(emp => emp.dept === selectedDept);
-                } else {
-                    filteredData = [...rawData];
-                }
-                renderDashboard(filteredData);
-                displayEmployeeData(filteredData);
-            });
+            console.log('✅ Department radios initialized');
             
             // Set date inputs
             if (dateRange.start) {
@@ -2004,9 +2099,11 @@
         }
 
         function exportToCSV() {
-            let csv = 'ID,Name,Department,Total Hours,Late Minutes,Absences\\n';
+            let csv = 'ID,Name,Department,Total Hours,Late Minutes,Absences\
+';
             filteredData.forEach(emp => {
-                csv += `"${emp.id}","${emp.name}","${emp.dept}","${emp.hours}","${emp.lateMin}","${emp.absences}"\\n`;
+                csv += `"${emp.id}","${emp.name}","${emp.dept}","${emp.hours}","${emp.lateMin}","${emp.absences}"\
+`;
             });
             downloadFile(csv, 'attendance_report.csv', 'text/csv');
         }
@@ -2033,7 +2130,9 @@
             console.log(`DEBUG: Found ${checkedCheckboxes.length} CHECKED checkboxes`);
             
             if (checkedCheckboxes.length === 0) {
-                alert('❌ No employees selected.\n\nPlease check the checkboxes next to the employees you want to print.');
+                alert('âŒ No employees selected.
+
+Please check the checkboxes next to the employees you want to print.');
                 return;
             }
             
@@ -2041,19 +2140,19 @@
             
             checkedCheckboxes.forEach(cb => {
                 const checkboxId = cb.dataset.id;
-                console.log(`✓ Processing checked box with ID: ${checkboxId}`);
+                console.log(`âœ“ Processing checked box with ID: ${checkboxId}`);
                 
                 // Find matching employee in filteredData
                 const emp = filteredData.find(e => String(e.id) === String(checkboxId));
                 if (emp) {
                     selectedEmployees.push(emp);
-                    console.log(`   ✅ Added employee: ${emp.name} (ID: ${emp.id}) - Dept: ${emp.dept}`);
+                    console.log(`   âœ… Added employee: ${emp.name} (ID: ${emp.id}) - Dept: ${emp.dept}`);
                 } else {
-                    console.warn(`   ❌ Employee not found with ID: ${checkboxId}`);
+                    console.warn(`   âŒ Employee not found with ID: ${checkboxId}`);
                 }
             });
             
-            console.log(`✅ Ready to print ${selectedEmployees.length} employee(s):`, selectedEmployees.map(e => e.name).join(', '));
+            console.log(`âœ… Ready to print ${selectedEmployees.length} employee(s):`, selectedEmployees.map(e => e.name).join(', '));
             
             // Group employees by department
             const byDept = {};
@@ -2066,7 +2165,7 @@
             // Sort departments alphabetically
             const deptList = Object.keys(byDept).sort();
             
-            console.log(`📊 Department Grouping:`);
+            console.log(`ðŸ“Š Department Grouping:`);
             deptList.forEach(dept => {
                 console.log(`   ${dept}: ${byDept[dept].length} employees`);
             });
@@ -2339,13 +2438,13 @@
                     
                     emp.dailyBreakdown.forEach(day => {
                         const rowClass = day.lateMin > 0 ? 'late-row' : '';
-                        const status = day.isMissed ? '❌' : (day.hasMissedPunch ? '⚠️' : '✅');
+                        const status = day.isMissed ? 'âŒ' : (day.hasMissedPunch ? 'âš ï¸' : 'âœ…');
                         const punches = day.punchPairs && day.punchPairs.length > 0 
                             ? day.punchPairs.map(p => formatTimeWithShiftAdjustment(p.in, p.out, emp.shift)).join('<br>') 
-                            : '—';
+                            : 'â€”';
                         
                         // Calculate hours from punchPairs if day.hours not available
-                        let hoursDisplay = '—';
+                        let hoursDisplay = 'â€”';
                         if (day.hours && day.hours > 0) {
                             hoursDisplay = parseFloat(day.hours).toFixed(1);
                         } else if (day.punchPairs && day.punchPairs.length > 0) {
@@ -2359,7 +2458,7 @@
                                 <td>${day.dayName}</td>
                                 <td>${punches}</td>
                                 <td>${hoursDisplay}</td>
-                                <td class="${day.lateMin > 0 ? 'late' : ''}">${day.lateMin > 0 ? day.lateMin : '—'}</td>
+                                <td class="${day.lateMin > 0 ? 'late' : ''}">${day.lateMin > 0 ? day.lateMin : 'â€”'}</td>
                                 <td>${status}</td>
                             </tr>
                         `;
@@ -2391,7 +2490,7 @@
                 changeType: oldValue === undefined ? 'NEW' : (oldValue !== newValue ? 'MODIFIED' : 'UNCHANGED')
             };
             changeLog.push(change);
-            console.log(`📝 Change logged: ${empName} ${field}: "${oldValue}" → "${newValue}"`);
+            console.log(`ðŸ“ Change logged: ${empName} ${field}: "${oldValue}" â†’ "${newValue}"`);
             return change;
         }
         
@@ -2421,7 +2520,7 @@
             if (dateRange && dateRange.start) {
                 detectedMonth = dateRange.start.getMonth() + 1;
                 detectedYear = dateRange.start.getFullYear();
-                console.log(`📅 Month/year extracted from parsed date range: ${detectedMonth}/${detectedYear}`);
+                console.log(`ðŸ“… Month/year extracted from parsed date range: ${detectedMonth}/${detectedYear}`);
                 return { month: detectedMonth, year: detectedYear };
             }
             
@@ -2437,7 +2536,7 @@
                         detectedMonth = parseInt(dateRangeMatch[2]); // Month from first date
                         detectedYear = parseInt(dateRangeMatch[3]);
                         
-                        console.log(`📅 Detected month from date range: ${detectedMonth}/${detectedYear}`);
+                        console.log(`ðŸ“… Detected month from date range: ${detectedMonth}/${detectedYear}`);
                         return { month: detectedMonth, year: detectedYear };
                     }
                     
@@ -2455,7 +2554,7 @@
                                     detectedYear = parseInt(yearMatch[0]);
                                 }
                             }
-                            console.log(`📅 Detected month from name: ${detectedMonth}/${detectedYear}`);
+                            console.log(`ðŸ“… Detected month from name: ${detectedMonth}/${detectedYear}`);
                         }
                     });
                 }
@@ -2464,7 +2563,7 @@
             if (!detectedMonth) {
                 detectedMonth = new Date().getMonth() + 1;
                 detectedYear = new Date().getFullYear();
-                console.log(`⚠️ Could not detect month, using current: ${detectedMonth}/${detectedYear}`);
+                console.log(`âš ï¸ Could not detect month, using current: ${detectedMonth}/${detectedYear}`);
             }
             
             return { month: detectedMonth, year: detectedYear };
@@ -2544,7 +2643,7 @@
                 
                 return comparison;
             } catch (error) {
-                console.log('ℹ️ No existing data for this month (first upload):', error);
+                console.log('â„¹ï¸ No existing data for this month (first upload):', error);
                 // First upload for this month
                 newEmployees.forEach(emp => {
                     logChange(emp.id, emp.name, 'record', undefined, 'NEW RECORD');
@@ -2561,47 +2660,59 @@
         // ========== ENHANCED FIRESTORE SAVE WITH CHANGE TRACKING ==========
         async function saveReportToFirebase() {
             if (filteredData.length === 0) {
-                alert('⚠️ No data to save. Please upload a report first.');
+                alert('âš ï¸ No data to save. Please upload a report first.');
                 return;
             }
 
             try {
                 const btn = event.target;
                 btn.disabled = true;
-                btn.textContent = '⏳ Processing...';
+                btn.textContent = 'â³ Processing...';
 
                 // Detect month from data
                 const monthYear = detectMonthFromData(rawData);
                 const monthStr = `${String(monthYear.month).padStart(2, '0')}_${monthYear.year}`;
                 
-                console.log(`\n🗓️ Processing report for: ${monthYear.month}/${monthYear.year}`);
+                console.log(`
+ðŸ—“ï¸ Processing report for: ${monthYear.month}/${monthYear.year}`);
 
                 // Compare with existing data
                 const comparison = await compareWithExisting(filteredData, monthYear);
                 
                 // Build summary message
-                let summaryMsg = `📊 Data Merge Summary for ${monthYear.month}/${monthYear.year}:\n\n`;
-                summaryMsg += `✨ NEW: ${comparison.new.length} employees\n`;
-                summaryMsg += `🔄 MODIFIED: ${comparison.modified.length} employees\n`;
-                summaryMsg += `✅ UNCHANGED: ${comparison.unchanged.length} employees\n`;
+                let summaryMsg = `ðŸ“Š Data Merge Summary for ${monthYear.month}/${monthYear.year}:
+
+`;
+                summaryMsg += `âœ¨ NEW: ${comparison.new.length} employees
+`;
+                summaryMsg += `ðŸ”„ MODIFIED: ${comparison.modified.length} employees
+`;
+                summaryMsg += `âœ… UNCHANGED: ${comparison.unchanged.length} employees
+`;
                 
                 if (comparison.modified.length > 0) {
-                    summaryMsg += `\nModified fields:\n`;
+                    summaryMsg += `
+Modified fields:
+`;
                     comparison.modified.forEach(item => {
-                        summaryMsg += `\n  ${item.emp.name} (ID: ${item.emp.id}):\n`;
+                        summaryMsg += `
+  ${item.emp.name} (ID: ${item.emp.id}):
+`;
                         item.differences.forEach(diff => {
-                            summaryMsg += `    • ${diff.field}: ${diff.oldValue} → ${diff.newValue}\n`;
+                            summaryMsg += `    â€¢ ${diff.field}: ${diff.oldValue} â†’ ${diff.newValue}
+`;
                         });
-                    });
                 }
                 
                 console.log(summaryMsg);
                 
                 // Show confirmation with changes
-                const proceed = confirm(summaryMsg + `\n\nProceed to save all changes to Firestore?`);
+                const proceed = confirm(summaryMsg + `
+
+Proceed to save all changes to Firestore?`);
                 
                 if (!proceed) {
-                    btn.textContent = '☁️ Save to Cloud';
+                    btn.textContent = 'â˜ï¸ Save to Cloud';
                     btn.disabled = false;
                     return;
                 }
@@ -2662,18 +2773,22 @@
                     }
                 );
                 
-                alert(`✅ Report saved successfully!\n\n${summaryMsg}\n\nData saved to Firestore with full change history.`);
-                btn.textContent = '☁️ Saved!';
+                alert(`âœ… Report saved successfully!
+
+${summaryMsg}
+
+Data saved to Firestore with full change history.`);
+                btn.textContent = 'â˜ï¸ Saved!';
                 
                 // Refresh month dropdown to show new month if added
                 setTimeout(() => {
                     loadAvailableMonths();
-                    btn.textContent = '☁️ Save to Cloud';
+                    btn.textContent = 'â˜ï¸ Save to Cloud';
                     btn.disabled = false;
                 }, 2000);
             } catch (error) {
-                alert('❌ Error: ' + error.message);
-                event.target.textContent = '☁️ Save to Cloud';
+                alert('âŒ Error: ' + error.message);
+                event.target.textContent = 'â˜ï¸ Save to Cloud';
                 event.target.disabled = false;
                 console.error(error);
             }
@@ -2714,12 +2829,19 @@
             // Add save button
             const header = card.querySelector('.employee-header');
             const saveBtn = document.createElement('button');
-            saveBtn.textContent = '💾 Save Changes';
+            saveBtn.textContent = 'ðŸ’¾ Save Changes';
             saveBtn.style.cssText = 'background: #16a34a; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.3rem; cursor: pointer; font-weight: 600; margin-left: auto;';
             saveBtn.onclick = () => saveEmployeeChanges(empId, card);
             header.appendChild(saveBtn);
             
-            alert(`✏️ Edit mode ON for ${emp.name}\n\nEditable fields:\n• Hours\n• Late Minutes\n• Absences\n\nClick 'Save Changes' when done.`);
+            alert(`âœï¸ Edit mode ON for ${emp.name}
+
+Editable fields:
+â€¢ Hours
+â€¢ Late Minutes
+â€¢ Absences
+
+Click 'Save Changes' when done.`);
         }
         
         async function saveEmployeeChanges(empId, card) {
@@ -2777,9 +2899,13 @@
                 
                 await saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}_${empData.monthId}`, empData);
                 
-                alert(`✅ Changes saved for ${emp.name}!\n\nModified fields:\n${changes.map(c => `• ${c.field}: ${c.oldValue} → ${c.newValue}`).join('\n')}`);
+                alert(`âœ… Changes saved for ${emp.name}!
+
+Modified fields:
+${changes.map(c => `â€¢ ${c.field}: ${c.oldValue} â†’ ${c.newValue}`).join('
+')}`);
             } else {
-                alert(`ℹ️ No changes made to ${emp.name}`);
+                alert(`â„¹ï¸ No changes made to ${emp.name}`);
             }
             
             currentEditingEmp = null;
@@ -2945,7 +3071,8 @@
             const employees = [];
             const titleCell = (data[0]?.[0] || '').toString().toLowerCase();
             
-            console.log('=== SMART PARSER STARTING ===\nDetected Title:', titleCell);
+            console.log('=== SMART PARSER STARTING ===
+Detected Title:', titleCell);
             
             // Extract date range from row 1 if available
             let dateRange = { start: null, end: null };
@@ -3078,7 +3205,8 @@
                                     hasMissedPunch: false
                                 };
                                 
-                                const times = cellContent.split(/[\r\n]+/).filter(t => t.trim() && /^\d{2}:\d{2}/.test(t.trim()));
+                                const times = cellContent.split(/[
+]+/).filter(t => t.trim() && /^\d{2}:\d{2}/.test(t.trim()));
                                 
                                 if (times.length === 0) {
                                     dayRecord.isMissed = true;
@@ -3220,9 +3348,11 @@
             
             rawData = employees;
             
-            console.log('\n========== DATA LOADED ==========');
+            console.log('
+========== DATA LOADED ==========');
             console.log('Total Employees:', rawData.length);
-            console.log('==============================\n');
+            console.log('==============================
+');
             
             if (rawData.length > 0) {
                 renderDashboard(rawData);
@@ -3248,7 +3378,9 @@
             document.getElementById('statLate').textContent = Math.round(totalLateMin);
             document.getElementById('statAvg').textContent = avgAttendance + '%';
             
-            console.log(`\n🎯 PUNCTUALITY CALCULATION DIAGNOSTICS:\n`);
+            console.log(`
+ðŸŽ¯ PUNCTUALITY CALCULATION DIAGNOSTICS:
+`);
             
             renderTable(data);
             updateCharts(data);
@@ -3299,7 +3431,7 @@
                     .filter(d => d !== null)
                     .join(', ') : 'N/A';
                 
-                console.log(`📊 ${emp.name} (ID ${emp.id}):`);
+                console.log(`ðŸ“Š ${emp.name} (ID ${emp.id}):`);
                 console.log(`  daysWorked: ${daysWorked} | lateCount: ${lateCount} | lateDays: [${lateDays}] | Punctuality: ${punctualityPercent}%`);
                 
                 // Determine performance tier
@@ -3347,7 +3479,7 @@
                                 </div>
                             </div>
                             <div class="tier-badge">${tier}</div>
-                            <button onclick="enableEditMode('${emp.id}')" style="background: #3b82f6; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 0.3rem; cursor: pointer; font-size: 0.8rem; margin-left: 0.5rem; font-weight: 600;">✏️ Edit</button>
+                            <button onclick="enableEditMode('${emp.id}')" style="background: #3b82f6; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 0.3rem; cursor: pointer; font-size: 0.8rem; margin-left: 0.5rem; font-weight: 600;">âœï¸ Edit</button>
                         </div>
                         
                         <div class="visual-metrics">
@@ -3412,7 +3544,7 @@
         
         // ========== TIME FORMAT HELPERS ==========
         function formatTime(time24h) {
-            if (!time24h) return '—';
+            if (!time24h) return 'â€”';
             const parts = time24h.split(':');
             if (parts.length < 2) return time24h;
             
@@ -3505,7 +3637,7 @@
 
         function formatTimeWithShiftAdjustment(actualIn, actualOut, shiftKey) {
             // Format punch pair with shift adjustment and actual times in parenthesis
-            if (!actualIn && !actualOut) return '—';
+            if (!actualIn && !actualOut) return 'â€”';
             
             const adjustedIn = adjustTimeForShift(actualIn, shiftKey, false);
             const adjustedOut = adjustTimeForShift(actualOut, shiftKey, true);
@@ -3521,7 +3653,7 @@
                 outDisplay += ` (actual: ${formatTime(adjustedOut.actualTime)})`;
             }
 
-            return `${inDisplay} → ${outDisplay || '(missing)'}`;
+            return `${inDisplay} â†’ ${outDisplay || '(missing)'}`;
         }
         
 
@@ -3560,13 +3692,13 @@
                         <tr style="${rowStyle}">
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};"><strong>${day.date}</strong></td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};"><strong>${day.dayName}</strong></td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;" colspan="2">—</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">—</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">—</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;" colspan="2">â€”</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">â€”</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">â€”</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};">
-                                <button onclick="openDayEditModal('${emp.id}', ${dayIdx})" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.7rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit punch times">✎</button>
+                                <button onclick="openDayEditModal('${emp.id}', ${dayIdx})" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.7rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit punch times">âœŽ</button>
                             </td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">❌</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">âŒ</td>
                         </tr>
                     `;
                 }
@@ -3586,13 +3718,13 @@
                         ` : ''}
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${inDisplay}</td>
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${outDisplay}</td>
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times" data-hours-cell="true" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : '—'}</td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times" data-hours-cell="true" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : 'â€”'}</td>
                         ${pairIdx === 0 ? `
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; font-weight: ${day.lateMin > 0 ? '700' : '400'}; color: ${day.lateMin > 0 ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">
-                                <button onclick="openDayEditModal('${emp.id}', ${dayIdx})" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.7rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit punch times">✎</button>
+                                <button onclick="openDayEditModal('${emp.id}', ${dayIdx})" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.7rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit punch times">âœŽ</button>
                             </td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">${day.isMissed ? '❌' : (day.hasMissedPunch ? '⚠️' : '✅')}</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">${day.isMissed ? 'âŒ' : (day.hasMissedPunch ? 'âš ï¸' : 'âœ…')}</td>
                         ` : ''}
                     </tr>
                 `;
@@ -3632,17 +3764,17 @@
         async function saveEmployeeChanges(empId) {
             const emp = filteredData.find(e => String(e.id) === String(empId));
             if (!emp) {
-                alert('❌ Employee not found');
+                alert('âŒ Employee not found');
                 return;
             }
             
             try {
-                console.log(`💾 Saving changes for ${emp.name}...`);
+                console.log(`ðŸ’¾ Saving changes for ${emp.name}...`);
                 
                 // Get the currently selected month from the dropdown
                 const currentMonth = document.getElementById('monthSelector').value;
                 if (!currentMonth) {
-                    alert('❌ Please select a month first');
+                    alert('âŒ Please select a month first');
                     return;
                 }
                 
@@ -3653,7 +3785,7 @@
                 const docId = `emp_${emp.id}_${currentMonth}`;
                 await saveToFirestore(EMPLOYEES_COLLECTION, docId, emp);
                 
-                console.log(`✅ Saved to Firestore: ${docId}`);
+                console.log(`âœ… Saved to Firestore: ${docId}`);
                 
                 // Re-calculate and update card metrics immediately
                 const card = document.querySelector(`.employee-card[data-id="${String(empId)}"]`);
@@ -3670,13 +3802,15 @@
                     card.style.borderColor = '#10b981';
                     setTimeout(() => { card.style.borderColor = '#e2e8f0'; }, 2000);
                     
-                    alert(`✅ Changes saved for ${emp.name}!\n\nMetrics updated live.`);
+                    alert(`âœ… Changes saved for ${emp.name}!
+
+Metrics updated live.`);
                 } else {
-                    alert(`✅ Changes saved for ${emp.name}!`);
+                    alert(`âœ… Changes saved for ${emp.name}!`);
                 }
             } catch (error) {
-                console.error('❌ Error saving employee changes:', error);
-                alert(`❌ Error saving changes: ${error.message}`);
+                console.error('âŒ Error saving employee changes:', error);
+                alert(`âŒ Error saving changes: ${error.message}`);
             }
         }
         
@@ -3688,7 +3822,7 @@
             
             const emp = filteredData.find(e => String(e.id) === String(empId));
             if (!emp) {
-                alert('❌ Employee not found');
+                alert('âŒ Employee not found');
                 return;
             }
             
@@ -3736,16 +3870,16 @@
                     <div style="background: white; border-radius: 8px; padding: 20px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);" onclick="event.stopPropagation()">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; gap: 12px;">
                             <h2 style="margin: 0; color: #1e293b; font-size: 1.2rem; line-height: 1.3;">${emp.name}<br><span style="font-size: 0.95rem; color: #64748b; font-weight: 400;">${day.date} (${day.dayName})</span></h2>
-                            <button onclick="closeDayEditModal()" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #94a3b8; padding: 0; min-width: 40px;">✕</button>
+                            <button onclick="closeDayEditModal()" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #94a3b8; padding: 0; min-width: 40px;">âœ•</button>
                         </div>
                         
                         <div style="margin-bottom: 24px;">
                             <h3 style="margin: 0 0 16px 0; color: #475569; font-size: 1.05rem; font-weight: 700;">Punch Times</h3>
                             ${emp.shift && shiftDefinitions[emp.shift] ? `
                                 <div style="padding: 12px; background: #e0f2fe; border-left: 4px solid #0369a1; border-radius: 4px; margin-bottom: 16px; font-size: 0.9rem;">
-                                    <strong>📅 Shift: ${emp.shift.toUpperCase()}</strong> 
+                                    <strong>ðŸ“… Shift: ${emp.shift.toUpperCase()}</strong> 
                                     ${formatTime(shiftDefinitions[emp.shift].start)} - ${formatTime(shiftDefinitions[emp.shift].end)}
-                                    <br><span style="font-size: 0.85rem; color: #475569;">⏳ Times beyond ±10 min buffer will auto-lock to shift boundary</span>
+                                    <br><span style="font-size: 0.85rem; color: #475569;">â³ Times beyond Â±10 min buffer will auto-lock to shift boundary</span>
                                 </div>
                             ` : ''}
                             ${pairRows}
@@ -3755,7 +3889,7 @@
                         
                         <div style="display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; flex-wrap: wrap;">
                             <button onclick="closeDayEditModal()" style="padding: 12px 24px; background: #e2e8f0; color: #1e293b; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1rem;">Cancel</button>
-                            <button onclick="saveDayPunchTimes('${empId}', ${dayIdx})" style="padding: 12px 24px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1rem;">💾 Save</button>
+                            <button onclick="saveDayPunchTimes('${empId}', ${dayIdx})" style="padding: 12px 24px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1rem;">ðŸ’¾ Save</button>
                         </div>
                     </div>
                 </div>
@@ -3786,7 +3920,6 @@
                             timestamp: edit.timestamp,
                             ...edit
                         });
-                    });
                 }
             });
             
@@ -3822,11 +3955,11 @@
                 return `
                     <div style="padding: 8px; background: white; border: 1px solid #e2e8f0; border-radius: 3px; margin-bottom: 6px;">
                         <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">
-                            <strong>${fieldDisplay}</strong> • ${timeDisplay}
+                            <strong>${fieldDisplay}</strong> â€¢ ${timeDisplay}
                         </div>
                         <div style="display: flex; gap: 6px; font-family: monospace; font-size: 0.8rem;">
                             <span style="color: #b45309; background: #fffbeb; padding: 2px 4px; border-radius: 2px;">${edit.original || '(empty)'}</span>
-                            <span style="color: #cbd5e1;">→</span>
+                            <span style="color: #cbd5e1;">â†’</span>
                             <span style="color: #059669; background: #ecfdf5; padding: 2px 4px; border-radius: 2px;">${edit.newValue}</span>
                         </div>
                     </div>
@@ -3847,7 +3980,7 @@
         function saveDayPunchTimes(empId, dayIdx) {
             const emp = filteredData.find(e => String(e.id) === String(empId));
             if (!emp) {
-                alert('❌ Employee not found');
+                alert('âŒ Employee not found');
                 return;
             }
             
@@ -3866,7 +3999,7 @@
                 if (inHour) {
                     const h = parseInt(inHour);
                     if (isNaN(h) || h < 0 || h > 23) {
-                        alert(`❌ Invalid IN hour for Pair ${pairIdx + 1}. Must be 0-23.`);
+                        alert(`âŒ Invalid IN hour for Pair ${pairIdx + 1}. Must be 0-23.`);
                         return;
                     }
                     inHour = String(h).padStart(2, '0');
@@ -3875,7 +4008,7 @@
                 if (inMin) {
                     const m = parseInt(inMin);
                     if (isNaN(m) || m < 0 || m > 59) {
-                        alert(`❌ Invalid IN minute for Pair ${pairIdx + 1}. Must be 0-59.`);
+                        alert(`âŒ Invalid IN minute for Pair ${pairIdx + 1}. Must be 0-59.`);
                         return;
                     }
                     inMin = String(m).padStart(2, '0');
@@ -3884,7 +4017,7 @@
                 if (outHour) {
                     const h = parseInt(outHour);
                     if (isNaN(h) || h < 0 || h > 23) {
-                        alert(`❌ Invalid OUT hour for Pair ${pairIdx + 1}. Must be 0-23.`);
+                        alert(`âŒ Invalid OUT hour for Pair ${pairIdx + 1}. Must be 0-23.`);
                         return;
                     }
                     outHour = String(h).padStart(2, '0');
@@ -3893,7 +4026,7 @@
                 if (outMin) {
                     const m = parseInt(outMin);
                     if (isNaN(m) || m < 0 || m > 59) {
-                        alert(`❌ Invalid OUT minute for Pair ${pairIdx + 1}. Must be 0-59.`);
+                        alert(`âŒ Invalid OUT minute for Pair ${pairIdx + 1}. Must be 0-59.`);
                         return;
                     }
                     outMin = String(m).padStart(2, '0');
@@ -3949,10 +4082,10 @@
             // Save to Firestore
             emp.editHistory = cellEditHistory;
             saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}`, emp).then(() => {
-                console.log(`✅ Saved punch times for ${emp.name} to Firestore`);
+                console.log(`âœ… Saved punch times for ${emp.name} to Firestore`);
             }).catch(err => {
-                console.error(`❌ Failed to save to Firestore:`, err);
-                alert(`⚠️ Changes saved locally but failed to sync to server. Please try again.`);
+                console.error(`âŒ Failed to save to Firestore:`, err);
+                alert(`âš ï¸ Changes saved locally but failed to sync to server. Please try again.`);
             });
             
             closeDayEditModal();
@@ -4020,7 +4153,7 @@
         function enterEditMode(button) {
             const cell = button.closest('.punch-time-cell');
             const display = cell.querySelector('.punch-display');
-            const currentValue = display.textContent.trim() === '—' ? '' : display.textContent.trim();
+            const currentValue = display.textContent.trim() === 'â€”' ? '' : display.textContent.trim();
             
             // Replace with editable input
             cell.innerHTML = `
@@ -4028,8 +4161,8 @@
                     style="width: 100%; padding: 2px 4px; font-size: 0.6rem; border: 2px solid #8b5cf6; border-radius: 3px; text-align: center;" 
                     placeholder="9:30 AM" onkeydown="if(event.key==='Enter') savePunchTime(this); if(event.key==='Escape') cancelEdit(this)">
                 <div style="display: flex; gap: 2px; margin-top: 4px; justify-content: center;">
-                    <button onclick="savePunchTime(this)" style="padding: 2px 6px; background: #10b981; color: white; border: none; border-radius: 2px; font-size: 0.5rem; cursor: pointer; font-weight: bold;">✓ Save</button>
-                    <button onclick="cancelEdit(this)" style="padding: 2px 6px; background: #ef4444; color: white; border: none; border-radius: 2px; font-size: 0.5rem; cursor: pointer; font-weight: bold;">✕ Cancel</button>
+                    <button onclick="savePunchTime(this)" style="padding: 2px 6px; background: #10b981; color: white; border: none; border-radius: 2px; font-size: 0.5rem; cursor: pointer; font-weight: bold;">âœ“ Save</button>
+                    <button onclick="cancelEdit(this)" style="padding: 2px 6px; background: #ef4444; color: white; border: none; border-radius: 2px; font-size: 0.5rem; cursor: pointer; font-weight: bold;">âœ• Cancel</button>
                 </div>
             `;
             
@@ -4050,7 +4183,7 @@
             const type = cell.dataset.type;
             
             if (!newValue) {
-                alert('⚠️ Please enter a time value');
+                alert('âš ï¸ Please enter a time value');
                 input.focus();
                 return;
             }
@@ -4058,7 +4191,13 @@
             // Parse and validate time
             const parsedTime = parseTime(newValue);
             if (!parsedTime) {
-                alert('❌ Invalid time format.\\n\\nAccepted formats:\\n• 9:30 AM\\n• 2:45 PM\\n• 09:30\\n• 14:45');
+                alert('âŒ Invalid time format.\
+\
+Accepted formats:\
+â€¢ 9:30 AM\
+â€¢ 2:45 PM\
+â€¢ 09:30\
+â€¢ 14:45');
                 input.focus();
                 return;
             }
@@ -4089,12 +4228,12 @@
             const day = emp.dailyBreakdown[dayIdx];
             const pair = day.punchPairs[pairIdx];
             const value = type === 'in' ? pair.in : pair.out;
-            const display = formatTime(value) || '—';
+            const display = formatTime(value) || 'â€”';
             
             cell.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
                     <span class="punch-display">${display}</span>
-                    <button class="punch-edit-btn" onclick="enterEditMode(this)" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.5rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit ${type} time">✏️</button>
+                    <button class="punch-edit-btn" onclick="enterEditMode(this)" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.5rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit ${type} time">âœï¸</button>
                 </div>
             `;
         }
@@ -4105,7 +4244,8 @@
             const pairIdx = parseInt(cell.dataset.pairIdx);
             const newTime = parsedTime;
             
-            console.log(`\n✈️ UPDATE PUNCH TIME CALLED`);
+            console.log(`
+âœˆï¸ UPDATE PUNCH TIME CALLED`);
             console.log(`   Type: ${type}, empId: ${empId}, dayIdx: ${dayIdx}, pairIdx: ${pairIdx}`);
             console.log(`   New value: '${newTime}'`);
             
@@ -4114,17 +4254,17 @@
             console.log(`   Found: ${emp ? 'YES' : 'NO'}`);
             
             if (!emp) {
-                console.error(`❌ Employee not found in filteredData`);
+                console.error(`âŒ Employee not found in filteredData`);
                 return;
             }
             
             if (!emp.dailyBreakdown) {
-                console.error(`❌ Employee found but no dailyBreakdown property`);
+                console.error(`âŒ Employee found but no dailyBreakdown property`);
                 console.log(`   Employee object keys:`, Object.keys(emp));
                 return;
             }
             
-            console.log(`✅ Employee found with ${emp.dailyBreakdown.length} days`);
+            console.log(`âœ… Employee found with ${emp.dailyBreakdown.length} days`);
             
             const day = emp.dailyBreakdown[dayIdx];
             
@@ -4151,7 +4291,7 @@
                 editCount: cellEditHistory[historyKey].length + 1
             });
             
-            console.log(`   📝 Edit recorded: ${originalValue || '—'} → ${newTime}`);
+            console.log(`   ðŸ“ Edit recorded: ${originalValue || 'â€”'} â†’ ${newTime}`);
             
             if (type === 'in') {
                 pair.in = newTime;
@@ -4236,30 +4376,30 @@
                 updateCardDisplay(emp, card);
                 
                 // Update the hours cell in the table immediately
-                console.log(`   🔍 Looking for hours cell - dayIdx=${dayIdx}, pairIdx=${pairIdx}`);
+                console.log(`   ðŸ” Looking for hours cell - dayIdx=${dayIdx}, pairIdx=${pairIdx}`);
                 const breakdownDiv = card.querySelector('.daily-breakdown');
-                console.log(`   ➡️ Breakdown div found: ${breakdownDiv ? 'YES' : 'NO'}`);
+                console.log(`   âž¡ï¸ Breakdown div found: ${breakdownDiv ? 'YES' : 'NO'}`);
                 
                 if (breakdownDiv) {
                     // First, check what elements exist
                     const allTds = breakdownDiv.querySelectorAll('td');
-                    console.log(`   ➡️ Total TD elements in breakdown: ${allTds.length}`);
+                    console.log(`   âž¡ï¸ Total TD elements in breakdown: ${allTds.length}`);
                     
                     const hoursCells = breakdownDiv.querySelectorAll('[data-hours-cell="true"]');
-                    console.log(`   ➡️ Hours cells with data-hours-cell="true": ${hoursCells.length}`);
+                    console.log(`   âž¡ï¸ Hours cells with data-hours-cell="true": ${hoursCells.length}`);
                     
                     // Try the selector
                     const selector = `[data-hours-cell="true"][data-day-idx="${dayIdx}"][data-pair-idx="${pairIdx}"]`;
-                    console.log(`   ➡️ Using selector: ${selector}`);
+                    console.log(`   âž¡ï¸ Using selector: ${selector}`);
                     const hoursCell = breakdownDiv.querySelector(selector);
-                    console.log(`   ➡️ Hours cell found: ${hoursCell ? 'YES' : 'NO'}`);
+                    console.log(`   âž¡ï¸ Hours cell found: ${hoursCell ? 'YES' : 'NO'}`);
                     
                     if (hoursCell) {
                         hoursCell.textContent = parseFloat(pair.pairHours).toFixed(2);
-                        console.log(`   ✏️ Updated hours cell for day ${dayIdx}, pair ${pairIdx} to ${pair.pairHours}`);
+                        console.log(`   âœï¸ Updated hours cell for day ${dayIdx}, pair ${pairIdx} to ${pair.pairHours}`);
                     } else {
                         // If not found, try logging the first few cells to see what attributes they have
-                        console.log(`   🔎 Sample hours cell attributes:`);
+                        console.log(`   ðŸ”Ž Sample hours cell attributes:`);
                         hoursCells.forEach((cell, idx) => {
                             if (idx < 3) {
                                 console.log(`      Cell ${idx}: data-day-idx="${cell.dataset.dayIdx}" data-pair-idx="${cell.dataset.pairIdx}"`);
@@ -4269,7 +4409,7 @@
                 }
             }
             
-            console.log(`✅ Updated ${type} time for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newTime}, Late: ${pairIdx === 0 ? day.lateMin : 'N/A'} min`);
+            console.log(`âœ… Updated ${type} time for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newTime}, Late: ${pairIdx === 0 ? day.lateMin : 'N/A'} min`);
             
             // Add "EDITED" badge to the cell (subtle indicator)
             const editCount = cellEditHistory[historyKey].length;
@@ -4281,7 +4421,7 @@
             // Create subtle badge
             const badge = document.createElement('span');
             badge.className = 'edit-badge';
-            badge.textContent = '✎';
+            badge.textContent = 'âœŽ';
             badge.title = `Edited ${editCount} time${editCount > 1 ? 's' : ''} - Click to view history`;
             badge.style.cssText = `
                 position: absolute;
@@ -4327,7 +4467,7 @@
             let content = `
                 <div style="margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
                     <div style="font-weight: 600; color: #0f172a; font-size: 0.85rem;">Edit History</div>
-                    <div style="font-size: 0.7rem; color: #64748b; margin-top: 2px;">${empName} • ${fieldType.toUpperCase()} edits</div>
+                    <div style="font-size: 0.7rem; color: #64748b; margin-top: 2px;">${empName} â€¢ ${fieldType.toUpperCase()} edits</div>
                 </div>`;
             
             if (edits.length === 0) {
@@ -4359,10 +4499,10 @@
                     
                     content += `
                         <div style="margin: 10px 0; padding: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 0.75rem;">
-                            <div style="color: #64748b; margin-bottom: 6px; font-weight: 500; font-size: 0.7rem;">Edit ${idx + 1} • ${timeDisplay}</div>
+                            <div style="color: #64748b; margin-bottom: 6px; font-weight: 500; font-size: 0.7rem;">Edit ${idx + 1} â€¢ ${timeDisplay}</div>
                             <div style="display: flex; align-items: center; gap: 8px; font-family: 'Courier New', monospace; font-weight: 500;">
                                 <span style="color: #b45309; background: #fffbeb; padding: 3px 6px; border-radius: 2px; flex-shrink: 0;">${originalDisplay}</span>
-                                <span style="color: #cbd5e1; font-size: 0.8rem;">→</span>
+                                <span style="color: #cbd5e1; font-size: 0.8rem;">â†’</span>
                                 <span style="color: #059669; background: #ecfdf5; padding: 3px 6px; border-radius: 2px; flex-shrink: 0;">${edit.newValue}</span>
                             </div>
                         </div>
@@ -4463,7 +4603,7 @@
             // The onblur handlers are already in the HTML, so we don't need to do anything
             // Just verify they're there
             const punchCells = card.querySelectorAll('[contenteditable="true"]');
-            console.log(`🔗 Found ${punchCells.length} editable punch cells with onblur handlers`);
+            console.log(`ðŸ”— Found ${punchCells.length} editable punch cells with onblur handlers`);
         }
         
         function updateCardDisplay(emp, card) {
@@ -4479,8 +4619,8 @@
             const punctualityPercent = daysWorked > 0 ? Math.max(0, 100 - (lateCount / daysWorked * 100)).toFixed(0) : '-';
             const absences = Math.max(0, dateRange.actualDays - daysWorked);
             
-            console.log(`   📊 updateCardDisplay for ${emp.name}:`);
-            console.log(`      emp.hours="${emp.hours}" → hoursNum=${hoursNum}`);
+            console.log(`   ðŸ“Š updateCardDisplay for ${emp.name}:`);
+            console.log(`      emp.hours="${emp.hours}" â†’ hoursNum=${hoursNum}`);
             
             // Update metric cards in the HTML
             const metrics = card.querySelectorAll('.metric-card-value');
@@ -4494,9 +4634,9 @@
                 if (metrics.length > 4) metrics[4].textContent = absences; // Absences
                 if (metrics.length > 5) metrics[5].textContent = daysWorked; // Worked
                 console.log(`      AFTER: metric[2]="${metrics[2].textContent}"`);
-                console.log(`      ✅ Updated metric cards`);
+                console.log(`      âœ… Updated metric cards`);
             } else {
-                console.log(`      ⚠️ Not enough metrics found (need 3+, found ${metrics.length})`);
+                console.log(`      âš ï¸ Not enough metrics found (need 3+, found ${metrics.length})`);
             }
         }
         
