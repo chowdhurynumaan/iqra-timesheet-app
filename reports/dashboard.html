@@ -3644,9 +3644,17 @@
             // Recalculate metrics
             const daysWorked = emp.daysWorked || (emp.dailyBreakdown ? emp.dailyBreakdown.filter(d => !d.isMissed).length : 0);
             const hoursNum = parseFloat(emp.hours) || 0;
+            const attendancePercent = dateRange.actualDays > 0 ? (daysWorked / dateRange.actualDays * 100) : 0;
+            
+            let lateCount = 0;
+            if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
+                lateCount = emp.dailyBreakdown.filter(d => d.lateMin > 0).length;
+            }
+            const punctualityPercent = daysWorked > 0 ? Math.max(0, 100 - (lateCount / daysWorked * 100)).toFixed(0) : '-';
+            const absences = Math.max(0, dateRange.actualDays - daysWorked);
+            
             console.log(`   📊 updateCardDisplay for ${emp.name}:`);
             console.log(`      emp.hours="${emp.hours}" → hoursNum=${hoursNum}`);
-            const attendancePercent = dateRange.actualDays > 0 ? (daysWorked / dateRange.actualDays * 100) : 0;
             
             // Update metric cards in the HTML
             const metrics = card.querySelectorAll('.metric-card-value');
