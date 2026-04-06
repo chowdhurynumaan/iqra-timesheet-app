@@ -913,14 +913,7 @@
                 console.log('âœ… Detected Employee Form Columns:', mapping);
                 
                 // Show detected columns and allow user to save
-                const confirmMsg = `âœ… Detected employee form columns:
-
-${
-                    Object.entries(mapping).map(([field, data]) => `â€¢ ${field}: "${data.header}"`).join('
-')
-                }
-
-Save this mapping to Firestore?`;
+                const confirmMsg = `✅ Detected employee form columns:\n\n${Object.entries(mapping).map(([field, data]) => `• ${field}: "${data.header}"`).join('\n')}\n\nSave this mapping to Firestore?`;
                 
                 if (confirm(confirmMsg)) {
                     saveEmployeeFormMapping(mapping);
@@ -1297,9 +1290,7 @@ Then re-upload the file.`;
                             allSheetData = {};
                             currentWorkbook.SheetNames.forEach(sheetName => {
                                 const sheet = currentWorkbook.Sheets[sheetName];
-                                allSheetData[sheetName] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-                            
-                            processMultiSheetData(allSheetData);
+                                allSheetData[sheetName] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });`r`n                            });`r`n`r`n                            processMultiSheetData(allSheetData);
                         } catch (err) {
                             console.error('âŒ Error parsing Excel:', err);
                             alert('âŒ Error parsing Excel file. Please ensure it\'s valid. Error: ' + err.message);
@@ -1356,9 +1347,7 @@ Then re-upload the file.`;
                             allSheetData = {};
                             currentWorkbook.SheetNames.forEach(sheetName => {
                                 const sheet = currentWorkbook.Sheets[sheetName];
-                                allSheetData[sheetName] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-                            
-                            processMultiSheetData(allSheetData);
+                                allSheetData[sheetName] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });`r`n                            });`r`n`r`n                            processMultiSheetData(allSheetData);
                         } catch (err) {
                             console.error('âŒ Error parsing Excel:', err);
                             alert('âŒ Error parsing Excel file. Please ensure it\'s valid. Error: ' + err.message);
@@ -4811,3 +4800,4 @@ Accepted formats:\
     </script>
 </body>
 </html>
+
