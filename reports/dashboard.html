@@ -3516,7 +3516,21 @@
             }
             
             const emp = filteredData.find(e => e.id === empId);
-            if (!emp || !emp.dailyBreakdown) return;
+            console.log(`   Looking for empId=${empId} in filteredData (${filteredData.length} employees)`);
+            console.log(`   Found: ${emp ? 'YES' : 'NO'}`);
+            
+            if (!emp) {
+                console.error(`❌ Employee not found in filteredData`);
+                return;
+            }
+            
+            if (!emp.dailyBreakdown) {
+                console.error(`❌ Employee found but no dailyBreakdown property`);
+                console.log(`   Employee object keys:`, Object.keys(emp));
+                return;
+            }
+            
+            console.log(`✅ Employee found with ${emp.dailyBreakdown.length} days`);
             
             const day = emp.dailyBreakdown[dayIdx];
             
