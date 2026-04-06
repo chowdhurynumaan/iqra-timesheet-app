@@ -443,8 +443,11 @@
             
             <!-- NEW: Department/Shift Settings -->
             <div class="control-section" id="deptShiftSection">
-                <label>🏢 Shift Settings:</label>
-                <div id="deptShiftEditor" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;" onclick="toggleShiftSettings()">
+                    <span id="shiftCollapseIcon" style="font-size: 1.2rem; transition: transform 0.2s;">▶</span>
+                    <label style="margin: 0; cursor: pointer; font-weight: 600;">🏢 Shift Settings</label>
+                </div>
+                <div id="deptShiftEditor" style="display: none; gap: 1rem; flex-wrap: wrap; align-items: flex-end; margin-top: 1rem;">
                     <!-- Shifts will be populated dynamically by renderShiftDefinitionsUI() -->
                 </div>
             </div>
@@ -736,6 +739,19 @@
         // Sanitize shift name for HTML ID (convert "/" to underscore)
         function sanitizeId(deptName) {
             return deptName.replace(/\//g, '_');
+        }
+        
+        function toggleShiftSettings() {
+            const editor = document.getElementById('deptShiftEditor');
+            const icon = document.getElementById('shiftCollapseIcon');
+            
+            if (editor.style.display === 'none' || editor.style.display === '') {
+                editor.style.display = 'grid';
+                icon.style.transform = 'rotate(90deg)';
+            } else {
+                editor.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            }
         }
         
         // Dynamic UI rendering for shift definitions - RESPONSIVE LAYOUT
