@@ -647,7 +647,8 @@
             try {
                 const cleanData = cleanUndefined(data);
                 await db.collection(collectionPath).doc(docId).set(cleanData, { merge: true });
-                console.log(`âœ… Saved to Firestore: ${collectionPath}/${docId}`);\n                return true;
+                console.log(`âœ… Saved to Firestore: ${collectionPath}/${docId}`);
+                return true;
             } catch (error) {
                 console.error('âŒ Firestore save error:', error);
                 return false;
@@ -658,7 +659,8 @@
             try {
                 const doc = await db.collection(collectionPath).doc(docId).get();
                 if (doc.exists) {
-                    console.log(`âœ… Loaded from Firestore: ${collectionPath}/${docId}`);\n                    return doc.data();
+                    console.log(`âœ… Loaded from Firestore: ${collectionPath}/${docId}`);
+                    return doc.data();
                 }
                 return null;
             } catch (error) {
@@ -670,7 +672,8 @@
         async function deleteFromFirestore(collectionPath, docId) {
             try {
                 await db.collection(collectionPath).doc(docId).delete();
-                console.log(`âœ… Deleted from Firestore: ${collectionPath}/${docId}`);\n                return true;
+                console.log(`âœ… Deleted from Firestore: ${collectionPath}/${docId}`);
+                return true;
             } catch (error) {
                 console.error('âŒ Firestore delete error:', error);
                 return false;
@@ -689,7 +692,8 @@
             };
             
             // Save to timesheet_app/reports/{reportId}
-            return saveToFirestore(`${TIMESHEET_COLLECTION}/reports`, reportId, reportData);\n        }
+            return saveToFirestore(`${TIMESHEET_COLLECTION}/reports`, reportId, reportData);
+        }
         
         async function saveEmployeeRecord(employee) {
             const empId = `emp_${employee.id}`;\n            const empData = {
@@ -699,7 +703,8 @@
             };
             
             // Save to timesheet_app/data/employees/{empId}
-            return saveToFirestore(`${TIMESHEET_COLLECTION}/employees`, empId, empData);\n        }
+            return saveToFirestore(`${TIMESHEET_COLLECTION}/employees`, empId, empData);
+        }
         
         async function loadPreviousReports(limit = 10) {
             try {
@@ -713,7 +718,8 @@
                     reports.push(doc.data());
                 });
                 
-                console.log(`âœ… Loaded ${reports.length} previous reports from Firestore`);\n                return reports;
+                console.log(`âœ… Loaded ${reports.length} previous reports from Firestore`);
+                return reports;
             } catch (error) {
                 console.error('âŒ Error loading reports:', error);
                 return [];
@@ -742,14 +748,16 @@
                     return bMonth - aMonth;
                 });
                 
-                console.log(`ðŸ“… Found ${uploadedMonths.length} uploaded months:`, uploadedMonths.map(m => m.id));\n                populateMonthDropdown();
+                console.log(`ðŸ“… Found ${uploadedMonths.length} uploaded months:`, uploadedMonths.map(m => m.id));
+                populateMonthDropdown();
                 
                 // Auto-load latest month by default
                 if (uploadedMonths.length > 0) {
                     const latestMonth = uploadedMonths[0]; // First in array is latest (sorted descending by year/month)
                     document.getElementById('monthSelector').value = latestMonth.id;
                     loadMonthData();
-                    console.log(`ðŸ“… Auto-loading latest month: ${latestMonth.id}`);\n                }
+                    console.log(`ðŸ“… Auto-loading latest month: ${latestMonth.id}`);
+                }
             } catch (error) {
                 console.error('âŒ Error loading available months:', error);
             }
@@ -867,7 +875,8 @@
                         index: colIdx,
                         header: headerRow[colIdx]
                     };
-                    console.log(`   âœ“ Found ${field} at column ${colIdx}: "${headerRow[colIdx]}"`);\n                }
+                    console.log(`   âœ“ Found ${field} at column ${colIdx}: "${headerRow[colIdx]}"`);
+                }
             });
             
             // If some columns detected, show them
@@ -884,7 +893,8 @@ Save this mapping to Firestore?`;
                 }
             } else {
                 // No columns detected - show what was found and ask for manual help
-                const foundHeaders = headerRow.slice(0, 10).join(', ');\n                const msg = `âš ï¸ Could not automatically detect standard columns.\n\nHeaders found:\n${foundHeaders}\n\nPlease rename your columns to match one of these patterns:\nâ€¢ ID: id, emp id, employee id, code\nâ€¢ Name: name, employee name, full name\nâ€¢ Department: department, dept, section\nâ€¢ Shift: shift, schedule\nâ€¢ Phone: phone, contact, mobile\nâ€¢ Email: email, e-mail\n
+                const foundHeaders = headerRow.slice(0, 10).join(', ');
+                const msg = `âš ï¸ Could not automatically detect standard columns.\n\nHeaders found:\n${foundHeaders}\n\nPlease rename your columns to match one of these patterns:\nâ€¢ ID: id, emp id, employee id, code\nâ€¢ Name: name, employee name, full name\nâ€¢ Department: department, dept, section\nâ€¢ Shift: shift, schedule\nâ€¢ Phone: phone, contact, mobile\nâ€¢ Email: email, e-mail\n
 Then re-upload the file.`;
                 alert(msg);
                 console.log('âŒ Could not auto-detect columns. Available headers:', headerRow);
@@ -935,7 +945,8 @@ Then re-upload the file.`;
                             ...emp,
                             shift: emp.shift || 'WK'
                         }));
-                        console.warn(`âš ï¸ No employees found in ${EMPLOYEES_COLLECTION}, using month document data`);\n                    }
+                        console.warn(`âš ï¸ No employees found in ${EMPLOYEES_COLLECTION}, using month document data`);
+                    }
                     
                     filteredData = [...rawData];
                     
@@ -966,7 +977,9 @@ Then re-upload the file.`;
                         }
                     });
                     
-                    console.log(`âœ… Loaded ${rawData.length} employees from ${monthId}`);\n                    console.log(`ðŸ“… Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);\n                    
+                    console.log(`âœ… Loaded ${rawData.length} employees from ${monthId}`);
+                    console.log(`ðŸ“… Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);
+                    
                     // Show data panels
                     document.getElementById('statsGrid').style.display = 'grid';
                     document.getElementById('chartSection').style.display = 'grid';
@@ -977,7 +990,8 @@ Then re-upload the file.`;
                     // Display employee data in the table (with daily breakdown)
                     displayEmployeeData(rawData);
                 } else {
-                    console.warn(`âš ï¸ No data found for month: ${monthId}`);\n                }
+                    console.warn(`âš ï¸ No data found for month: ${monthId}`);
+                }
             } catch (error) {
                 console.error('âŒ Error loading month data:', error);
             }
@@ -991,7 +1005,8 @@ Then re-upload the file.`;
                     Object.assign(cellEditHistory, emp.editHistory);
                 }
             });
-            console.log(`ðŸ“ Restored edit history:`, Object.keys(cellEditHistory).length, 'cells edited');\n        }
+            console.log(`ðŸ“ Restored edit history:`, Object.keys(cellEditHistory).length, 'cells edited');
+        }
         
         // Re-display badges for all edited cells
         function reattachEditBadges() {
@@ -1110,12 +1125,14 @@ Then re-upload the file.`;
                 const card = document.createElement('div');
                 card.className = 'employee-card';
                 card.setAttribute('data-tier', tier);
-                card.setAttribute('data-id', emp.id);\n                card.innerHTML = `\n                    <div class="employee-header">\n                        <input type="checkbox" class="employee-checkbox" data-id="${emp.id}" style="margin-right: 0.75rem; width: 20px; height: 20px; cursor: pointer; flex-shrink: 0;">\n                        <div class="employee-info">\n                            <div class="employee-name">${name}</div>\n                            <div class="employee-meta">\n                                <span class="employee-dept">${id}</span>\n                                <span class="employee-dept" style="background: #dbeafe; color: #0369a1;">${dept}</span>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="visual-metrics">\n                        <div class="metrics-line">\n                            <div class="metric-card rate-card">\n                                <div class="metric-card-title">Attendance</div>\n                                <div class="metric-card-value">${attendancePercent.toFixed(0)}%</div>\n                            </div>\n                            <div class="metric-card punctuality-card">\n                                <div class="metric-card-title">Punctuality</div>\n                                <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>\n                            </div>\n                            <div class="metric-card hours-card">\n                                <div class="metric-card-title">Hours</div>\n                                <div class="metric-card-value">${hoursNum.toFixed(2)}</div>\n                                <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>\n                                <div class="metric-card-sub">hrs</div>\n                            </div>\n                            <div class="metric-card late-card">\n                                <div class="metric-card-title">Late Min</div>\n                                <div class="metric-card-value">${lateMin}</div>\n                                <div class="metric-card-sub">min</div>\n                            </div>\n                            <div class="metric-card absence-card">\n                                <div class="metric-card-title">Absences</div>\n                                <div class="metric-card-value">${absences}</div>\n                                <div class="metric-card-sub">days</div>\n                            </div>\n                            <div class="metric-card worked-card">\n                                <div class="metric-card-title">Worked</div>\n                                <div class="metric-card-value">${daysWorked}</div>\n                                <div class="metric-card-sub">days</div>\n                            </div>\n                        </div>\n                    </div>\n                    ${dailyBreakdownHtml}
+                card.setAttribute('data-id', emp.id);
+                card.innerHTML = `\n                    <div class="employee-header">\n                        <input type="checkbox" class="employee-checkbox" data-id="${emp.id}" style="margin-right: 0.75rem; width: 20px; height: 20px; cursor: pointer; flex-shrink: 0;">\n                        <div class="employee-info">\n                            <div class="employee-name">${name}</div>\n                            <div class="employee-meta">\n                                <span class="employee-dept">${id}</span>\n                                <span class="employee-dept" style="background: #dbeafe; color: #0369a1;">${dept}</span>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="visual-metrics">\n                        <div class="metrics-line">\n                            <div class="metric-card rate-card">\n                                <div class="metric-card-title">Attendance</div>\n                                <div class="metric-card-value">${attendancePercent.toFixed(0)}%</div>\n                            </div>\n                            <div class="metric-card punctuality-card">\n                                <div class="metric-card-title">Punctuality</div>\n                                <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>\n                            </div>\n                            <div class="metric-card hours-card">\n                                <div class="metric-card-title">Hours</div>\n                                <div class="metric-card-value">${hoursNum.toFixed(2)}</div>\n                                <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>\n                                <div class="metric-card-sub">hrs</div>\n                            </div>\n                            <div class="metric-card late-card">\n                                <div class="metric-card-title">Late Min</div>\n                                <div class="metric-card-value">${lateMin}</div>\n                                <div class="metric-card-sub">min</div>\n                            </div>\n                            <div class="metric-card absence-card">\n                                <div class="metric-card-title">Absences</div>\n                                <div class="metric-card-value">${absences}</div>\n                                <div class="metric-card-sub">days</div>\n                            </div>\n                            <div class="metric-card worked-card">\n                                <div class="metric-card-title">Worked</div>\n                                <div class="metric-card-value">${daysWorked}</div>\n                                <div class="metric-card-sub">days</div>\n                            </div>\n                        </div>\n                    </div>\n                    ${dailyBreakdownHtml}
                 `;\n                
                 tableBody.appendChild(card);
             });
             
-            console.log(`ðŸ“Š Displayed ${employees.length} employees with complete metrics & daily breakdown`);\n            
+            console.log(`ðŸ“Š Displayed ${employees.length} employees with complete metrics & daily breakdown`);
+            
             // Restore edit badges after rendering
             reattachEditBadges();
         }
@@ -1268,7 +1285,8 @@ Then re-upload the file.`;
                     if (!file) return;
                     
                     const isExcel = /\.(xlsx?|xls)$/.test(file.name.toLowerCase());
-                    console.log(`ðŸ“‹ Employee Form File Selected: ${file.name}`);\n                    
+                    console.log(`ðŸ“‹ Employee Form File Selected: ${file.name}`);
+                    
                     if (isExcel) {
                         const reader = new FileReader();
                         reader.onload = (ev) => {
@@ -1310,7 +1328,8 @@ Then re-upload the file.`;
                     const data = sheets[priorityName];
                     const result = parseSheet(data, priorityName);
                     if (result.employees.length > 0 && priority < bestResult.priority) {
-                        console.log(`âœ“ Priority sheet "${priorityName}" found with ${result.employees.length} employees`);\n                        bestResult = { ...result, priority };
+                        console.log(`âœ“ Priority sheet "${priorityName}" found with ${result.employees.length} employees`);
+                        bestResult = { ...result, priority };
                     }
                 }
             });
@@ -1321,7 +1340,8 @@ Then re-upload the file.`;
                 Object.keys(sheets).forEach(sheetName => {
                     const data = sheets[sheetName];
                     const result = parseSheet(data, sheetName);
-                    console.log(`   "${sheetName}": ${result.employees.length} employees`);\n                    if (result.employees.length > bestResult.employees.length) {
+                    console.log(`   "${sheetName}": ${result.employees.length} employees`);
+                    if (result.employees.length > bestResult.employees.length) {
                         bestResult = result;
                     }
                 });
@@ -1333,7 +1353,9 @@ Then re-upload the file.`;
             rawData = bestResult.employees;
             filteredData = [...rawData];
             \n            console.log(`
-âœ… DATA LOADED FROM: ${bestResult.source}`);\n            console.log(`ðŸ“Š Total Employees: ${rawData.length}, Days: ${dateRange.actualDays}`);\n            
+âœ… DATA LOADED FROM: ${bestResult.source}`);
+            console.log(`ðŸ“Š Total Employees: ${rawData.length}, Days: ${dateRange.actualDays}`);
+            
             // Parse individual employee sheets for enhanced lateness data
             parseIndividualSheets(sheets, rawData);
             
@@ -1376,7 +1398,8 @@ Then re-upload the file.`;
                 return;
             }
             
-            console.log(`ðŸ” Parsing ${individualSheetNames.length} individual employee sheets for lateness data`);\n            
+            console.log(`ðŸ” Parsing ${individualSheetNames.length} individual employee sheets for lateness data`);
+            
             individualSheetNames.forEach(sheetName => {
                 const data = sheets[sheetName];
                 if (!data || data.length < 3) return;
@@ -1459,7 +1482,8 @@ Then re-upload the file.`;
                         dateRange.start = new Date(dateMatch[3], parseInt(dateMatch[1]) - 1, parseInt(dateMatch[2]));
                         dateRange.end = new Date(dateMatch[6], parseInt(dateMatch[4]) - 1, parseInt(dateMatch[5]));
                         dateRange.actualDays = Math.floor((dateRange.end - dateRange.start) / (1000 * 60 * 60 * 24)) + 1;
-                        console.log(`ðŸ“… Date Range (from header): ${dateRange.start.toLocaleDateString()} to ${dateRange.end.toLocaleDateString()} (${dateRange.actualDays} days)`);\n                        return;
+                        console.log(`ðŸ“… Date Range (from header): ${dateRange.start.toLocaleDateString()} to ${dateRange.end.toLocaleDateString()} (${dateRange.actualDays} days)`);
+                        return;
                     }
                 }
             }
@@ -1484,29 +1508,35 @@ Then re-upload the file.`;
                 if (foundDates.length > 5) break;
             }
             
-            console.log(`ðŸ“… Found dates: ${foundDates.join(', ')}`);\n            
+            console.log(`ðŸ“… Found dates: ${foundDates.join(', ')}`);
+            
             // If we found a month, calculate the correct number of days in that month
             if (detectedYear && detectedMonth) {
                 dateRange.start = new Date(detectedYear, detectedMonth - 1, 1);
                 // Get last day of the month
                 dateRange.end = new Date(detectedYear, detectedMonth, 0);
                 dateRange.actualDays = dateRange.end.getDate();
-                console.log(`ðŸ“… Detected Month/Year: ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][detectedMonth-1]} ${detectedYear} â†’ ${dateRange.actualDays} days`);\n                console.log(`ðŸ“… dateRange.actualDays = ${dateRange.actualDays} (should be 31 for March)`);\n                return;
+                console.log(`ðŸ“… Detected Month/Year: ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][detectedMonth-1]} ${detectedYear} â†’ ${dateRange.actualDays} days`);
+                console.log(`ðŸ“… dateRange.actualDays = ${dateRange.actualDays} (should be 31 for March)`);
+                return;
             }
             
             // Final fallback to 31 days
             dateRange.actualDays = 31;
-            console.log(`ðŸ“… Date Range: Using default 31 days`);\n        }
+            console.log(`ðŸ“… Date Range: Using default 31 days`);
+        }
         function findColumnByHeader(row, searchTerms) {
             // Find column index by searching for header text
             if (!row) return -1;
             for (let j = 0; j < row.length; j++) {
                 const cell = (row[j] || '').toString().toLowerCase().trim();
                 if (searchTerms.some(term => cell.includes(term))) {
-                    console.log(`    Found column for "${searchTerms.join('|')}" at index ${j}: "${row[j]}"`);\n                    return j;
+                    console.log(`    Found column for "${searchTerms.join('|')}" at index ${j}: "${row[j]}"`);
+                    return j;
                 }
             }
-            console.log(`    Column not found for: "${searchTerms.join('|')}"`);\n            return -1;
+            console.log(`    Column not found for: "${searchTerms.join('|')}"`);
+            return -1;
         }
         function parseAttendanceLogs(data) {
             console.log('ðŸ” Parsing Attendance Logs - Extracting IN/OUT times from Attend. Logs sheet');
@@ -1708,7 +1738,8 @@ Then re-upload the file.`;
                             totalMinutes
                         });
                         
-                        console.log(`  âœ“ Parsed: ${name} (ID: ${id}, Dept: ${dept}, Days: ${daysWorked})`);\n                    }
+                        console.log(`  âœ“ Parsed: ${name} (ID: ${id}, Dept: ${dept}, Days: ${daysWorked})`);
+                    }
                     
                     i += 4;
                     continue;
@@ -1716,7 +1747,8 @@ Then re-upload the file.`;
                 i++;
             }
             
-            console.log(`  Total parsed: ${employees.length} employees`);\n            return employees;
+            console.log(`  Total parsed: ${employees.length} employees`);
+            return employees;
         }
         function parseAttendanceSummary(data) {
             console.log('ðŸ” Parsing Attendance Summary');
@@ -1753,7 +1785,8 @@ Then re-upload the file.`;
                 const found_actual = findColumnByHeader(subHeaderData, ['actual']);
                 if (found_actual >= 0) colHoursActual = found_actual;
                 
-                console.log(`  Using columns: ID=${colId}, Name=${colName}, Dept=${colDept}, HoursActual=${colHoursActual}, LateMin=${colLateMin}, Absences=${colAbsences}`);\n            }
+                console.log(`  Using columns: ID=${colId}, Name=${colName}, Dept=${colDept}, HoursActual=${colHoursActual}, LateMin=${colLateMin}, Absences=${colAbsences}`);
+            }
             
             // Parse employee rows starting from row 4 (index 4)
             for (let i = 4; i < data.length; i++) {
@@ -1791,9 +1824,11 @@ Then re-upload the file.`;
                     absences,
                     dailyBreakdown: null
                 });
-                console.log(`  âœ“ Parsed: ${name} (ID: ${id}, Dept: ${dept}, Hours: ${hours}, Late: ${lateMin}, Absences: ${absences})`);\n            }
+                console.log(`  âœ“ Parsed: ${name} (ID: ${id}, Dept: ${dept}, Hours: ${hours}, Late: ${lateMin}, Absences: ${absences})`);
+            }
             
-            console.log(`  Total parsed: ${employees.length} employees`);\n            return employees;
+            console.log(`  Total parsed: ${employees.length} employees`);
+            return employees;
         }
         function parseAbnormal(data) {
             console.log('ðŸ” Parsing Abnormal Records');
@@ -1955,7 +1990,8 @@ Then re-upload the file.`;
                 radio.value = dept;
                 radio.onchange = () => filterByDept(dept);
                 label.appendChild(radio);
-                label.appendChild(document.createTextNode(` ${dept}`));\n                deptRadiosContainer.appendChild(label);
+                label.appendChild(document.createTextNode(` ${dept}`));
+                deptRadiosContainer.appendChild(label);
             });
             console.log('✅ Department radios initialized');
             
@@ -2009,7 +2045,8 @@ Then re-upload the file.`;
         function printSelected() {
             // Get only CHECKED employee-checkbox elements using CSS selector
             const checkedCheckboxes = document.querySelectorAll('.employee-checkbox:checked');
-            console.log(`DEBUG: Found ${checkedCheckboxes.length} CHECKED checkboxes`);\n            
+            console.log(`DEBUG: Found ${checkedCheckboxes.length} CHECKED checkboxes`);
+            
             if (checkedCheckboxes.length === 0) {
                 alert('âŒ No employees selected.
 Please check the checkboxes next to the employees you want to print.');
@@ -2020,16 +2057,20 @@ Please check the checkboxes next to the employees you want to print.');
             
             checkedCheckboxes.forEach(cb => {
                 const checkboxId = cb.dataset.id;
-                console.log(`âœ“ Processing checked box with ID: ${checkboxId}`);\n                
+                console.log(`âœ“ Processing checked box with ID: ${checkboxId}`);
+                
                 // Find matching employee in filteredData
                 const emp = filteredData.find(e => String(e.id) === String(checkboxId));
                 if (emp) {
                     selectedEmployees.push(emp);
-                    console.log(`   âœ… Added employee: ${emp.name} (ID: ${emp.id}) - Dept: ${emp.dept}`);\n                } else {
-                    console.warn(`   âŒ Employee not found with ID: ${checkboxId}`);\n                }
+                    console.log(`   âœ… Added employee: ${emp.name} (ID: ${emp.id}) - Dept: ${emp.dept}`);
+                } else {
+                    console.warn(`   âŒ Employee not found with ID: ${checkboxId}`);
+                }
             });
             
-            console.log(`âœ… Ready to print ${selectedEmployees.length} employee(s):`, selectedEmployees.map(e => e.name).join(', '));\n            
+            console.log(`âœ… Ready to print ${selectedEmployees.length} employee(s):`, selectedEmployees.map(e => e.name).join(', '));
+            
             // Group employees by department
             const byDept = {};
             selectedEmployees.forEach(emp => {
@@ -2041,8 +2082,10 @@ Please check the checkboxes next to the employees you want to print.');
             // Sort departments alphabetically
             const deptList = Object.keys(byDept).sort();
             
-            console.log(`ðŸ“Š Department Grouping:`);\n            deptList.forEach(dept => {
-                console.log(`   ${dept}: ${byDept[dept].length} employees`);\n            });
+            console.log(`ðŸ“Š Department Grouping:`);
+            deptList.forEach(dept => {
+                console.log(`   ${dept}: ${byDept[dept].length} employees`);
+            });
             
             // Generate print HTML - LANDSCAPE, 2 CARDS PER PAGE, GROUPED BY DEPT\n            let printHTML = `\n            <!DOCTYPE html>\n            <html lang="en">\n            <head>\n                <meta charset="UTF-8">\n                <meta name="viewport" content="width=device-width, initial-scale=1.0">\n                <title>Attendance Report - ${new Date().toLocaleDateString()}</title>\n                <style>\n                    @page { size: A4 landscape; margin: 15px; }\n                    * { box-sizing: border-box; }\n                    html { \n                        height: 100%; \n                    }\n                    body { \n                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; \n                        margin: 0; \n                        padding: 0; \n                        background: white; \n                        height: 100%;\n                    }\n                    .dept-header-page {\n                        page-break-after: always;\n                        width: 100%;\n                        height: 100vh;\n                        display: flex;\n                        align-items: center;\n                        justify-content: center;\n                        text-align: center;\n                        border-bottom: 3px solid #1e293b;\n                    }\n                    .dept-header-page h1 {\n                        font-size: 48px;\n                        color: #1e293b;\n                        margin: 0;\n                        text-transform: uppercase;\n                        letter-spacing: 2px;\n                    }\n                    .dept-header-page p {\n                        font-size: 18px;\n                        color: #64748b;\n                        margin: 20px 0 0 0;\n                    }\n                    .cards-page {\n                        page-break-after: always;\n                        display: grid;\n                        grid-template-columns: 1fr 1fr;\n                        gap: 10px;\n                        padding: 10px;\n                        width: 100%;\n                        height: 100%;\n                        min-height: 100vh;\n                        break-inside: avoid;\n                    }\n                    .employee-card {\n                        border: 1px solid #e2e8f0;\n                        border-radius: 6px;\n                        overflow: hidden;\n                        background: white;\n                        display: flex;\n                        flex-direction: column;\n                        break-inside: avoid;\n                    }\n                    .employee-title { \n                        background: #f1f5f9; \n                        padding: 8px; \n                        border-bottom: 2px solid #cbd5e1; \n                        flex-shrink: 0;\n                    }\n                    .employee-title h2 { \n                        margin: 0; \n                        font-size: 13px; \n                        color: #1e293b; \n                    }\n                    .employee-title p { \n                        margin: 1px 0 0 0; \n                        font-size: 10px; \n                        color: #64748b; \n                    }\n                    .metrics { \n                        display: grid; \n                        grid-template-columns: repeat(6, 1fr); \n                        gap: 4px; \n                        padding: 8px; \n                        background: #fafbfc; \n                        border-bottom: 1px solid #e2e8f0; \n                        flex-shrink: 0;\n                    }\n                    .metric { \n                        text-align: center; \n                        font-size: 9px;\n                    }\n                    .metric-title { \n                        font-size: 8px; \n                        font-weight: 600; \n                        color: #64748b; \n                        text-transform: uppercase; \n                        margin-bottom: 1px; \n                    }\n                    .metric-value { \n                        font-size: 12px; \n                        font-weight: 700; \n                        color: #1e293b; \n                    }\n                    .metric-unit { \n                        font-size: 7px; \n                        color: #94a3b8; \n                    }\n                    .daily-table { \n                        width: 100%; \n                        border-collapse: collapse; \n                        font-size: 9px;\n                        flex: 1;\n                        overflow: visible;\n                    }\n                    .daily-table thead { \n                        background: #e2e8f0; \n                    }\n                    .daily-table tbody { \n                        display: table-row-group;\n                    }\n                    .daily-table th { \n                        padding: 3px 2px; \n                        text-align: left; \n                        font-weight: 700; \n                        color: #1e293b; \n                        border: 0.5px solid #cbd5e1; \n                    }\n                    .daily-table td { \n                        padding: 2px 2px; \n                        border: 0.5px solid #e2e8f0; \n                    }\n                    .daily-table tr:nth-child(odd) { \n                        background: white; \n                    }\n                    .daily-table tr:nth-child(even) { \n                        background: #f8fafc; \n                    }\n                    .daily-table tr.late-row { \n                        background: #fee2e2; \n                        border-left: 3px solid #dc2626; \n                    }\n                    .daily-table td.late { \n                        color: #dc2626; \n                        font-weight: 700; \n                    }\n                    @media print {\n                        body { margin: 0; padding: 0; }\n                        * { margin: 0; padding: 0; }\n                    }\n                </style>\n            </head>\n            <body>
             `;\n            
@@ -2130,7 +2173,8 @@ Please check the checkboxes next to the employees you want to print.');
                 changeType: oldValue === undefined ? 'NEW' : (oldValue !== newValue ? 'MODIFIED' : 'UNCHANGED')
             };
             changeLog.push(change);
-            console.log(`ðŸ“ Change logged: ${empName} ${field}: "${oldValue}" â†’ "${newValue}"`);\n            return change;
+            console.log(`ðŸ“ Change logged: ${empName} ${field}: "${oldValue}" â†’ "${newValue}"`);
+            return change;
         }
         
         function getChangesSummary() {
@@ -2158,7 +2202,8 @@ Please check the checkboxes next to the employees you want to print.');
             if (dateRange && dateRange.start) {
                 detectedMonth = dateRange.start.getMonth() + 1;
                 detectedYear = dateRange.start.getFullYear();
-                console.log(`ðŸ“… Month/year extracted from parsed date range: ${detectedMonth}/${detectedYear}`);\n                return { month: detectedMonth, year: detectedYear };
+                console.log(`ðŸ“… Month/year extracted from parsed date range: ${detectedMonth}/${detectedYear}`);
+                return { month: detectedMonth, year: detectedYear };
             }
             
             // Check first 10 rows for date patterns
@@ -2173,7 +2218,8 @@ Please check the checkboxes next to the employees you want to print.');
                         detectedMonth = parseInt(dateRangeMatch[2]); // Month from first date
                         detectedYear = parseInt(dateRangeMatch[3]);
                         
-                        console.log(`ðŸ“… Detected month from date range: ${detectedMonth}/${detectedYear}`);\n                        return { month: detectedMonth, year: detectedYear };
+                        console.log(`ðŸ“… Detected month from date range: ${detectedMonth}/${detectedYear}`);
+                        return { month: detectedMonth, year: detectedYear };
                     }
                     
                     // Look for month names
@@ -2190,7 +2236,8 @@ Please check the checkboxes next to the employees you want to print.');
                                     detectedYear = parseInt(yearMatch[0]);
                                 }
                             }
-                            console.log(`ðŸ“… Detected month from name: ${detectedMonth}/${detectedYear}`);\n                        }
+                            console.log(`ðŸ“… Detected month from name: ${detectedMonth}/${detectedYear}`);
+                        }
                     });
                 }
             }
@@ -2198,7 +2245,8 @@ Please check the checkboxes next to the employees you want to print.');
             if (!detectedMonth) {
                 detectedMonth = new Date().getMonth() + 1;
                 detectedYear = new Date().getFullYear();
-                console.log(`âš ï¸ Could not detect month, using current: ${detectedMonth}/${detectedYear}`);\n            }
+                console.log(`âš ï¸ Could not detect month, using current: ${detectedMonth}/${detectedYear}`);
+            }
             
             return { month: detectedMonth, year: detectedYear };
         }
@@ -2303,7 +2351,8 @@ Please check the checkboxes next to the employees you want to print.');
                 // Detect month from data
                 const monthYear = detectMonthFromData(rawData);
                 const monthStr = `${String(monthYear.month).padStart(2, '0')}_${monthYear.year}`;\n                \n                console.log(`
-ðŸ—“ï¸ Processing report for: ${monthYear.month}/${monthYear.year}`);\n
+ðŸ—“ï¸ Processing report for: ${monthYear.month}/${monthYear.year}`);
+
                 // Compare with existing data
                 const comparison = await compareWithExisting(filteredData, monthYear);
                 
@@ -2318,7 +2367,8 @@ Please check the checkboxes next to the employees you want to print.');
                 console.log(summaryMsg);
                 
                 // Show confirmation with changes\n                const proceed = confirm(summaryMsg + `\n
-Proceed to save all changes to Firestore?`);\n                
+Proceed to save all changes to Firestore?`);
+                
                 if (!proceed) {
                     btn.textContent = 'â˜ï¸ Save to Cloud';
                     btn.disabled = false;
@@ -2360,7 +2410,8 @@ Proceed to save all changes to Firestore?`);\n
                         year: monthYear.year,
                         monthId: monthId
                     };
-                    await saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}_${monthId}`, empData);\n                }
+                    await saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}_${monthId}`, empData);
+                }
                 
                 // Save change log separately for audit
                 await saveToFirestore(
@@ -2376,7 +2427,8 @@ Proceed to save all changes to Firestore?`);\n
                     }
                 );
                 \n                alert(`âœ… Report saved successfully!\n\n${summaryMsg}\n
-Data saved to Firestore with full change history.`);\n                btn.textContent = 'â˜ï¸ Saved!';
+Data saved to Firestore with full change history.`);
+                btn.textContent = 'â˜ï¸ Saved!';
                 
                 // Refresh month dropdown to show new month if added
                 setTimeout(() => {
@@ -2403,7 +2455,8 @@ Data saved to Firestore with full change history.`);\n                btn.textCo
         let currentEditingEmp = null;
         
         function enableEditMode(empId) {
-            const card = document.querySelector(`[data-id="${empId}"]`);\n            if (!card) return;
+            const card = document.querySelector(`[data-id="${empId}"]`);
+            if (!card) return;
             
             currentEditingEmp = empId;
             const emp = filteredData.find(e => e.id.toString() === empId.toString());
@@ -2429,7 +2482,8 @@ Data saved to Firestore with full change history.`);\n                btn.textCo
             saveBtn.onclick = () => saveEmployeeChanges(empId, card);
             header.appendChild(saveBtn);
             \n            alert(`âœï¸ Edit mode ON for ${emp.name}\n\nEditable fields:\nâ€¢ Hours\nâ€¢ Late Minutes\nâ€¢ Absences\n
-Click 'Save Changes' when done.`);\n        }
+Click 'Save Changes' when done.`);
+        }
         
         async function saveEmployeeChanges(empId, card) {
             const emp = filteredData.find(e => e.id.toString() === empId.toString());
@@ -2483,10 +2537,12 @@ Click 'Save Changes' when done.`);\n        }
                     changedBy: auth.currentUser?.email || 'anonymous'
                 });
                 
-                await saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}_${empData.monthId}`, empData);\n                \n                alert(`âœ… Changes saved for ${emp.name}!\n\nModified fields:
+                await saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}_${empData.monthId}`, empData);
+                \n                alert(`âœ… Changes saved for ${emp.name}!\n\nModified fields:
 ${changes.map(c => `â€¢ ${c.field}: ${c.oldValue} â†’ ${c.newValue}`).join('\n')}`);
             } else {
-                alert(`â„¹ï¸ No changes made to ${emp.name}`);\n            }
+                alert(`â„¹ï¸ No changes made to ${emp.name}`);
+            }
             
             currentEditingEmp = null;
         }
@@ -2894,7 +2950,8 @@ Detected Title:', titleCell);
             document.getElementById('statLate').textContent = Math.round(totalLateMin);
             document.getElementById('statAvg').textContent = avgAttendance + '%';
             \n            console.log(`\nðŸŽ¯ PUNCTUALITY CALCULATION DIAGNOSTICS:
-`);\n            
+`);
+            
             renderTable(data);
             updateCharts(data);
         }
@@ -2942,7 +2999,9 @@ Detected Title:', titleCell);
                     .filter(d => d !== null)
                     .join(', ') : 'N/A';
                 
-                console.log(`ðŸ“Š ${emp.name} (ID ${emp.id}):`);\n                console.log(`  daysWorked: ${daysWorked} | lateCount: ${lateCount} | lateDays: [${lateDays}] | Punctuality: ${punctualityPercent}%`);\n                
+                console.log(`ðŸ“Š ${emp.name} (ID ${emp.id}):`);
+                console.log(`  daysWorked: ${daysWorked} | lateCount: ${lateCount} | lateDays: [${lateDays}] | Punctuality: ${punctualityPercent}%`);
+                
                 // Determine performance tier
                 let tier = 'Excellent';
                 let tierColor = '#16a34a';
@@ -3138,7 +3197,8 @@ Detected Title:', titleCell);
             }
             
             try {
-                console.log(`ðŸ’¾ Saving changes for ${emp.name}...`);\n                
+                console.log(`ðŸ’¾ Saving changes for ${emp.name}...`);
+                
                 // Get the currently selected month from the dropdown
                 const currentMonth = document.getElementById('monthSelector').value;
                 if (!currentMonth) {
@@ -3152,9 +3212,11 @@ Detected Title:', titleCell);
                 // Update Firestore with the modified employee data
                 const docId = `emp_${emp.id}_${currentMonth}`;\n                await saveToFirestore(EMPLOYEES_COLLECTION, docId, emp);
                 
-                console.log(`âœ… Saved to Firestore: ${docId}`);\n                
+                console.log(`âœ… Saved to Firestore: ${docId}`);
+                
                 // Re-calculate and update card metrics immediately
-                const card = document.querySelector(`.employee-card[data-id="${String(empId)}"]`);\n                if (card) {
+                const card = document.querySelector(`.employee-card[data-id="${String(empId)}"]`);
+                if (card) {
                     updateCardDisplay(emp, card);
                     
                     // Re-render the daily breakdown
@@ -3167,11 +3229,14 @@ Detected Title:', titleCell);
                     card.style.borderColor = '#10b981';
                     setTimeout(() => { card.style.borderColor = '#e2e8f0'; }, 2000);
                     \n                    alert(`âœ… Changes saved for ${emp.name}!\n
-Metrics updated live.`);\n                } else {
-                    alert(`âœ… Changes saved for ${emp.name}!`);\n                }
+Metrics updated live.`);
+                } else {
+                    alert(`âœ… Changes saved for ${emp.name}!`);
+                }
             } catch (error) {
                 console.error('âŒ Error saving employee changes:', error);
-                alert(`âŒ Error saving changes: ${error.message}`);\n            }
+                alert(`âŒ Error saving changes: ${error.message}`);
+            }
         }
         
         
@@ -3277,7 +3342,8 @@ Metrics updated live.`);\n                } else {
                 if (inHour) {
                     const h = parseInt(inHour);
                     if (isNaN(h) || h < 0 || h > 23) {
-                        alert(`âŒ Invalid IN hour for Pair ${pairIdx + 1}. Must be 0-23.`);\n                        return;
+                        alert(`âŒ Invalid IN hour for Pair ${pairIdx + 1}. Must be 0-23.`);
+                        return;
                     }
                     inHour = String(h).padStart(2, '0');
                 }
@@ -3285,7 +3351,8 @@ Metrics updated live.`);\n                } else {
                 if (inMin) {
                     const m = parseInt(inMin);
                     if (isNaN(m) || m < 0 || m > 59) {
-                        alert(`âŒ Invalid IN minute for Pair ${pairIdx + 1}. Must be 0-59.`);\n                        return;
+                        alert(`âŒ Invalid IN minute for Pair ${pairIdx + 1}. Must be 0-59.`);
+                        return;
                     }
                     inMin = String(m).padStart(2, '0');
                 }
@@ -3293,7 +3360,8 @@ Metrics updated live.`);\n                } else {
                 if (outHour) {
                     const h = parseInt(outHour);
                     if (isNaN(h) || h < 0 || h > 23) {
-                        alert(`âŒ Invalid OUT hour for Pair ${pairIdx + 1}. Must be 0-23.`);\n                        return;
+                        alert(`âŒ Invalid OUT hour for Pair ${pairIdx + 1}. Must be 0-23.`);
+                        return;
                     }
                     outHour = String(h).padStart(2, '0');
                 }
@@ -3301,7 +3369,8 @@ Metrics updated live.`);\n                } else {
                 if (outMin) {
                     const m = parseInt(outMin);
                     if (isNaN(m) || m < 0 || m > 59) {
-                        alert(`âŒ Invalid OUT minute for Pair ${pairIdx + 1}. Must be 0-59.`);\n                        return;
+                        alert(`âŒ Invalid OUT minute for Pair ${pairIdx + 1}. Must be 0-59.`);
+                        return;
                     }
                     outMin = String(m).padStart(2, '0');
                 }
@@ -3353,8 +3422,11 @@ Metrics updated live.`);\n                } else {
             
             // Save to Firestore
             emp.editHistory = cellEditHistory;
-            saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}`, emp).then(() => {\n                console.log(`âœ… Saved punch times for ${emp.name} to Firestore`);\n            }).catch(err => {
-                console.error(`âŒ Failed to save to Firestore:`, err);\n                alert(`âš ï¸ Changes saved locally but failed to sync to server. Please try again.`);\n            });
+            saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}`, emp).then(() => {\n                console.log(`âœ… Saved punch times for ${emp.name} to Firestore`);
+            }).catch(err => {
+                console.error(`âŒ Failed to save to Firestore:`, err);
+                alert(`âš ï¸ Changes saved locally but failed to sync to server. Please try again.`);
+            });
             
             closeDayEditModal();
         }
@@ -3493,18 +3565,27 @@ Accepted formats:\
             const pairIdx = parseInt(cell.dataset.pairIdx);
             const newTime = parsedTime;
             \n            console.log(`
-âœˆï¸ UPDATE PUNCH TIME CALLED`);\n            console.log(`   Type: ${type}, empId: ${empId}, dayIdx: ${dayIdx}, pairIdx: ${pairIdx}`);\n            console.log(`   New value: '${newTime}'`);\n            
+âœˆï¸ UPDATE PUNCH TIME CALLED`);
+            console.log(`   Type: ${type}, empId: ${empId}, dayIdx: ${dayIdx}, pairIdx: ${pairIdx}`);
+            console.log(`   New value: '${newTime}'`);
+            
             const emp = filteredData.find(e => e.id == empId);  // Use == for string/number compatibility
-            console.log(`   Looking for empId=${empId} in filteredData (${filteredData.length} employees)`);\n            console.log(`   Found: ${emp ? 'YES' : 'NO'}`);\n            
+            console.log(`   Looking for empId=${empId} in filteredData (${filteredData.length} employees)`);
+            console.log(`   Found: ${emp ? 'YES' : 'NO'}`);
+            
             if (!emp) {
-                console.error(`âŒ Employee not found in filteredData`);\n                return;
+                console.error(`âŒ Employee not found in filteredData`);
+                return;
             }
             
             if (!emp.dailyBreakdown) {
-                console.error(`âŒ Employee found but no dailyBreakdown property`);\n                console.log(`   Employee object keys:`, Object.keys(emp));\n                return;
+                console.error(`âŒ Employee found but no dailyBreakdown property`);
+                console.log(`   Employee object keys:`, Object.keys(emp));
+                return;
             }
             
-            console.log(`âœ… Employee found with ${emp.dailyBreakdown.length} days`);\n            
+            console.log(`âœ… Employee found with ${emp.dailyBreakdown.length} days`);
+            
             const day = emp.dailyBreakdown[dayIdx];
             
             // If this is a "No punches" day, create the first punch pair
@@ -3529,7 +3610,8 @@ Accepted formats:\
                 editCount: cellEditHistory[historyKey].length + 1
             });
             
-            console.log(`   ðŸ“ Edit recorded: ${originalValue || 'â€”'} â†’ ${newTime}`);\n            
+            console.log(`   ðŸ“ Edit recorded: ${originalValue || 'â€”'} â†’ ${newTime}`);
+            
             if (type === 'in') {
                 pair.in = newTime;
             } else {
@@ -3556,7 +3638,8 @@ Accepted formats:\
                 pair.pairHours = 0;
             }
             
-            console.log(`   Updated pair[${pairIdx}].pairHours = ${pair.pairHours}`);\n            let dayTotalMinutes = 0;
+            console.log(`   Updated pair[${pairIdx}].pairHours = ${pair.pairHours}`);
+            let dayTotalMinutes = 0;
             day.punchPairs.forEach(p => {
                 if (p.in && p.out) {
                     const inParts = p.in.split(':').map(Number);
@@ -3601,37 +3684,51 @@ Accepted formats:\
             emp.hours = newHours + ' hrs';
             emp.lateMin = Math.round(totalLateMinutes);
             
-            console.log(`   Recalculated total hours: ${emp.hours}, late: ${emp.lateMin} min`);\n            
+            console.log(`   Recalculated total hours: ${emp.hours}, late: ${emp.lateMin} min`);
+            
             // Update display instantly
-            const card = document.querySelector(`.employee-card[data-id="${String(empId)}"]`);\n            console.log(`   Card found: ${card ? 'YES' : 'NO'}`);\n            
+            const card = document.querySelector(`.employee-card[data-id="${String(empId)}"]`);
+            console.log(`   Card found: ${card ? 'YES' : 'NO'}`);
+            
             if (card) {
-                console.log(`   Calling updateCardDisplay...`);\n                updateCardDisplay(emp, card);
+                console.log(`   Calling updateCardDisplay...`);
+                updateCardDisplay(emp, card);
                 
                 // Update the hours cell in the table immediately
-                console.log(`   ðŸ” Looking for hours cell - dayIdx=${dayIdx}, pairIdx=${pairIdx}`);\n                const breakdownDiv = card.querySelector('.daily-breakdown');
-                console.log(`   âž¡ï¸ Breakdown div found: ${breakdownDiv ? 'YES' : 'NO'}`);\n                
+                console.log(`   ðŸ” Looking for hours cell - dayIdx=${dayIdx}, pairIdx=${pairIdx}`);
+                const breakdownDiv = card.querySelector('.daily-breakdown');
+                console.log(`   âž¡ï¸ Breakdown div found: ${breakdownDiv ? 'YES' : 'NO'}`);
+                
                 if (breakdownDiv) {
                     // First, check what elements exist
                     const allTds = breakdownDiv.querySelectorAll('td');
-                    console.log(`   âž¡ï¸ Total TD elements in breakdown: ${allTds.length}`);\n                    
+                    console.log(`   âž¡ï¸ Total TD elements in breakdown: ${allTds.length}`);
+                    
                     const hoursCells = breakdownDiv.querySelectorAll('[data-hours-cell="true"]');
-                    console.log(`   âž¡ï¸ Hours cells with data-hours-cell="true": ${hoursCells.length}`);\n                    
+                    console.log(`   âž¡ï¸ Hours cells with data-hours-cell="true": ${hoursCells.length}`);
+                    
                     // Try the selector
-                    const selector = `[data-hours-cell="true"][data-day-idx="${dayIdx}"][data-pair-idx="${pairIdx}"]`;\n                    console.log(`   âž¡ï¸ Using selector: ${selector}`);\n                    const hoursCell = breakdownDiv.querySelector(selector);
-                    console.log(`   âž¡ï¸ Hours cell found: ${hoursCell ? 'YES' : 'NO'}`);\n                    
+                    const selector = `[data-hours-cell="true"][data-day-idx="${dayIdx}"][data-pair-idx="${pairIdx}"]`;\n                    console.log(`   âž¡ï¸ Using selector: ${selector}`);
+                    const hoursCell = breakdownDiv.querySelector(selector);
+                    console.log(`   âž¡ï¸ Hours cell found: ${hoursCell ? 'YES' : 'NO'}`);
+                    
                     if (hoursCell) {
                         hoursCell.textContent = parseFloat(pair.pairHours).toFixed(2);
-                        console.log(`   âœï¸ Updated hours cell for day ${dayIdx}, pair ${pairIdx} to ${pair.pairHours}`);\n                    } else {
+                        console.log(`   âœï¸ Updated hours cell for day ${dayIdx}, pair ${pairIdx} to ${pair.pairHours}`);
+                    } else {
                         // If not found, try logging the first few cells to see what attributes they have
-                        console.log(`   ðŸ”Ž Sample hours cell attributes:`);\n                        hoursCells.forEach((cell, idx) => {
+                        console.log(`   ðŸ”Ž Sample hours cell attributes:`);
+                        hoursCells.forEach((cell, idx) => {
                             if (idx < 3) {
-                                console.log(`      Cell ${idx}: data-day-idx="${cell.dataset.dayIdx}" data-pair-idx="${cell.dataset.pairIdx}"`);\n                            }
+                                console.log(`      Cell ${idx}: data-day-idx="${cell.dataset.dayIdx}" data-pair-idx="${cell.dataset.pairIdx}"`);
+                            }
                         });
                     }
                 }
             }
             
-            console.log(`âœ… Updated ${type} time for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newTime}, Late: ${pairIdx === 0 ? day.lateMin : 'N/A'} min`);\n            
+            console.log(`âœ… Updated ${type} time for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newTime}, Late: ${pairIdx === 0 ? day.lateMin : 'N/A'} min`);
+            
             // Add "EDITED" badge to the cell (subtle indicator)
             const editCount = cellEditHistory[historyKey].length;
             
@@ -3698,7 +3795,9 @@ Accepted formats:\
             // Create tooltip element
             const tooltip = document.createElement('div');
             tooltip.className = 'edit-history-tooltip';
-            tooltip.innerHTML = content;\n            tooltip.style.cssText = `\n                position: fixed;\n                background: white;\n                border: 1px solid #cbd5e1;\n                border-radius: 6px;\n                padding: 14px;\n                font-size: 0.8rem;\n                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);\n                z-index: 10000;\n                max-width: 380px;\n                max-height: 500px;\n                overflow-y: auto;\n                animation: slideIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);\n                pointer-events: auto;
+            tooltip.innerHTML = content;\n            tooltip.style.cssText = `\n                position: fixed;\n                background: white;\n                border: 1px solid #cbd5e1;\n                border-radius: 6px;\n                padding: 14px;\n                font-size: 0.8rem;\n                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+                z-index: 10000;\n                max-width: 380px;\n                max-height: 500px;\n                overflow-y: auto;\n                animation: slideIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+                pointer-events: auto;
             `;\n            
             document.body.appendChild(tooltip);
             
@@ -3754,7 +3853,8 @@ Accepted formats:\
         // Add animation styles
         if (!document.querySelector('style[data-edit-history]')) {
             const style = document.createElement('style');
-            style.setAttribute('data-edit-history', 'true');\n            style.textContent = `\n                @keyframes slideIn {\n                    from { opacity: 0; transform: translateY(-5px); }\n                    to { opacity: 1; transform: translateY(0); }\n                }\n                @keyframes slideOut {\n                    from { opacity: 1; transform: translateY(0); }\n                    to { opacity: 0; transform: translateY(-5px); }\n                }
+            style.setAttribute('data-edit-history', 'true');
+            style.textContent = `\n                @keyframes slideIn {\n                    from { opacity: 0; transform: translateY(-5px); }\n                    to { opacity: 1; transform: translateY(0); }\n                }\n                @keyframes slideOut {\n                    from { opacity: 1; transform: translateY(0); }\n                    to { opacity: 0; transform: translateY(-5px); }\n                }
             `;\n            document.head.appendChild(style);
         }
         
@@ -3763,7 +3863,8 @@ Accepted formats:\
             // The onblur handlers are already in the HTML, so we don't need to do anything
             // Just verify they're there
             const punchCells = card.querySelectorAll('[contenteditable="true"]');
-            console.log(`ðŸ”— Found ${punchCells.length} editable punch cells with onblur handlers`);\n        }
+            console.log(`ðŸ”— Found ${punchCells.length} editable punch cells with onblur handlers`);
+        }
         
         function updateCardDisplay(emp, card) {
             // Recalculate metrics
@@ -3778,17 +3879,23 @@ Accepted formats:\
             const punctualityPercent = daysWorked > 0 ? Math.max(0, 100 - (lateCount / daysWorked * 100)).toFixed(0) : '-';
             const absences = Math.max(0, dateRange.actualDays - daysWorked);
             
-            console.log(`   ðŸ“Š updateCardDisplay for ${emp.name}:`);\n            console.log(`      emp.hours="${emp.hours}" â†’ hoursNum=${hoursNum}`);\n            
+            console.log(`   ðŸ“Š updateCardDisplay for ${emp.name}:`);
+            console.log(`      emp.hours="${emp.hours}" â†’ hoursNum=${hoursNum}`);
+            
             // Update metric cards in the HTML
             const metrics = card.querySelectorAll('.metric-card-value');
-            console.log(`      Found ${metrics.length} metric-card-value elements`);\n            if (metrics && metrics.length >= 3) {
-                console.log(`      BEFORE: metric[2]="${metrics[2].textContent}"`);\n                metrics[0].textContent = attendancePercent.toFixed(0) + '%'; // Attendance
+            console.log(`      Found ${metrics.length} metric-card-value elements`);
+            if (metrics && metrics.length >= 3) {
+                console.log(`      BEFORE: metric[2]="${metrics[2].textContent}"`);
+                metrics[0].textContent = attendancePercent.toFixed(0) + '%'; // Attendance
                 metrics[1].textContent = punctualityPercent + (punctualityPercent !== '-' ? '%' : ''); // Punctuality
                 metrics[2].textContent = hoursNum.toFixed(2); // Hours
                 if (metrics.length > 3) metrics[3].textContent = (emp.lateMin || 0); // Late Min
                 if (metrics.length > 4) metrics[4].textContent = absences; // Absences
                 if (metrics.length > 5) metrics[5].textContent = daysWorked; // Worked
-                console.log(`      AFTER: metric[2]="${metrics[2].textContent}"`);\n                console.log(`      âœ… Updated metric cards`);\n            } else {
+                console.log(`      AFTER: metric[2]="${metrics[2].textContent}"`);
+                console.log(`      âœ… Updated metric cards`);
+            } else {
                 console.log(`      âš ï¸ Not enough metrics found (need 3+, found ${metrics.length})`);
             }
         }
