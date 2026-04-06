@@ -3684,7 +3684,6 @@
             console.log(`✅ Updated ${type} time for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newTime}, Late: ${pairIdx === 0 ? day.lateMin : 'N/A'} min`);
             
             // Add "EDITED" badge to the cell
-            const historyKey = `${empId}_${dayIdx}_${pairIdx}_${type}`;
             const editCount = cellEditHistory[historyKey].length;
             
             // Remove old badge if it exists
