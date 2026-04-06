@@ -1387,8 +1387,9 @@
             // Fallback: Try to detect month/year from dates in the data (YYYY-MM-DD format)
             let detectedMonth = null;
             let detectedYear = null;
+            let foundDates = [];
             
-            for (let i = 0; i < Math.min(100, data.length); i++) {
+            for (let i = 0; i < Math.min(150, data.length); i++) {
                 const row = data[i];
                 for (let j = 0; j < Math.min(20, row.length); j++) {
                     const cell = (row[j] || '').toString().trim();
@@ -1396,12 +1397,14 @@
                     if (dateMatchISO) {
                         detectedYear = parseInt(dateMatchISO[1]);
                         detectedMonth = parseInt(dateMatchISO[2]);
-                        console.log(`📅 Found date in data: ${cell} -> Year: ${detectedYear}, Month: ${detectedMonth}`);
-                        break;
+                        foundDates.push(cell);
+                        if (foundDates.length > 5) break; // Found enough samples
                     }
                 }
-                if (detectedYear && detectedMonth) break;
+                if (foundDates.length > 5) break;
             }
+            
+            console.log(`📅 Found dates: ${foundDates.join(', ')}`);
             
             // If we found a month, calculate the correct number of days in that month
             if (detectedYear && detectedMonth) {
@@ -1409,7 +1412,8 @@
                 // Get last day of the month
                 dateRange.end = new Date(detectedYear, detectedMonth, 0);
                 dateRange.actualDays = dateRange.end.getDate();
-                console.log(`📅 Date Range (from detected month): ${dateRange.start.toLocaleDateString()} to ${dateRange.end.toLocaleDateString()} (${dateRange.actualDays} days in ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][detectedMonth-1]} ${detectedYear})`);
+                console.log(`📅 Detected Month/Year: ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][detectedMonth-1]} ${detectedYear} → ${dateRange.actualDays} days`);
+                console.log(`📅 dateRange.actualDays = ${dateRange.actualDays} (should be 31 for March)`);
                 return;
             }
             
@@ -1597,6 +1601,7 @@
                         // Fill in missing days as absent if actualDays is higher than data provided
                         // This ensures the complete month is shown even if Excel only has partial days
                         if (dailyBreakdown.length < dateRange.actualDays) {
+                            console.log(`  📅 Filling missing days: Current breakdown has ${dailyBreakdown.length} days, but month has ${dateRange.actualDays} days`);
                             for (let dayIndex = dailyBreakdown.length; dayIndex < dateRange.actualDays; dayIndex++) {
                                 const dayNum = dayIndex + 1;
                                 const dayDate = new Date(dateRange.start);
@@ -1608,8 +1613,11 @@
                                 };
                                 dailyBreakdown.push(dayRecord);
                                 missedDays++;
+                                console.log(`    Added missing day ${dayNum} (${dayDate.toISOString().split('T')[0]})`);
                             }
-                            console.log(`  ℹ️ Filled in ${dateRange.actualDays - (dailyBreakdown.length - (dateRange.actualDays - dailyBreakdown.length))} missing days for ${name}`);
+                            console.log(`  ✓ Filled in ${dateRange.actualDays - (dailyBreakdown.length - (dateRange.actualDays - dailyBreakdown.length))} missing days for ${name}`);
+                        } else {
+                            console.log(`  ✓ ${name}: Daily breakdown complete (${dailyBreakdown.length} days = ${dateRange.actualDays} days)`);
                         }
                         
                         employees.push({
