@@ -894,6 +894,64 @@
             }
         }
         
+        // NEW: Extract shift definitions from "Attend. Rules Form" sheet in Excel
+        async function extractAndSaveShiftDefinitions(sheets) {
+            try {
+                const attendRulesSheet = sheets['Attend. Rules Form'];
+                if (!attendRulesSheet || attendRulesSheet.length < 5) {
+                    console.log('⚠️ Attend. Rules Form sheet not found or too small');
+                    return;
+                }
+                
+                // Row 4 (index 3) has headers, data starts at row 5 (index 4)
+                const newShifts = {};
+                
+                for (let row = 4; row < Math.min(14, attendRulesSheet.length); row++) {
+                    const shiftRow = attendRulesSheet[row] || [];
+                    if (shiftRow.length < 9) continue;
+                    
+                    const shiftNum = shiftRow[0]; // Shift Number col
+                    const inTime = shiftRow[1];   // In col
+                    const outTime = shiftRow[2]; // Out col
+                    const deptName = shiftRow[8]; // Department col
+                    
+                    // Only process if we have times and dept name
+                    if (inTime && outTime && deptName && deptName !== 'Department') {
+                        const timeIn = String(inTime).trim();
+                        const timeOut = String(outTime).trim();
+                        const dept = String(deptName).trim();
+                        
+                        // Valid time format check
+                        if (/^\d{1,2}:\d{2}/.test(timeIn) && /^\d{1,2}:\d{2}/.test(timeOut)) {
+                            newShifts[dept] = {
+                                start: timeIn,
+                                end: timeOut
+                            };
+                            console.log(`   ✓ Shift: ${dept} = ${timeIn} to ${timeOut}`);
+                        }
+                    }
+                }
+                
+                if (Object.keys(newShifts).length > 0) {
+                    console.log(`📋 Extracted ${Object.keys(newShifts).length} shift definitions`);
+                    
+                    // Merge with existing shifts (don't overwrite WK/FT/EV if already defined)
+                    const merged = { ...shiftDefinitions, ...newShifts };
+                    
+                    await saveToFirestore(TIMESHEET_COLLECTION, 'shiftDefinitions', merged);
+                    shiftDefinitions = merged;
+                    
+                    console.log('✅ Updated shift definitions in Firestore');
+                    console.log('Updated shifts:', newShifts);
+                    
+                    // Refresh shift settings UI
+                    loadShiftDefinitions();
+                }
+            } catch (error) {
+                console.error('❌ Error extracting shift definitions:', error);
+            }
+        }
+        
         async function loadMonthData() {
             const monthId = document.getElementById('monthSelector').value;
             if (!monthId) return;
@@ -1284,8 +1342,20 @@
                             try {
                                 const data = new Uint8Array(ev.target.result);
                                 const workbook = XLSX.read(data, { type: 'array' });
-                                const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, defval: '' });
+                                
+                                // Parse ALL sheets (first for employee data, second for shift definitions)
+                                const allSheets = {};
+                                workbook.SheetNames.forEach(sheetName => {
+                                    const sheet = workbook.Sheets[sheetName];
+                                    allSheets[sheetName] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                                });
+                                
+                                // Parse employee form structure from first sheet
+                                const sheetData = allSheets[workbook.SheetNames[0]];
                                 parseEmployeeFormStructure(sheetData);
+                                
+                                // ALSO extract and update shift definitions from "Attend. Rules Form" sheet
+                                await extractAndSaveShiftDefinitions(allSheets);
                             } catch (err) {
                                 console.error('❌ Error parsing employee form:', err);
                                 alert('❌ Error parsing employee form. Error: ' + err.message);
