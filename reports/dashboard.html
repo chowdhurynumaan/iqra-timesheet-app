@@ -3688,10 +3688,14 @@
                     else timeDisplay = timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                 }
                 
+                // Handle fieldType - may be 'in', 'out', or extracted from key
+                const fieldType = edit.fieldType || 'edit';
+                const fieldDisplay = fieldType.toUpperCase();
+                
                 return `
                     <div style="padding: 8px; background: white; border: 1px solid #e2e8f0; border-radius: 3px; margin-bottom: 6px;">
                         <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">
-                            <strong>${edit.fieldType.toUpperCase()}</strong> • ${timeDisplay}
+                            <strong>${fieldDisplay}</strong> • ${timeDisplay}
                         </div>
                         <div style="display: flex; gap: 6px; font-family: monospace; font-size: 0.8rem;">
                             <span style="color: #b45309; background: #fffbeb; padding: 2px 4px; border-radius: 2px;">${edit.original || '(empty)'}</span>
