@@ -813,21 +813,39 @@
                 return;
             }
             
-            const headerRow = data[0] || [];
+            // SMART HEADER DETECTION: Find the row that has ID, Name, Department columns
+            let headerRowIdx = 0;
+            let headerRow = data[0] || [];
+            
+            // Scan first 20 rows to find the actual header row
+            for (let i = 0; i < Math.min(20, data.length); i++) {
+                const row = data[i] || [];
+                const rowStr = row.map(cell => (cell || '').toString().toLowerCase()).join('|');
+                
+                // Look for rows that contain typical header keywords
+                if (rowStr.includes('id') && rowStr.includes('name') && 
+                    (rowStr.includes('department') || rowStr.includes('dept') || rowStr.includes('section'))) {
+                    headerRowIdx = i;
+                    headerRow = row;
+                    console.log(`📋 Found actual header row at index ${i}`);
+                    break;
+                }
+            }
+            
             const mapping = {};
             const headerLower = headerRow.map(h => (h || '').toString().toLowerCase().trim());
             
-            console.log('📋 Employee Form Headers Found:');
+            console.log('📋 Employee Form Headers Found (Row ' + (headerRowIdx + 1) + '):');
             console.log(headerRow);
             
             // Detect columns by looking for key column headers
             const columnPatterns = {
-                id: ['id', 'emp id', 'employee id', 'code', 'emp code', '#'],
-                name: ['name', 'employee name', 'emp name', 'full name'],
-                dept: ['department', 'dept', 'section', 'division'],
-                shift: ['shift', 'schedule'],
-                phone: ['phone', 'contact', 'mobile', 'tel'],
-                email: ['email', 'e-mail']
+                id: ['id', 'emp id', 'employee id', 'code', 'emp code', '#', '*id'],
+                name: ['name', 'employee name', 'emp name', 'full name', '*name'],
+                dept: ['department', 'dept', 'section', 'division', '*department', '*dept', '*section'],
+                shift: ['shift', 'schedule', '*shift'],
+                phone: ['phone', 'contact', 'mobile', 'tel', '*phone'],
+                email: ['email', 'e-mail', '*email']
             };
             
             Object.entries(columnPatterns).forEach(([field, patterns]) => {
