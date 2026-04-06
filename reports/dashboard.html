@@ -467,6 +467,7 @@
                         <button class="btn-export" onclick="exportToExcel()">📑 Export Excel</button>
                         <button class="btn-export" onclick="saveReportToFirebase()">☁️ Save Cloud</button>
                         <button class="btn-export" onclick="printSelected()" style="background: #059669;">🖨️ Print</button>
+                        <button class="btn-export" onclick="cleanupDuplicateEmployees()" style="background: #8b5cf6;">🧹 Clean Duplicates</button>
                     </div>
                 </div>
             </div>
@@ -3051,6 +3052,122 @@
                 event.target.textContent = '☁️ Save to Cloud';
                 event.target.disabled = false;
                 console.error(error);
+            }
+        }
+
+        // ========== CLEANUP DUPLICATE EMPLOYEES ==========
+        async function cleanupDuplicateEmployees() {
+            const proceed = confirm('🧹 CLEANUP DUPLICATES\n\nThis will scan your Firestore database and remove duplicate employee records.\n\nDuplicates are identified when the same employee (ID + Month) appears multiple times. Only the most recent copy will be kept.\n\nThis operation cannot be undone!\n\nProceed?');
+            
+            if (!proceed) return;
+            
+            try {
+                const btn = event.target;
+                btn.disabled = true;
+                btn.textContent = '🔍 Scanning...';
+                
+                // Get ALL employees from Firestore
+                const empSnapshot = await db.collection(EMPLOYEES_COLLECTION).get();
+                
+                console.log(`\n🧹 CLEANUP STARTED\n📊 Total documents in Firestore: ${empSnapshot.docs.length}`);
+                
+                // Group by employee ID + month
+                const empsByIdMonth = {};
+                const allDocs = [];
+                
+                empSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const key = `${data.id}_${data.monthId}`;
+                    
+                    if (!empsByIdMonth[key]) {
+                        empsByIdMonth[key] = [];
+                    }
+                    
+                    allDocs.push({ docId: doc.id, data });
+                    empsByIdMonth[key].push({ docId: doc.id, data, timestamp: data.lastUpdated || data.timestamp || new Date(0) });
+                });
+                
+                // Find duplicates
+                const duplicates = [];
+                const kept = [];
+                
+                for (const [key, docs] of Object.entries(empsByIdMonth)) {
+                    if (docs.length > 1) {
+                        console.log(`\n⚠️ Found ${docs.length} copies of: ${docs[0].data.name} (ID: ${docs[0].data.id}, Month: ${docs[0].data.monthId})`);
+                        
+                        // Sort by timestamp descending (most recent first)
+                        docs.sort((a, b) => {
+                            const timeA = new Date(a.timestamp).getTime();
+                            const timeB = new Date(b.timestamp).getTime();
+                            return timeB - timeA;
+                        });
+                        
+                        // Keep the first (most recent), delete the rest
+                        kept.push(docs[0].docId);
+                        for (let i = 1; i < docs.length; i++) {
+                            duplicates.push({
+                                docId: docs[i].docId,
+                                name: docs[i].data.name,
+                                id: docs[i].data.id,
+                                month: docs[i].data.monthId,
+                                timestamp: docs[i].timestamp
+                            });
+                            console.log(`  🗑️ Deleting: ${docs[i].docId} (created: ${new Date(docs[i].timestamp).toLocaleDateString()})`);
+                        }
+                    }
+                }
+                
+                if (duplicates.length === 0) {
+                    alert('✅ Good news!\n\nNo duplicate employee records found. Your database is clean!');
+                    btn.textContent = '🧹 Clean Duplicates';
+                    btn.disabled = false;
+                    return;
+                }
+                
+                // Show what will be deleted
+                btn.textContent = '⏳ Deleting...';
+                
+                let summaryMsg = `🧹 DUPLICATES FOUND: ${duplicates.length} records\n\n`;
+                summaryMsg += duplicates.slice(0, 10).map(d => 
+                    `❌ ${d.name} (ID: ${d.id}) - Month: ${d.month}`
+                ).join('\n');
+                
+                if (duplicates.length > 10) {
+                    summaryMsg += `\n\n... and ${duplicates.length - 10} more`;
+                }
+                
+                // Delete duplicates in batches
+                const batchSize = 200; // Firestore batch limit
+                for (let i = 0; i < duplicates.length; i += batchSize) {
+                    const batch = db.batch();
+                    const batchDocs = duplicates.slice(i, i + batchSize);
+                    
+                    batchDocs.forEach(dup => {
+                        const docRef = db.collection(EMPLOYEES_COLLECTION).doc(dup.docId);
+                        batch.delete(docRef);
+                    });
+                    
+                    await batch.commit();
+                    console.log(`✅ Deleted batch ${Math.floor(i / batchSize) + 1} (${batchDocs.length} documents)`);
+                }
+                
+                // Success message
+                console.log(`\n✅ CLEANUP COMPLETE`);
+                console.log(`📊 Deleted: ${duplicates.length} duplicate documents`);
+                console.log(`📊 Kept: ${kept.length} records`);
+                
+                alert(`✅ CLEANUP COMPLETE!\n\n${summaryMsg}\n\n🗑️ Total Deleted: ${duplicates.length} duplicate records\n✅ Kept: ${kept.length} records\n\nYour database is now clean!`);
+                
+                btn.textContent = '🧹 Done!';
+                setTimeout(() => {
+                    btn.textContent = '🧹 Clean Duplicates';
+                    btn.disabled = false;
+                }, 2000);
+            } catch (error) {
+                console.error('❌ Cleanup error:', error);
+                alert(`❌ Error during cleanup: ${error.message}`);
+                event.target.textContent = '🧹 Clean Duplicates';
+                event.target.disabled = false;
             }
         }
 
