@@ -3609,11 +3609,13 @@
             // Recalculate total employee hours and late minutes
             let totalMinutes = 0;
             let totalLateMinutes = 0;
-            emp.dailyBreakdown.forEach(d => {
-                totalMinutes += (parseFloat(d.hours) || 0) * 60;
+            emp.dailyBreakdown.forEach((d, idx) => {
+                const dayHours = (parseFloat(d.hours) || 0);
+                totalMinutes += dayHours * 60;
                 totalLateMinutes += (d.lateMin || 0);
             });
-            emp.hours = (totalMinutes / 60).toFixed(2) + ' hrs';
+            const newHours = (totalMinutes / 60).toFixed(2);
+            emp.hours = newHours + ' hrs';
             emp.lateMin = Math.round(totalLateMinutes);
             
             console.log(`   Recalculated total hours: ${emp.hours}, late: ${emp.lateMin} min`);
@@ -3642,28 +3644,22 @@
             // Recalculate metrics
             const daysWorked = emp.daysWorked || (emp.dailyBreakdown ? emp.dailyBreakdown.filter(d => !d.isMissed).length : 0);
             const hoursNum = parseFloat(emp.hours) || 0;
-            const attendancePercent = dateRange.actualDays > 0 ? (daysWorked / dateRange.actualDays * 100) : 0;
-            
-            let lateCount = 0;
-            if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
-                lateCount = emp.dailyBreakdown.filter(d => d.lateMin > 0).length;
-            }
-            const punctualityPercent = daysWorked > 0 ? Math.max(0, 100 - (lateCount / daysWorked * 100)).toFixed(0) : '-';
-            const absences = Math.max(0, dateRange.actualDays - daysWorked);
-            
             console.log(`   📊 updateCardDisplay for ${emp.name}:`);
-            console.log(`      hoursNum=${hoursNum}, attendance=${attendancePercent.toFixed(0)}, punctuality=${punctualityPercent}`);
+            console.log(`      emp.hours="${emp.hours}" → hoursNum=${hoursNum}`);
+            const attendancePercent = dateRange.actualDays > 0 ? (daysWorked / dateRange.actualDays * 100) : 0;
             
             // Update metric cards in the HTML
             const metrics = card.querySelectorAll('.metric-card-value');
             console.log(`      Found ${metrics.length} metric-card-value elements`);
             if (metrics && metrics.length >= 3) {
+                console.log(`      BEFORE: metric[2]="${metrics[2].textContent}"`);
                 metrics[0].textContent = attendancePercent.toFixed(0) + '%'; // Attendance
                 metrics[1].textContent = punctualityPercent + (punctualityPercent !== '-' ? '%' : ''); // Punctuality
                 metrics[2].textContent = hoursNum.toFixed(0); // Hours
                 if (metrics.length > 3) metrics[3].textContent = (emp.lateMin || 0); // Late Min
                 if (metrics.length > 4) metrics[4].textContent = absences; // Absences
                 if (metrics.length > 5) metrics[5].textContent = daysWorked; // Worked
+                console.log(`      AFTER: metric[2]="${metrics[2].textContent}"`);
                 console.log(`      ✅ Updated metric cards`);
             } else {
                 console.log(`      ⚠️ Not enough metrics found (need 3+, found ${metrics.length})`);
