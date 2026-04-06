@@ -3464,8 +3464,18 @@
                         <tr style="${rowStyle}">
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};"><strong>${day.date}</strong></td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};"><strong>${day.dayName}</strong></td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-type="in" data-is-new="true" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" placeholder="9:30 AM" title="Click to add IN time (e.g., 9:30 AM or 09:30)">—</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-type="out" data-is-new="true" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" placeholder="5:30 PM" title="Click to add OUT time (e.g., 5:30 PM or 17:30)">—</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a; position: relative;" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-type="in" data-is-new="true" class="punch-time-cell">
+                                <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                    <span class="punch-display">—</span>
+                                    <button class="punch-edit-btn" onclick="enterEditMode(this)" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.5rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit IN time">✎</button>
+                                </div>
+                            </td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a; position: relative;" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-type="out" data-is-new="true" class="punch-time-cell">
+                                <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                    <span class="punch-display">—</span>
+                                    <button class="punch-edit-btn" onclick="enterEditMode(this)" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.5rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit OUT time">✎</button>
+                                </div>
+                            </td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" data-hours-cell="true">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">❌</td>
@@ -3480,8 +3490,18 @@
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.date}</strong></td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.dayName}</strong></td>
                         ` : ''}
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" data-type="in" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" title="Edit IN time (e.g., 9:30 AM or 09:30)">${formatTime(pair.in)}</td>
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" data-type="out" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" title="Edit OUT time (e.g., 5:30 PM or 17:30)">${formatTime(pair.out)}</td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a; position: relative;" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" data-type="in" class="punch-time-cell">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                <span class="punch-display">${formatTime(pair.in)}</span>
+                                <button class="punch-edit-btn" onclick="enterEditMode(this)" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.5rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit IN time">✎</button>
+                            </div>
+                        </td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a; position: relative;" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" data-type="out" class="punch-time-cell">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                <span class="punch-display">${formatTime(pair.out)}</span>
+                                <button class="punch-edit-btn" onclick="enterEditMode(this)" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.5rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit OUT time">✎</button>
+                            </div>
+                        </td>
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times" data-hours-cell="true" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : '—'}</td>
                         ${pairIdx === 0 ? `
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; font-weight: ${day.lateMin > 0 ? '700' : '400'}; color: ${day.lateMin > 0 ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>
@@ -3572,32 +3592,99 @@
             }
         }
         
-        function updatePunchTime(event, type) {
-            const empId = parseInt(event.target.dataset.empId);
-            const dayIdx = parseInt(event.target.dataset.dayIdx);
-            const pairIdx = parseInt(event.target.dataset.pairIdx);
-            const userInput = event.target.textContent.trim();
+        
+        // Enter edit mode for a punch time cell
+        function enterEditMode(button) {
+            const cell = button.closest('.punch-time-cell');
+            const display = cell.querySelector('.punch-display');
+            const currentValue = display.textContent.trim() === '—' ? '' : display.textContent.trim();
+            
+            // Replace with editable input
+            cell.innerHTML = `
+                <input type="text" class="punch-edit-input" value="${currentValue}" 
+                    style="width: 100%; padding: 2px 4px; font-size: 0.6rem; border: 2px solid #8b5cf6; border-radius: 3px; text-align: center;" 
+                    placeholder="9:30 AM" onkeydown="if(event.key==='Enter') savePunchTime(this); if(event.key==='Escape') cancelEdit(this)">
+                <div style="display: flex; gap: 2px; margin-top: 4px; justify-content: center;">
+                    <button onclick="savePunchTime(this)" style="padding: 2px 6px; background: #10b981; color: white; border: none; border-radius: 2px; font-size: 0.5rem; cursor: pointer; font-weight: bold;">✓ Save</button>
+                    <button onclick="cancelEdit(this)" style="padding: 2px 6px; background: #ef4444; color: white; border: none; border-radius: 2px; font-size: 0.5rem; cursor: pointer; font-weight: bold;">✕ Cancel</button>
+                </div>
+            `;
+            
+            // Focus and select input
+            const input = cell.querySelector('.punch-edit-input');
+            input.focus();
+            input.select();
+        }
+        
+        // Save punch time after editing
+        function savePunchTime(button) {
+            const cell = button.closest('.punch-time-cell');
+            const input = cell.querySelector('.punch-edit-input');
+            const newValue = input.value.trim();
+            const empId = cell.dataset.empId;
+            const dayIdx = parseInt(cell.dataset.dayIdx);
+            const pairIdx = parseInt(cell.dataset.pairIdx);
+            const type = cell.dataset.type;
+            
+            if (!newValue) {
+                alert('⚠️ Please enter a time value');
+                input.focus();
+                return;
+            }
+            
+            // Parse and validate time
+            const parsedTime = parseTime(newValue);
+            if (!parsedTime) {
+                alert('❌ Invalid time format.\\n\\nAccepted formats:\\n• 9:30 AM\\n• 2:45 PM\\n• 09:30\\n• 14:45');
+                input.focus();
+                return;
+            }
+            
+            // Trigger the update (now refactored to handle the new flow)
+            updatePunchTime(cell, type, parsedTime);
+            
+            // Restore display mode after update
+            restoreCellDisplay(cell);
+        }
+        
+        // Cancel editing
+        function cancelEdit(button) {
+            const cell = button.closest('.punch-time-cell');
+            restoreCellDisplay(cell);
+        }
+        
+        // Restore cell to display mode
+        function restoreCellDisplay(cell) {
+            const empId = cell.dataset.empId;
+            const dayIdx = parseInt(cell.dataset.dayIdx);
+            const pairIdx = parseInt(cell.dataset.pairIdx);
+            const type = cell.dataset.type;
+            
+            const emp = filteredData.find(e => String(e.id) === String(empId));
+            if (!emp) return;
+            
+            const day = emp.dailyBreakdown[dayIdx];
+            const pair = day.punchPairs[pairIdx];
+            const value = type === 'in' ? pair.in : pair.out;
+            const display = formatTime(value) || '—';
+            
+            cell.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                    <span class="punch-display">${display}</span>
+                    <button class="punch-edit-btn" onclick="enterEditMode(this)" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.5rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit ${type} time">✏️</button>
+                </div>
+            `;
+        }
+
+        function updatePunchTime(cell, type, parsedTime) {
+            const empId = parseInt(cell.dataset.empId);
+            const dayIdx = parseInt(cell.dataset.dayIdx);
+            const pairIdx = parseInt(cell.dataset.pairIdx);
+            const newTime = parsedTime;
             
             console.log(`\n✈️ UPDATE PUNCH TIME CALLED`);
             console.log(`   Type: ${type}, empId: ${empId}, dayIdx: ${dayIdx}, pairIdx: ${pairIdx}`);
-            console.log(`   Input: '${userInput}'`);
-            
-            // Parse the time (accepts both 12-hour and 24-hour formats)
-            const newTime = parseTime(userInput);
-            
-            console.log(`   Parsed: '${newTime}'`);
-            
-            if (!newTime) {
-                alert('❌ Invalid time format.\n\nAccepted formats:\n• 9:30 AM\n• 2:45 PM\n• 09:30\n• 14:45');
-                const emp = filteredData.find(e => e.id === empId);
-                if (emp?.dailyBreakdown?.[dayIdx]?.punchPairs?.[pairIdx]) {
-                    const pair = emp.dailyBreakdown[dayIdx].punchPairs[pairIdx];
-                    event.target.textContent = formatTime(type === 'in' ? pair.in : pair.out);
-                } else {
-                    event.target.textContent = '—';
-                }
-                return;
-            }
+            console.log(`   New value: '${newTime}'`);
             
             const emp = filteredData.find(e => e.id == empId);  // Use == for string/number compatibility
             console.log(`   Looking for empId=${empId} in filteredData (${filteredData.length} employees)`);
