@@ -3386,7 +3386,7 @@
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-is-new="true" class="editable-punch-in" onblur="updatePunchTime(event, 'in')" placeholder="9:30 AM" title="Click to add IN time (e.g., 9:30 AM or 09:30)">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; cursor: text; background: #fef08a;" contenteditable="true" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-is-new="true" class="editable-punch-out" onblur="updatePunchTime(event, 'out')" placeholder="5:30 PM" title="Click to add OUT time (e.g., 5:30 PM or 17:30)">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" data-hours-cell="true">—</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};"><button class="calc-hours-btn" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" style="padding: 0.15rem 0.3rem; background: #f59e0b; color: white; border: none; border-radius: 2px; cursor: pointer; font-weight: 600; font-size: 0.55rem;">⚡ Calc</button></td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};"><button onclick="calculateHoursForDay(document.querySelector('.employee-card[data-id=\\'${emp.id}\\']'), ${emp.id}, ${dayIdx})ata-id=\\'${emp.id}\\']'), ${emp.id}, ${dayIdx})" style="padding: 0.15rem 0.3rem; background: #f59e0b; color: white; border: none; border-radius: 2px; cursor: pointer; font-weight: 600; font-size: 0.55rem;">⚡ Calc</button></td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">❌</td>
                         </tr>
@@ -3611,24 +3611,6 @@
         
         // Attach event listeners for real-time editing
         function attachPunchEditListeners(card) {
-            // Attach click handlers to calculate buttons
-            const calcButtons = card.querySelectorAll('.calc-hours-btn');
-            console.log(`🔗 Found ${calcButtons.length} calc buttons in card`);
-            
-            calcButtons.forEach(btn => {
-                const empId = parseInt(btn.dataset.empId);
-                const dayIdx = parseInt(btn.dataset.dayIdx);
-                
-                console.log(`   ➜ Attaching click handler to button: empId=${empId}, dayIdx=${dayIdx}`);
-                
-                btn.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    console.log(`✅ CALC BUTTON CLICKED: empId=${empId}, dayIdx=${dayIdx}`);
-                    calculateHoursForDay(card, empId, dayIdx);
-                });
-            });
-            
             // Keep blur for final validation when they click away
             const punchCells = card.querySelectorAll('[contenteditable="true"]');
             punchCells.forEach(cell => {
@@ -3644,9 +3626,28 @@
         }
         
         function calculateHoursForDay(card, empId, dayIdx) {
+            console.log(`\n⚡ BUTTON CLICKED - calculateHoursForDay called`);
+            console.log(`   empId=${empId}, dayIdx=${dayIdx}, card=${card ? 'found' : 'NOT FOUND'}`);
+            
+            if (!card) {
+                console.error(`❌ Card element not found!`);
+                return;
+            }
+            
             const table = card.querySelector('table');
+            if (!table) {
+                console.error(`❌ Table not found in card`);
+                return;
+            }
+            
             const tbody = table.querySelector('tbody');
+            if (!tbody) {
+                console.error(`❌ Tbody not found in table`);
+                return;
+            }
+            
             const allRows = Array.from(tbody.querySelectorAll('tr'));
+            console.log(`   Found ${allRows.length} rows in tbody`);
             
             // Find all rows with this dayIdx
             const dayRows = allRows.filter(r => {
@@ -3654,7 +3655,12 @@
                 return cell !== null;
             });
             
-            if (dayRows.length === 0) return;
+            console.log(`   Found ${dayRows.length} rows with dayIdx=${dayIdx}`);
+            
+            if (dayRows.length === 0) {
+                console.error(`❌ No rows found for dayIdx=${dayIdx}`);
+                return;
+            }
             
             // Look through all day rows to find IN and OUT times
             let inTime = null, outTime = null;
@@ -3666,9 +3672,12 @@
             });
             
             const hoursCell = dayRows[0].querySelector('[data-hours-cell="true"]');
-            if (!hoursCell) return;
+            if (!hoursCell) {
+                console.error(`❌ Hours cell not found`);
+                return;
+            }
             
-            console.log(`\n📊 CALCULATING HOURS FOR EMPLOYEE ${empId}, DAY ${dayIdx + 1}`);
+            console.log(`📊 CALCULATING HOURS FOR EMPLOYEE ${empId}, DAY ${dayIdx + 1}`);
             console.log(`   IN: '${inTime}'`);
             console.log(`   OUT: '${outTime}'`);
             
