@@ -450,23 +450,10 @@
             </div>
             
             <div class="control-section">
-                <label>Data Source:</label>
-                <select id="sheetSelector">
-                    <option value="auto">Auto-Detect (Recommended)</option>
-                </select>
-            </div>
-            <div class="control-section">
                 <label>Department:</label>
                 <select id="deptFilter">
                     <option value="">All Departments</option>
                 </select>
-            </div>
-            <div class="control-section">
-                <label>Date Range:</label>
-                <input type="date" id="startDate">
-                <span>to</span>
-                <input type="date" id="endDate">
-                <button class="btn-filter" onclick="filterByDateRange()">Apply</button>
             </div>
             <div class="control-section">
                 <button class="btn-export" onclick="exportToCSV()">Export CSV</button>
@@ -1068,49 +1055,16 @@
                     const dept = String(deptName).trim();
                     const t1in = normalizeTime(inTime1);
                     const t1out = normalizeTime(outTime1);
-                    const t2in = normalizeTime(inTime2);
-                    const t2out = normalizeTime(outTime2);
                     
                     // Skip if no valid times in first block
                     if (!t1in || !t1out) continue;
                     
-                    // Handle compound department names (e.g., "WK/EV" → extract as separate shifts)
-                    if (dept.includes('/')) {
-                        const parts = dept.split('/').map(p => p.trim());
-                        
-                        // First part gets first time block
-                        newShifts[parts[0]] = {
-                            start: t1in,
-                            end: t1out
-                        };
-                        console.log(`   ✓ Shift: ${parts[0]} = ${t1in} to ${t1out}`);
-                        
-                        // If second part exists, check for second time block
-                        if (parts.length > 1) {
-                            if (t2in && t2out) {
-                                // Use second time block if available
-                                newShifts[parts[1]] = {
-                                    start: t2in,
-                                    end: t2out
-                                };
-                                console.log(`   ✓ Shift: ${parts[1]} = ${t2in} to ${t2out}`);
-                            } else {
-                                // Otherwise use same time block as first
-                                newShifts[parts[1]] = {
-                                    start: t1in,
-                                    end: t1out
-                                };
-                                console.log(`   ✓ Shift: ${parts[1]} = ${t1in} to ${t1out}`);
-                            }
-                        }
-                    } else {
-                        // Single department name
-                        newShifts[dept] = {
-                            start: t1in,
-                            end: t1out
-                        };
-                        console.log(`   ✓ Shift: ${dept} = ${t1in} to ${t1out}`);
-                    }
+                    // Keep compound names like WK/EV, WK/EV/FT as single shifts (means employees work multiple shifts)
+                    newShifts[dept] = {
+                        start: t1in,
+                        end: t1out
+                    };
+                    console.log(`   ✓ Shift: ${dept} = ${t1in} to ${t1out}`);
                 }
                 
                 if (Object.keys(newShifts).length > 0) {
