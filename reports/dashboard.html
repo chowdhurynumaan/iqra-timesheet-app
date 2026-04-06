@@ -922,11 +922,17 @@
                         
                         // Valid time format check
                         if (/^\d{1,2}:\d{2}/.test(timeIn) && /^\d{1,2}:\d{2}/.test(timeOut)) {
-                            newShifts[dept] = {
-                                start: timeIn,
-                                end: timeOut
+                            // Normalize time format to HH:mm (add leading zero if needed)
+                            const normalizeTime = (t) => {
+                                const parts = t.split(':');
+                                return `${String(parts[0]).padStart(2, '0')}:${parts[1]}`;
                             };
-                            console.log(`   ✓ Shift: ${dept} = ${timeIn} to ${timeOut}`);
+                            
+                            newShifts[dept] = {
+                                start: normalizeTime(timeIn),
+                                end: normalizeTime(timeOut)
+                            };
+                            console.log(`   ✓ Shift: ${dept} = ${normalizeTime(timeIn)} to ${normalizeTime(timeOut)}`);
                         }
                     }
                 }
