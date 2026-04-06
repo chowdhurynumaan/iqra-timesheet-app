@@ -20,12 +20,12 @@
         .container { max-width: 1400px; margin: 0 auto; }
         
         /* Header */
-        .header { background: white; padding: 2rem; border-radius: 0.75rem; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-bottom: 2px solid #e2e8f0; display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; }
+        .header { background: white; padding: 1rem; border-radius: 0.75rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-bottom: 2px solid #e2e8f0; display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; }
         .header-left { flex: 1; }
         .header-right { display: flex; gap: 2rem; align-items: flex-end; }
         .button-group { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
-        h1 { font-size: 2.5rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
-        .subtitle { font-size: 1rem; color: #64748b; }
+        h1 { font-size: 2rem; font-weight: 700; color: #1e293b; margin-bottom: 0.25rem; }
+        .subtitle { font-size: 0.85rem; color: #64748b; }
         
         /* Button Styles */
         .btn-upload { background: #2563eb; color: white; border: none; padding: 0.65rem 1.25rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s; font-size: 0.85rem; }
@@ -440,18 +440,18 @@
     <!-- Main Application Container -->
     <div class="container">
         <div class="header" style="display: block;">
-            <div class="header-left" style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0;">
+            <div class="header-left" style="margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e2e8f0;">
                 <h1>Attendance Dashboard</h1>
                 <p class="subtitle">Upload your attendance report (CSV or Excel) to visualize performance</p>
             </div>
             
             <!-- Tools Section -->
-            <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0;">
-                <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;" onclick="toggleHeaderButtons()">
-                    <span id="headerCollapseIcon" style="font-size: 0.9rem; transition: transform 0.3s; transform: rotate(180deg);">▼</span>
-                    <h3 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em;">🛠️ Tools</h3>
+            <div style="margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e2e8f0;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="toggleHeaderButtons()">
+                    <span id="headerCollapseIcon" style="font-size: 0.85rem; transition: transform 0.3s; transform: rotate(180deg);">▼</span>
+                    <h3 style="margin: 0; font-size: 0.8rem; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em;">🛠️ TOOLS</h3>
                 </div>
-                <div id="headerButtonsContainer" style="display: none; gap: 1.5rem; flex-wrap: wrap; align-items: flex-end; margin-top: 1rem;">
+                <div id="headerButtonsContainer" style="display: none; gap: 1rem; flex-wrap: wrap; align-items: flex-end; margin-top: 0.5rem;">
                     <div class="button-group">
                         <label class="btn-upload">
                             <span>📋 Upload Employee Form</span>
@@ -472,24 +472,24 @@
             </div>
             
             <!-- Shift Settings Section -->
-            <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0;">
-                <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;" onclick="toggleShiftSettings()">
-                    <span id="shiftCollapseIcon" style="font-size: 0.9rem; transition: transform 0.3s;">▶</span>
-                    <h3 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em;">🏢 Shift Settings</h3>
+            <div style="margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e2e8f0;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="toggleShiftSettings()">
+                    <span id="shiftCollapseIcon" style="font-size: 0.85rem; transition: transform 0.3s;">▶</span>
+                    <h3 style="margin: 0; font-size: 0.8rem; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em;">🏢 SHIFT SETTINGS</h3>
                 </div>
-                <div id="deptShiftEditor" style="display: none; gap: 1rem; flex-wrap: wrap; align-items: flex-end; margin-top: 1rem;">
+                <div id="deptShiftEditor" style="display: none; gap: 1rem; flex-wrap: wrap; align-items: flex-end; margin-top: 0.5rem;">
                     <!-- Shifts will be populated dynamically -->
                 </div>
             </div>
             
             <!-- Analytics Section -->
-            <div>
-                <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;" onclick="toggleChartsSection()">
-                    <span id="chartsCollapseIcon" style="font-size: 0.9rem; transition: transform 0.3s; transform: rotate(180deg);">▼</span>
-                    <h3 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em;">📊 Analytics</h3>
+            <div style="margin-bottom: 0.5rem; padding-bottom: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="toggleChartsSection()">
+                    <span id="chartsCollapseIcon" style="font-size: 0.85rem; transition: transform 0.3s; transform: rotate(180deg);">▼</span>
+                    <h3 style="margin: 0; font-size: 0.8rem; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em;">📊 ANALYTICS</h3>
                 </div>
                 
-                <div id="chartsContainer" class="charts-section" style="display: none; margin-top: 1rem;">
+                <div id="chartsContainer" class="charts-section" style="display: none; margin-top: 0.5rem;">
                     <div class="chart-card" id="lateChartWrapper">
                         <div class="chart-title">⏰ Top 15 Late Arrivals</div>
                         <div class="chart-container">
