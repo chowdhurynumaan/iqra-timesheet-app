@@ -3572,8 +3572,8 @@
                 return day.punchPairs.map((pair, pairIdx) => {
                     const adjustedIn = adjustTimeForShift(pair.in, emp.shift, false);
                     const adjustedOut = adjustTimeForShift(pair.out, emp.shift, true);
-                    const inDisplay = formatTime(adjustedIn.displayTime) + (adjustedIn.wasAdjusted ? ` <span style="font-size: 0.5rem; color: #e74c3c; font-weight: 600;" title="${adjustedIn.adjustedReason}">(actual: ${formatTime(adjustedIn.actualTime)})</span>` : '');
-                    const outDisplay = formatTime(adjustedOut.displayTime) + (adjustedOut.wasAdjusted ? ` <span style="font-size: 0.5rem; color: #e74c3c; font-weight: 600;" title="${adjustedOut.adjustedReason}">(actual: ${formatTime(adjustedOut.actualTime)})</span>` : '');
+                    const inDisplay = `${formatTime(adjustedIn.displayTime)}${adjustedIn.wasAdjusted ? `<br><span style="font-size: 0.45rem; color: #e74c3c; font-weight: 600;" title="${adjustedIn.adjustedReason}">(actual: ${formatTime(adjustedIn.actualTime)})</span>` : ''}`;
+                    const outDisplay = `${formatTime(adjustedOut.displayTime)}${adjustedOut.wasAdjusted ? `<br><span style="font-size: 0.45rem; color: #e74c3c; font-weight: 600;" title="${adjustedOut.adjustedReason}">(actual: ${formatTime(adjustedOut.actualTime)})</span>` : ''}`;
                     
                     return `
                     <tr style="${rowStyle}">
