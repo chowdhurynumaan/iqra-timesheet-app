@@ -751,8 +751,7 @@
             const editor = document.getElementById('deptShiftEditor');
             if (!editor) return;
             
-            // Clear existing content except the "Save Shifts" button
-            const saveButton = editor.querySelector('button[onclick="saveShiftDefinitions()"]');
+            // Clear existing content
             editor.innerHTML = '';
             
             // Create input fields for each shift in shiftDefinitions
