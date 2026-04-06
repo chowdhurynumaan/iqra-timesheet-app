@@ -1418,7 +1418,7 @@
                     // Validate we have good data
                     if (id && !isNaN(parseInt(id)) && name && name !== 'nan') {
                         const timesRow = data[i + 3] || [];
-                        const dayCount = Math.min(dateRange.actualDays || 28, 28);
+                        const dayCount = dateRange.actualDays || 28;
                         
                         let totalMinutes = 0, totalLateMinutes = 0, daysWorked = 0, missedDays = 0, missedPunches = 0;
                         const dailyBreakdown = [];
