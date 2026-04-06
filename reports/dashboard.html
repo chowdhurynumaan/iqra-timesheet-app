@@ -1123,6 +1123,7 @@
         
         async function loadMonthData() {
             const monthId = document.getElementById('monthSelector').value;
+            console.log(`📅 DEBUG: loadMonthData() called with monthId="${monthId}"`);
             if (!monthId) return;
             
             try {
@@ -1131,6 +1132,7 @@
                 if (monthDoc.exists) {
                     const reportData = monthDoc.data();
                     dateRange = reportData.dateRange || { start: null, end: null, actualDays: 0 };
+                    console.log(`📅 DEBUG: Month document exists. Date range:`, dateRange);
                     
                     // Load individual employees from EMPLOYEES_COLLECTION (they have full dailyBreakdown data)
                     const empSnapshot = await db.collection(EMPLOYEES_COLLECTION)
@@ -2218,6 +2220,10 @@
             
             // Populate department filter (clear existing, create radio buttons)
             const depts = new Set(rawData.map(e => e.dept).filter(d => d && d !== 'undefined'));
+            console.log(`🏢 DEBUG: Total employees loaded: ${rawData.length}`);
+            console.log(`🏢 DEBUG: Departments found in data:`, Array.from(depts));
+            console.log(`🏢 DEBUG: Sample employee data (first 3):`, rawData.slice(0, 3).map(e => ({id: e.id, name: e.name, dept: e.dept})));
+            
             const deptContainer = document.getElementById('deptFilter');
             deptContainer.innerHTML = '';
             
@@ -2236,6 +2242,7 @@
             
             // Add departments in sorted order
             const sortedDepts = Array.from(depts).sort();
+            console.log(`🏢 DEBUG: Creating radio buttons for ${sortedDepts.length} departments:`, sortedDepts);
             sortedDepts.forEach(dept => {
                 const label = document.createElement('label');
                 label.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; cursor: pointer;';
@@ -2248,6 +2255,7 @@
                 label.appendChild(document.createTextNode(dept));
                 deptContainer.appendChild(label);
             });
+            console.log(`✅ DEBUG: Department radio buttons rendered. Total options: ${deptContainer.children.length} (1 "All" + ${sortedDepts.length} departments)`);
             
             // Add event listeners to all radio buttons
             document.querySelectorAll('input[name="department"]').forEach(radio => {
