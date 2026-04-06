@@ -3515,7 +3515,7 @@
                 return;
             }
             
-            const emp = filteredData.find(e => e.id === empId);
+            const emp = filteredData.find(e => e.id == empId);  // Use == for string/number compatibility
             console.log(`   Looking for empId=${empId} in filteredData (${filteredData.length} employees)`);
             console.log(`   Found: ${emp ? 'YES' : 'NO'}`);
             
