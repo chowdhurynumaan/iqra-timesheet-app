@@ -3464,7 +3464,7 @@
                 
                 // Update Firestore with the modified employee data
                 const docId = `emp_${emp.id}_${currentMonth}`;
-                await saveToFirestore(TIMESHEET_COLLECTION, docId, emp);
+                await saveToFirestore(EMPLOYEES_COLLECTION, docId, emp);
                 
                 console.log(`✅ Saved to Firestore: ${docId}`);
                 
