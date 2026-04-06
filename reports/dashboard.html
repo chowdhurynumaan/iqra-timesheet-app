@@ -3597,17 +3597,35 @@
                 const [outHour, outMin] = pair.out ? pair.out.split(':') : ['', ''];
                 
                 return `
-                    <div style="display: grid; grid-template-columns: 80px 1fr 1fr; gap: 12px; margin-bottom: 12px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; align-items: end;">
-                        <div style="font-weight: 600; color: #1e293b; font-size: 0.95rem; line-height: 1.8rem;">Pair ${pairIdx + 1}</div>
+                    <div style="margin-bottom: 20px; padding: 16px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 6px;">
+                        <div style="font-weight: 700; color: #1e293b; font-size: 1.05rem; margin-bottom: 16px;">Pair ${pairIdx + 1}</div>
                         
-                        <div>
-                            <label style="display: block; font-size: 0.75rem; color: #64748b; font-weight: 600; margin-bottom: 6px; text-transform: uppercase;">IN Time</label>
-                            <div style="display: flex; gap: 4px; align-items: center; justify-content: space-between;">
-                                <input type="number" min="0" max="23" class="modal-punch-in-hour-${pairIdx}" value="${inHour}" 
-                                    placeholder="HH" style="width: 50px; padding: 8px 6px; font-size: 0.9rem; border: 2px solid #0369a1; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
-                                <span style="color: #1e293b; font-weight: bold; font-size: 1.1rem;">:</span>
-                                <input type="number" min="0" max="59" class="modal-punch-in-min-${pairIdx}" value="${inMin}" 
-                                    placeholder="MM" style="width: 50px; padding: 8px 6px; font-size: 0.9rem; border: 2px solid #0369a1; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div>
+                                <label style="display: block; font-size: 0.8rem; color: #475569; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">IN Time</label>
+                                <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">
+                                    <input type="number" min="0" max="23" class="modal-punch-in-hour-${pairIdx}" value="${inHour}" 
+                                        placeholder="HH" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #0369a1; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
+                                    <span style="color: #1e293b; font-weight: bold; font-size: 1.3rem;">:</span>
+                                    <input type="number" min="0" max="59" class="modal-punch-in-min-${pairIdx}" value="${inMin}" 
+                                        placeholder="MM" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #0369a1; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; font-size: 0.8rem; color: #475569; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">OUT Time</label>
+                                <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">
+                                    <input type="number" min="0" max="23" class="modal-punch-out-hour-${pairIdx}" value="${outHour}" 
+                                        placeholder="HH" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #dc2626; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
+                                    <span style="color: #1e293b; font-weight: bold; font-size: 1.3rem;">:</span>
+                                    <input type="number" min="0" max="59" class="modal-punch-out-min-${pairIdx}" value="${outMin}" 
+                                        placeholder="MM" style="width: 60px; padding: 12px 8px; font-size: 1.1rem; border: 2px solid #dc2626; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
                             </div>
                         </div>
                         
@@ -3628,23 +3646,23 @@
             const editHistoryHtml = buildModalEditHistory(emp, dayIdx);
             
             const modalHtml = `
-                <div id="dayEditModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;" onclick="if(event.target.id === 'dayEditModal') closeDayEditModal()">
-                    <div style="background: white; border-radius: 8px; padding: 24px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);" onclick="event.stopPropagation()">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h2 style="margin: 0; color: #1e293b; font-size: 1.3rem;">${emp.name} - ${day.date} (${day.dayName})</h2>
-                            <button onclick="closeDayEditModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #94a3b8;">✕</button>
+                <div id="dayEditModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 16px;" onclick="if(event.target.id === 'dayEditModal') closeDayEditModal()">
+                    <div style="background: white; border-radius: 8px; padding: 20px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);" onclick="event.stopPropagation()">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; gap: 12px;">
+                            <h2 style="margin: 0; color: #1e293b; font-size: 1.2rem; line-height: 1.3;">${emp.name}<br><span style="font-size: 0.95rem; color: #64748b; font-weight: 400;">${day.date} (${day.dayName})</span></h2>
+                            <button onclick="closeDayEditModal()" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #94a3b8; padding: 0; min-width: 40px;">✕</button>
                         </div>
                         
                         <div style="margin-bottom: 24px;">
-                            <h3 style="margin: 0 0 16px 0; color: #475569; font-size: 1rem;">Punch Times</h3>
+                            <h3 style="margin: 0 0 16px 0; color: #475569; font-size: 1.05rem; font-weight: 700;">Punch Times</h3>
                             ${pairRows}
                         </div>
                         
                         ${editHistoryHtml}
                         
-                        <div style="display: flex; gap: 12px; margin-top: 20px; justify-content: flex-end;">
-                            <button onclick="closeDayEditModal()" style="padding: 8px 16px; background: #e2e8f0; color: #1e293b; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>
-                            <button onclick="saveDayPunchTimes('${empId}', ${dayIdx})" style="padding: 8px 16px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">💾 Save</button>
+                        <div style="display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; flex-wrap: wrap;">
+                            <button onclick="closeDayEditModal()" style="padding: 12px 24px; background: #e2e8f0; color: #1e293b; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1rem;">Cancel</button>
+                            <button onclick="saveDayPunchTimes('${empId}', ${dayIdx})" style="padding: 12px 24px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1rem;">💾 Save</button>
                         </div>
                     </div>
                 </div>
