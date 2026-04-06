@@ -1703,9 +1703,7 @@ Then re-upload the file.`;
                             // Try multiple parsing methods to handle different formats
                             if (cellContent) {
                                 // Method 1: Split by newlines or line breaks
-                                const lines = cellContent.split(/[
-
-]+/);
+                                const lines = cellContent.split(/[\n\r]+/);
                                 lines.forEach(line => {
                                     const matches = line.match(/(\d{1,2}):(\d{2})/g);
                                     if (matches) {
