@@ -445,26 +445,7 @@
             <div class="control-section" id="deptShiftSection">
                 <label>🏢 Shift Settings:</label>
                 <div id="deptShiftEditor" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
-                    <!-- Departments will be populated here -->
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <label style="margin: 0; font-size: 0.85rem;">WK (9AM):</label>
-                        <input type="time" id="shiftWK_start" value="09:00" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
-                        <span>to</span>
-                        <input type="time" id="shiftWK_end" value="17:30" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <label style="margin: 0; font-size: 0.85rem;">FT (9AM):</label>
-                        <input type="time" id="shiftFT_start" value="09:00" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
-                        <span>to</span>
-                        <input type="time" id="shiftFT_end" value="17:30" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <label style="margin: 0; font-size: 0.85rem;">EV (6PM):</label>
-                        <input type="time" id="shiftEV_start" value="18:00" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
-                        <span>to</span>
-                        <input type="time" id="shiftEV_end" value="02:30" style="padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;">
-                    </div>
-                    <button onclick="saveShiftDefinitions()" style="padding: 0.35rem 1rem; background: #059669; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">Save Shifts</button>
+                    <!-- Shifts will be populated dynamically by renderShiftDefinitionsUI() -->
                 </div>
             </div>
             
@@ -758,25 +739,82 @@
                     console.log('📋 Using default shift definitions');
                 }
                 
-                // Update UI with loaded values
-                document.getElementById('shiftWK_start').value = shiftDefinitions.WK?.start || '09:00';
-                document.getElementById('shiftWK_end').value = shiftDefinitions.WK?.end || '17:30';
-                document.getElementById('shiftFT_start').value = shiftDefinitions.FT?.start || '09:00';
-                document.getElementById('shiftFT_end').value = shiftDefinitions.FT?.end || '17:30';
-                document.getElementById('shiftEV_start').value = shiftDefinitions.EV?.start || '18:00';
-                document.getElementById('shiftEV_end').value = shiftDefinitions.EV?.end || '02:30';
+                // Render dynamic shift UI for ALL shifts
+                renderShiftDefinitionsUI();
             } catch (error) {
                 console.error('❌ Error loading shift definitions:', error);
             }
         }
         
+        // Dynamic UI rendering for shift definitions
+        function renderShiftDefinitionsUI() {
+            const editor = document.getElementById('deptShiftEditor');
+            if (!editor) return;
+            
+            // Clear existing content except the "Save Shifts" button
+            const saveButton = editor.querySelector('button[onclick="saveShiftDefinitions()"]');
+            editor.innerHTML = '';
+            
+            // Create input fields for each shift in shiftDefinitions
+            Object.entries(shiftDefinitions).forEach(([deptName, times]) => {
+                const shiftDiv = document.createElement('div');
+                shiftDiv.style.cssText = 'display: flex; align-items: center; gap: 0.5rem;';
+                
+                const label = document.createElement('label');
+                label.style.cssText = 'margin: 0; font-size: 0.85rem; min-width: 80px; font-weight: 600;';
+                label.textContent = `${deptName}:`;
+                
+                const startInput = document.createElement('input');
+                startInput.type = 'time';
+                startInput.id = `shift${deptName}_start`;
+                startInput.value = times.start || '09:00';
+                startInput.style.cssText = 'padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;';
+                
+                const toSpan = document.createElement('span');
+                toSpan.textContent = 'to';
+                toSpan.style.cssText = 'font-size: 0.85rem;';
+                
+                const endInput = document.createElement('input');
+                endInput.type = 'time';
+                endInput.id = `shift${deptName}_end`;
+                endInput.value = times.end || '17:30';
+                endInput.style.cssText = 'padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem;';
+                
+                shiftDiv.appendChild(label);
+                shiftDiv.appendChild(startInput);
+                shiftDiv.appendChild(toSpan);
+                shiftDiv.appendChild(endInput);
+                
+                editor.appendChild(shiftDiv);
+            });
+            
+            // Re-add the Save Shifts button at the end
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save Shifts';
+            saveButton.onclick = saveShiftDefinitions;
+            saveButton.style.cssText = 'padding: 0.35rem 1rem; background: #059669; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.85rem; margin-top: 0.5rem;';
+            editor.appendChild(saveButton);
+            
+            console.log(`🎯 Shift UI rendered for ${Object.keys(shiftDefinitions).length} shifts`);
+        }
+        
         async function saveShiftDefinitions() {
             try {
-                const newDefs = {
-                    WK: { start: document.getElementById('shiftWK_start').value, end: document.getElementById('shiftWK_end').value },
-                    FT: { start: document.getElementById('shiftFT_start').value, end: document.getElementById('shiftFT_end').value },
-                    EV: { start: document.getElementById('shiftEV_start').value, end: document.getElementById('shiftEV_end').value }
-                };
+                // Dynamically read values from ALL shift input fields
+                const newDefs = {};
+                Object.keys(shiftDefinitions).forEach(deptName => {
+                    const startId = `shift${deptName}_start`;
+                    const endId = `shift${deptName}_end`;
+                    const startInput = document.getElementById(startId);
+                    const endInput = document.getElementById(endId);
+                    
+                    if (startInput && endInput) {
+                        newDefs[deptName] = {
+                            start: startInput.value,
+                            end: endInput.value
+                        };
+                    }
+                });
                 
                 shiftDefinitions = newDefs;
                 
