@@ -2183,8 +2183,7 @@ Then re-upload the file.`;
             
             if (checkedCheckboxes.length === 0) {
                 alert('âŒ No employees selected.
-
-Please check the checkboxes next to the employees you want to print.');
+\n\nPlease check the checkboxes next to the employees you want to print.');
                 return;
             }
             
@@ -3123,8 +3122,7 @@ ${changes.map(c => `â€¢ ${c.field}: ${c.oldValue} â†’ ${c.newValue}`).j
             const employees = [];
             const titleCell = (data[0]?.[0] || '').toString().toLowerCase();
             
-            console.log('=== SMART PARSER STARTING ===
-Detected Title:', titleCell);
+            console.log('=== SMART PARSER STARTING ===\n\nDetected Title:', titleCell);
             
             // Extract date range from row 1 if available
             let dateRange = { start: null, end: null };
@@ -3401,11 +3399,9 @@ Detected Title:', titleCell);
             
             rawData = employees;
             
-            console.log('
-========== DATA LOADED ==========');
+            console.log('\n\n========== DATA LOADED ==========');
             console.log('Total Employees:', rawData.length);
-            console.log('==============================
-');
+            console.log('==============================\n\n');
             
             if (rawData.length > 0) {
                 renderDashboard(rawData);
@@ -4249,8 +4245,7 @@ Metrics updated live.`);
 Accepted formats:\
 â€¢ 9:30 AM\
 â€¢ 2:45 PM\
-â€¢ 09:30\
-â€¢ 14:45');
+â€¢ 09:30\\n\nâ€¢ 14:45');
                 input.focus();
                 return;
             }
