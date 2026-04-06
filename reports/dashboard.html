@@ -746,7 +746,7 @@
             }
         }
         
-        // Dynamic UI rendering for shift definitions - TABLE FORMAT
+        // Dynamic UI rendering for shift definitions - EXCEL STYLE TABLE
         function renderShiftDefinitionsUI() {
             const editor = document.getElementById('deptShiftEditor');
             if (!editor) return;
@@ -754,73 +754,149 @@
             // Clear existing content
             editor.innerHTML = '';
             
-            // Create table
+            // Create table with Excel-like styling
             const table = document.createElement('table');
-            table.style.cssText = 'width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 0.9rem;';
+            table.style.cssText = `
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 1rem;
+                font-family: Arial, sans-serif;
+                font-size: 0.9rem;
+                border: 2px solid #8B7355;
+            `;
             
-            // Create table header
+            // Create table header with Excel-like styling
             const thead = document.createElement('thead');
             const headerRow = document.createElement('tr');
-            headerRow.style.cssText = 'background: #f0f4f8; border-bottom: 2px solid #cbd5e1;';
+            headerRow.style.cssText = `
+                background: linear-gradient(135deg, #C8A882 0%, #D4B5A0 100%);
+                border: 1px solid #8B7355;
+            `;
             
-            const headers = ['Shift', 'In Time', 'Out Time'];
+            const headers = ['Shift Number', 'Shift Name', 'In Time', 'Out Time'];
             headers.forEach(headerText => {
                 const th = document.createElement('th');
                 th.textContent = headerText;
-                th.style.cssText = 'padding: 0.75rem; text-align: left; font-weight: 600; border: 1px solid #cbd5e1;';
+                th.style.cssText = `
+                    padding: 0.75rem;
+                    text-align: center;
+                    font-weight: 700;
+                    border: 1px solid #8B7355;
+                    color: #2c1810;
+                    background: #D4B5A0;
+                `;
                 headerRow.appendChild(th);
             });
             thead.appendChild(headerRow);
             table.appendChild(thead);
             
-            // Create table body
+            // Create table body with Excel-like alternating colors
             const tbody = document.createElement('tbody');
+            let shiftNum = 1;
             Object.entries(shiftDefinitions).forEach(([deptName, times], idx) => {
                 const row = document.createElement('tr');
-                row.style.cssText = idx % 2 === 0 ? 'background: #fff;' : 'background: #f8fafc;';
+                // Alternate between white and light orange like Excel
+                const isOdd = idx % 2 === 0;
+                row.style.cssText = `
+                    background: ${isOdd ? '#FFFBF5' : '#FFF4E6'};
+                    border: 1px solid #8B7355;
+                `;
+                
+                // Shift Number
+                const numCell = document.createElement('td');
+                numCell.textContent = shiftNum;
+                numCell.style.cssText = `
+                    padding: 0.6rem;
+                    border: 1px solid #8B7355;
+                    text-align: center;
+                    font-weight: 600;
+                    background: ${isOdd ? '#FFF9F0' : '#FFF0E6'};
+                `;
+                row.appendChild(numCell);
                 
                 // Shift Name
                 const nameCell = document.createElement('td');
                 nameCell.textContent = deptName;
-                nameCell.style.cssText = 'padding: 0.75rem; border: 1px solid #cbd5e1; font-weight: 600;';
+                nameCell.style.cssText = `
+                    padding: 0.6rem;
+                    border: 1px solid #8B7355;
+                    text-align: left;
+                    font-weight: 600;
+                    background: ${isOdd ? '#FFFBF5' : '#FFF4E6'};
+                `;
                 row.appendChild(nameCell);
                 
                 // In Time Input
                 const startCell = document.createElement('td');
-                startCell.style.cssText = 'padding: 0.5rem; border: 1px solid #cbd5e1;';
+                startCell.style.cssText = `
+                    padding: 0.4rem;
+                    border: 1px solid #8B7355;
+                    text-align: center;
+                    background: ${isOdd ? '#FFFBF5' : '#FFF4E6'};
+                `;
                 const startInput = document.createElement('input');
                 startInput.type = 'time';
                 startInput.id = `shift${deptName}_start`;
                 startInput.value = times.start || '09:00';
-                startInput.style.cssText = 'width: 90%; padding: 0.4rem; border: 1px solid #cbd5e1; border-radius: 3px; font-size: 0.9rem;';
+                startInput.style.cssText = `
+                    width: 95%;
+                    padding: 0.5rem;
+                    border: 1px solid #999;
+                    border-radius: 3px;
+                    font-size: 0.9rem;
+                    text-align: center;
+                `;
                 startCell.appendChild(startInput);
                 row.appendChild(startCell);
                 
                 // Out Time Input
                 const endCell = document.createElement('td');
-                endCell.style.cssText = 'padding: 0.5rem; border: 1px solid #cbd5e1;';
+                endCell.style.cssText = `
+                    padding: 0.4rem;
+                    border: 1px solid #8B7355;
+                    text-align: center;
+                    background: ${isOdd ? '#FFFBF5' : '#FFF4E6'};
+                `;
                 const endInput = document.createElement('input');
                 endInput.type = 'time';
                 endInput.id = `shift${deptName}_end`;
                 endInput.value = times.end || '17:30';
-                endInput.style.cssText = 'width: 90%; padding: 0.4rem; border: 1px solid #cbd5e1; border-radius: 3px; font-size: 0.9rem;';
+                endInput.style.cssText = `
+                    width: 95%;
+                    padding: 0.5rem;
+                    border: 1px solid #999;
+                    border-radius: 3px;
+                    font-size: 0.9rem;
+                    text-align: center;
+                `;
                 endCell.appendChild(endInput);
                 row.appendChild(endCell);
                 
                 tbody.appendChild(row);
+                shiftNum++;
             });
             table.appendChild(tbody);
             
             editor.appendChild(table);
             
-            // Re-add the Save Shifts button
+            // Add Save button
             const saveButton = document.createElement('button');
             saveButton.textContent = 'Save Shifts';
             saveButton.onclick = saveShiftDefinitions;
-            saveButton.style.cssText = 'padding: 0.5rem 1.5rem; background: #059669; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem;';
+            saveButton.style.cssText = `
+                padding: 0.6rem 1.5rem;
+                background: #059669;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 0.9rem;
+                margin-top: 0.5rem;
+            `;
             editor.appendChild(saveButton);
             
-            console.log(`🎯 Shift table rendered for ${Object.keys(shiftDefinitions).length} shifts`);
+            console.log(`🎯 Shift table (Excel style) rendered for ${Object.keys(shiftDefinitions).length} shifts`);
         }
         
         async function saveShiftDefinitions() {
