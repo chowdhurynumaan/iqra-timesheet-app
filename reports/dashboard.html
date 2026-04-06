@@ -3706,14 +3706,6 @@
             }
         }
         
-                // Also keep blur for final validation and full data update
-                newCell.addEventListener('blur', (event) => {
-                    const type = event.target.classList.contains('editable-punch-in') ? 'in' : 'out';
-                    updatePunchTime(event, type);
-                });
-            });
-        }
-        
         function updateCardDisplay(emp, card) {
             // Recalculate metrics
             const daysWorked = emp.daysWorked || (emp.dailyBreakdown ? emp.dailyBreakdown.filter(d => !d.isMissed).length : 0);
