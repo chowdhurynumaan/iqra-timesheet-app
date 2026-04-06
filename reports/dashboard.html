@@ -3165,12 +3165,7 @@
                 return;
             }
             
-            // DEBUG: Check if emp.id exists
-            console.log('DEBUG: First 3 employees at renderTable time:');
-            const first3 = data.slice(0, 3);
-            first3.forEach((e, i) => {
-                console.log(`  [${i}] name="${e.name}", id="${e.id}", keys=${Object.keys(e)}`);
-            });
+
             
             const cards = data.map((emp) => {
                 // Calculate metrics
@@ -3308,16 +3303,9 @@
                 `;
             }).join('');
             
-            // DEBUG: Check what data-ids are in the HTML string before inserting
-            const dataIdMatches = cards.match(/data-id="([^"]+)"/g);
-            console.log('DEBUG: data-id values in HTML string before insertion:', dataIdMatches ? dataIdMatches.slice(0, 5) : 'NONE');
-            
+
             document.getElementById('tableBody').innerHTML = cards;
-            
-            // DEBUG: Check what data-ids are AFTER insertion
-            const insertedCards = document.querySelectorAll('.employee-card');
-            const insertedIds = Array.from(insertedCards).slice(0, 5).map(c => c.dataset.id);
-            console.log('DEBUG: data-id values in DOM after insertion:', insertedIds);
+
             
             // Attach real-time edit listeners to all employee cards
             const allCards = document.querySelectorAll('.employee-card');
@@ -3632,29 +3620,11 @@
             
             // Update display instantly
             const card = document.querySelector(`.employee-card[data-id="${String(empId)}"]`);
-            if (!card) {
-                const allCards = document.querySelectorAll(`.employee-card`);
-                const cardIds = Array.from(allCards).map(c => c.dataset.id);
-                console.log(`   ❌ Card not found. Looking for data-id="${String(empId)}"`)
-                console.log(`   Available cards (${allCards.length}):`, cardIds);
-            }
             console.log(`   Card found: ${card ? 'YES' : 'NO'}`);
             
             if (card) {
                 console.log(`   Calling updateCardDisplay...`);
                 updateCardDisplay(emp, card);
-                
-                // Re-render the daily breakdown to show updated values
-                const breakdownDiv = card.querySelector('.daily-breakdown');
-                console.log(`   Breakdown div found: ${breakdownDiv ? 'YES' : 'NO'}`);
-                
-                if (breakdownDiv) {
-                    console.log(`   Re-rendering daily breakdown...`);
-                    breakdownDiv.innerHTML = renderDailyBreakdown(emp);
-                    // Re-attach event listeners to the new cells
-                    attachPunchEditListeners(card);
-                    console.log(`   Done re-rendering`);
-                }
             }
             
             console.log(`✅ Updated ${type} time for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newTime}, Late: ${pairIdx === 0 ? day.lateMin : 'N/A'} min`);
@@ -3681,15 +3651,22 @@
             const punctualityPercent = daysWorked > 0 ? Math.max(0, 100 - (lateCount / daysWorked * 100)).toFixed(0) : '-';
             const absences = Math.max(0, dateRange.actualDays - daysWorked);
             
+            console.log(`   📊 updateCardDisplay for ${emp.name}:`);
+            console.log(`      hoursNum=${hoursNum}, attendance=${attendancePercent.toFixed(0)}, punctuality=${punctualityPercent}`);
+            
             // Update metric cards in the HTML
             const metrics = card.querySelectorAll('.metric-card-value');
+            console.log(`      Found ${metrics.length} metric-card-value elements`);
             if (metrics && metrics.length >= 3) {
                 metrics[0].textContent = attendancePercent.toFixed(0) + '%'; // Attendance
                 metrics[1].textContent = punctualityPercent + (punctualityPercent !== '-' ? '%' : ''); // Punctuality
                 metrics[2].textContent = hoursNum.toFixed(0); // Hours
-                metrics[3].textContent = (emp.lateMin || 0); // Late Min (if exists)
-                metrics[4].textContent = absences; // Absences (if exists)
-                metrics[5].textContent = daysWorked; // Worked (if exists)
+                if (metrics.length > 3) metrics[3].textContent = (emp.lateMin || 0); // Late Min
+                if (metrics.length > 4) metrics[4].textContent = absences; // Absences
+                if (metrics.length > 5) metrics[5].textContent = daysWorked; // Worked
+                console.log(`      ✅ Updated metric cards`);
+            } else {
+                console.log(`      ⚠️ Not enough metrics found (need 3+, found ${metrics.length})`);
             }
         }
         
