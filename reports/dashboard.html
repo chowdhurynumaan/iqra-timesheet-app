@@ -3164,6 +3164,10 @@
                 return;
             }
             
+            // DEBUG: Check if emp.id exists
+            console.log('DEBUG: First 3 employees at renderTable time:');
+            console.log(data.slice(0, 3).map(e => ({name: e.name, id: e.id, hasId: !!e.id})));
+            
             const cards = data.map((emp) => {
                 // Calculate metrics
                 const hoursNum = parseFloat(emp.hours) || 0;
