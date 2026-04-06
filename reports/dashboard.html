@@ -712,12 +712,12 @@
                 console.log(`📅 Found ${uploadedMonths.length} uploaded months:`, uploadedMonths.map(m => m.id));
                 populateMonthDropdown();
                 
-                // Auto-load February if available, otherwise load latest month
+                // Auto-load latest month by default
                 if (uploadedMonths.length > 0) {
-                    const februaryMonth = uploadedMonths.find(m => m.id.includes('_02'));
-                    const monthToLoad = februaryMonth || uploadedMonths[0];
-                    document.getElementById('monthSelector').value = monthToLoad.id;
+                    const latestMonth = uploadedMonths[0]; // First in array is latest (sorted descending by year/month)
+                    document.getElementById('monthSelector').value = latestMonth.id;
                     loadMonthData();
+                    console.log(`📅 Auto-loading latest month: ${latestMonth.id}`);
                 }
             } catch (error) {
                 console.error('❌ Error loading available months:', error);
