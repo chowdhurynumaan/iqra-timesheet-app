@@ -3458,26 +3458,18 @@
                 
                 const rowStyle = `line-height: 1.2; background-color: ${rowColor}; ${rowBorder}`;
                 
-                // If no punch pairs, show EDITABLE cells for IN/OUT
+                // If no punch pairs, show placeholder
                 if (hasNoPunches) {
                     return `
                         <tr style="${rowStyle}">
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};"><strong>${day.date}</strong></td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};"><strong>${day.dayName}</strong></td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a; position: relative;" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-type="in" data-is-new="true" class="punch-time-cell">
-                                <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
-                                    <span class="punch-display">—</span>
-                                    <button class="punch-edit-btn" onclick="enterEditMode(this)" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.5rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit IN time">✎</button>
-                                </div>
-                            </td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a; position: relative;" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="0" data-type="out" data-is-new="true" class="punch-time-cell">
-                                <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
-                                    <span class="punch-display">—</span>
-                                    <button class="punch-edit-btn" onclick="enterEditMode(this)" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.5rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit OUT time">✎</button>
-                                </div>
-                            </td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" data-hours-cell="true">—</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;" colspan="2">—</td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">—</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">—</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};">
+                                <button onclick="openDayEditModal('${emp.id}', ${dayIdx})" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.7rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit punch times">✎</button>
+                            </td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">❌</td>
                         </tr>
                     `;
@@ -3490,21 +3482,14 @@
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.date}</strong></td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.dayName}</strong></td>
                         ` : ''}
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a; position: relative;" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" data-type="in" class="punch-time-cell">
-                            <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
-                                <span class="punch-display">${formatTime(pair.in)}</span>
-                                <button class="punch-edit-btn" onclick="enterEditMode(this)" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.5rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit IN time">✎</button>
-                            </div>
-                        </td>
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a; position: relative;" data-emp-id="${emp.id}" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}" data-type="out" class="punch-time-cell">
-                            <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
-                                <span class="punch-display">${formatTime(pair.out)}</span>
-                                <button class="punch-edit-btn" onclick="enterEditMode(this)" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.5rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit OUT time">✎</button>
-                            </div>
-                        </td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;" title="${type} time">${formatTime(pair.in)}</td>
+                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;" title="${type} time">${formatTime(pair.out)}</td>
                         <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; color: #0369a1; font-weight: 600;" title="Hours auto-calculated from punch times" data-hours-cell="true" data-day-idx="${dayIdx}" data-pair-idx="${pairIdx}">${pair.pairHours ? parseFloat(pair.pairHours).toFixed(2) : '—'}</td>
                         ${pairIdx === 0 ? `
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; font-weight: ${day.lateMin > 0 ? '700' : '400'}; color: ${day.lateMin > 0 ? '#dc2626' : '#64748b'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '-'}</td>
+                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">
+                                <button onclick="openDayEditModal('${emp.id}', ${dayIdx})" style="background: none; border: none; padding: 0; cursor: pointer; color: #8b5cf6; font-size: 0.7rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit punch times">✎</button>
+                            </td>
                             <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">${day.isMissed ? '❌' : (day.hasMissedPunch ? '⚠️' : '✅')}</td>
                         ` : ''}
                     </tr>
@@ -3519,7 +3504,7 @@
                         </div>
                         <button onclick="saveEmployeeChanges('${emp.id}')" style="padding: 0.2rem 0.6rem; background: #10b981; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: 700; font-size: 0.55rem;">💾 SAVE</button>
                     </div>
-                    <!-- DAILY TABLE WITH EDITABLE PUNCH TIMES -->
+                    <!-- DAILY TABLE WITH PUNCH TIMES (Edit via modal button) -->
                     <table style="width: 100%; font-size: 0.6rem; border-collapse: collapse; font-family: monospace; line-height: 1;">
                         <thead>
                             <tr style="background: #e2e8f0;">
@@ -3529,6 +3514,7 @@
                                 <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #fef08a;">OUT</th>
                                 <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem; background: #dbeafe;">Hrs</th>
                                 <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Late</th>
+                                <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">Edit</th>
                                 <th style="padding: 0.15rem 0.2rem; text-align: center; color: #1e293b; font-weight: 700; border: 0.5px solid #cbd5e1; font-size: 0.55rem;">S</th>
                             </tr>
                         </thead>
@@ -3592,6 +3578,267 @@
             }
         }
         
+        
+        // Open modal to edit all punch pairs for a day
+        function openDayEditModal(empId, dayIdx) {
+            // Close any existing modal first
+            closeDayEditModal();
+            
+            const emp = filteredData.find(e => String(e.id) === String(empId));
+            if (!emp) {
+                alert('❌ Employee not found');
+                return;
+            }
+            
+            const day = emp.dailyBreakdown[dayIdx];
+            const pairRows = day.punchPairs.map((pair, pairIdx) => `
+                <div style="display: grid; grid-template-columns: 120px 1fr 1fr; gap: 12px; margin-bottom: 12px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px;">
+                    <div style="font-weight: 600; color: #1e293b; font-size: 0.9rem;">Pair ${pairIdx + 1}</div>
+                    
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; color: #64748b; font-weight: 500; margin-bottom: 4px;">IN Time</label>
+                        <input type="text" class="modal-punch-in-${pairIdx}" value="${formatTime(pair.in) || ''}" 
+                            placeholder="9:30 AM" style="width: 100%; padding: 6px 8px; font-size: 0.85rem; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace;">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; color: #64748b; font-weight: 500; margin-bottom: 4px;">OUT Time</label>
+                        <input type="text" class="modal-punch-out-${pairIdx}" value="${formatTime(pair.out) || ''}" 
+                            placeholder="5:30 PM" style="width: 100%; padding: 6px 8px; font-size: 0.85rem; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace;">
+                    </div>
+                </div>
+            `).join('');
+            
+            const editHistoryHtml = buildModalEditHistory(emp, dayIdx);
+            
+            const modalHtml = `
+                <div id="dayEditModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;" onclick="if(event.target.id === 'dayEditModal') closeDayEditModal()">
+                    <div style="background: white; border-radius: 8px; padding: 24px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);" onclick="event.stopPropagation()">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2 style="margin: 0; color: #1e293b; font-size: 1.3rem;">${emp.name} - ${day.date} (${day.dayName})</h2>
+                            <button onclick="closeDayEditModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #94a3b8;">✕</button>
+                        </div>
+                        
+                        <div style="margin-bottom: 24px;">
+                            <h3 style="margin: 0 0 16px 0; color: #475569; font-size: 1rem;">Punch Times</h3>
+                            ${pairRows}
+                        </div>
+                        
+                        ${editHistoryHtml}
+                        
+                        <div style="display: flex; gap: 12px; margin-top: 20px; justify-content: flex-end;">
+                            <button onclick="closeDayEditModal()" style="padding: 8px 16px; background: #e2e8f0; color: #1e293b; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>
+                            <button onclick="saveDayPunchTimes('${empId}', ${dayIdx})" style="padding: 8px 16px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">💾 Save</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Add ESC key support
+            document.addEventListener('keydown', function closeOnEsc(e) {
+                if (e.key === 'Escape') {
+                    closeDayEditModal();
+                    document.removeEventListener('keydown', closeOnEsc);
+                }
+            });
+        }
+        
+        // Build edit history for modal
+        function buildModalEditHistory(emp, dayIdx) {
+            const day = emp.dailyBreakdown[dayIdx];
+            let historyEntries = [];
+            
+            // Collect all edits for this day
+            Object.keys(cellEditHistory).forEach(key => {
+                if (key.startsWith(`${emp.id}_${dayIdx}_`)) {
+                    const edits = cellEditHistory[key];
+                    edits.forEach(edit => {
+                        historyEntries.push({
+                            timestamp: edit.timestamp,
+                            ...edit
+                        });
+                    });
+                }
+            });
+            
+            // Sort by timestamp descending
+            historyEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            if (historyEntries.length === 0) {
+                return `<div style="padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; color: #94a3b8; font-size: 0.85rem; text-align: center;">No edit history for this day</div>`;
+            }
+            
+            const historyHtml = historyEntries.slice(0, 10).map((edit, idx) => {
+                const timestamp = new Date(edit.timestamp);
+                const isValidDate = !isNaN(timestamp.getTime());
+                let timeDisplay = 'Recently';
+                if (isValidDate) {
+                    const now = new Date();
+                    const diff = now - timestamp;
+                    const minutes = Math.floor(diff / 60000);
+                    const hours = Math.floor(diff / 3600000);
+                    const days = Math.floor(diff / 86400000);
+                    
+                    if (minutes < 1) timeDisplay = 'Just now';
+                    else if (minutes < 60) timeDisplay = `${minutes}m ago`;
+                    else if (hours < 24) timeDisplay = `${hours}h ago`;
+                    else if (days < 7) timeDisplay = `${days}d ago`;
+                    else timeDisplay = timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                }
+                
+                return `
+                    <div style="padding: 8px; background: white; border: 1px solid #e2e8f0; border-radius: 3px; margin-bottom: 6px;">
+                        <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;">
+                            <strong>${edit.fieldType.toUpperCase()}</strong> • ${timeDisplay}
+                        </div>
+                        <div style="display: flex; gap: 6px; font-family: monospace; font-size: 0.8rem;">
+                            <span style="color: #b45309; background: #fffbeb; padding: 2px 4px; border-radius: 2px;">${edit.original || '(empty)'}</span>
+                            <span style="color: #cbd5e1;">→</span>
+                            <span style="color: #059669; background: #ecfdf5; padding: 2px 4px; border-radius: 2px;">${edit.newValue}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            return `
+                <div>
+                    <h3 style="margin: 0 0 12px 0; color: #475569; font-size: 1rem;">Edit History (${historyEntries.length} ${historyEntries.length === 1 ? 'edit' : 'edits'})</h3>
+                    <div style="background: #f1f5f9; padding: 12px; border-radius: 4px;">
+                        ${historyHtml}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Save punch times from modal
+        function saveDayPunchTimes(empId, dayIdx) {
+            const emp = filteredData.find(e => String(e.id) === String(empId));
+            if (!emp) {
+                alert('❌ Employee not found');
+                return;
+            }
+            
+            const day = emp.dailyBreakdown[dayIdx];
+            const pairCount = day.punchPairs.length;
+            
+            // Collect and validate all inputs
+            const updates = [];
+            for (let pairIdx = 0; pairIdx < pairCount; pairIdx++) {
+                const inInput = document.querySelector(`.modal-punch-in-${pairIdx}`).value.trim();
+                const outInput = document.querySelector(`.modal-punch-out-${pairIdx}`).value.trim();
+                
+                if (inInput || outInput) {
+                    // Validate if provided
+                    if (inInput && !parseTime(inInput)) {
+                        alert(`❌ Invalid IN time for Pair ${pairIdx + 1}.\n\nAccepted formats:\n• 9:30 AM\n• 2:45 PM\n• 09:30\n• 14:45`);
+                        return;
+                    }
+                    if (outInput && !parseTime(outInput)) {
+                        alert(`❌ Invalid OUT time for Pair ${pairIdx + 1}.\n\nAccepted formats:\n• 9:30 AM\n• 2:45 PM\n• 09:30\n• 14:45`);
+                        return;
+                    }
+                    
+                    updates.push({
+                        pairIdx: pairIdx,
+                        in: inInput ? parseTime(inInput) : day.punchPairs[pairIdx].in,
+                        out: outInput ? parseTime(outInput) : day.punchPairs[pairIdx].out
+                    });
+                }
+            }
+            
+            // Apply updates
+            updates.forEach(update => {
+                const oldIn = day.punchPairs[update.pairIdx].in;
+                const oldOut = day.punchPairs[update.pairIdx].out;
+                
+                // Update IN time
+                if (update.in !== oldIn) {
+                    day.punchPairs[update.pairIdx].in = update.in;
+                    recordPunchEdit(emp.id, dayIdx, update.pairIdx, 'in', oldIn, update.in);
+                }
+                
+                // Update OUT time
+                if (update.out !== oldOut) {
+                    day.punchPairs[update.pairIdx].out = update.out;
+                    recordPunchEdit(emp.id, dayIdx, update.pairIdx, 'out', oldOut, update.out);
+                }
+                
+                // Recalculate hours
+                if (update.in && update.out) {
+                    const inTime = parseTimeToMinutes(update.in);
+                    const outTime = parseTimeToMinutes(update.out);
+                    const hours = (outTime - inTime) / 60;
+                    day.punchPairs[update.pairIdx].pairHours = Math.max(0, hours);
+                }
+            });
+            
+            // Recalculate daily and total hours
+            recalculateHours(emp, dayIdx);
+            
+            // Update UI
+            displayEmployeeData(filteredData);
+            closeDayEditModal();
+        }
+        
+        // Record punch edit with timestamp
+        function recordPunchEdit(empId, dayIdx, pairIdx, fieldType, original, newValue) {
+            const historyKey = `${empId}_${dayIdx}_${pairIdx}_${fieldType}`;
+            if (!cellEditHistory[historyKey]) {
+                cellEditHistory[historyKey] = [];
+            }
+            cellEditHistory[historyKey].push({
+                original: original,
+                newValue: newValue,
+                timestamp: new Date().toISOString(),
+                fieldType: fieldType
+            });
+        }
+        
+        // Helper to convert time string to minutes since midnight
+        function parseTimeToMinutes(timeStr) {
+            const parts = timeStr.split(':');
+            return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+        }
+        
+        // Recalculate hours after punch time changes
+        function recalculateHours(emp, dayIdx) {
+            const day = emp.dailyBreakdown[dayIdx];
+            let dayHours = 0;
+            
+            if (day.punchPairs) {
+                day.punchPairs.forEach(pair => {
+                    if (pair.in && pair.out && pair.pairHours) {
+                        dayHours += pair.pairHours;
+                    }
+                });
+            }
+            
+            day.hours = dayHours;
+            
+            // Recalculate total hours
+            let totalHours = 0;
+            let totalLateMin = 0;
+            if (emp.dailyBreakdown) {
+                emp.dailyBreakdown.forEach(d => {
+                    if (d.hours) totalHours += d.hours;
+                    if (d.lateMin) totalLateMin += d.lateMin;
+                });
+            }
+            
+            emp.hours = `${totalHours.toFixed(2)} hrs`;
+            emp.late = `${totalLateMin} min`;
+        }
+        
+        // Close day edit modal
+        function closeDayEditModal() {
+            const modal = document.getElementById('dayEditModal');
+            if (modal) modal.remove();
+        }
+        
+        
+        // ===== OLD CELL-BASED EDIT FUNCTIONS (kept for compatibility) =====
         
         // Enter edit mode for a punch time cell
         function enterEditMode(button) {
