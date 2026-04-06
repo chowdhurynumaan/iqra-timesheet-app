@@ -1861,10 +1861,25 @@
                                 if (firstParts.length >= 2) {
                                     const actualStart = firstParts[0] * 60 + firstParts[1];
                                     const expectedStart = getExpectedStartTime(dept, actualStart);
+                                    
+                                    // DEBUG: Log the calculation
+                                    const dateStr = dayDate.toISOString().split('T')[0];
+                                    if (emp.id === '7' || emp.id === 7) { // ABDUR RASHID
+                                        console.log(`[ID 7 DEBUG] ${dateStr}: dept="${dept}", actual=${times[0]} (${actualStart} min), expected=${expectedStart} min (${Math.floor(expectedStart/60)}:${String(expectedStart%60).padStart(2,'0')})`);
+                                    }
+                                    
                                     if (actualStart > expectedStart) {
                                         const lateMin = actualStart - expectedStart;
                                         dayRecord.lateMin = lateMin;
                                         totalLateMinutes += lateMin;
+                                        
+                                        if (emp.id === '7' || emp.id === 7) {
+                                            console.log(`  → LATE by ${lateMin} minutes`);
+                                        }
+                                    } else {
+                                        if (emp.id === '7' || emp.id === 7) {
+                                            console.log(`  → EARLY by ${expectedStart - actualStart} minutes`);
+                                        }
                                     }
                                 }
                             } else if (times.length === 1) {
@@ -3232,13 +3247,21 @@
                     const maxTime = Math.max(...timeValues);
                     const avgMidpoint = (minTime + maxTime) / 2;
                     
+                    let result;
                     if (actualStart < avgMidpoint) {
                         // Likely early shift - check against minimum (earliest) shift start
-                        return minTime;
+                        result = minTime;
                     } else {
                         // Likely evening shift - check against maximum (latest) shift start
-                        return maxTime;
+                        result = maxTime;
                     }
+                    
+                    // DEBUG
+                    if (dept === 'WK/EV') {
+                        console.log(`[getExpectedStartTime] dept=WK/EV, actual=${actualStart}, midpoint=${avgMidpoint}, shiftTimes=${JSON.stringify(shiftTimes)}, returning=${result}`);
+                    }
+                    
+                    return result;
                 }
                 
                 return 540; // Fallback
