@@ -894,12 +894,20 @@
                     
                     rawData = [];
                     empSnapshot.forEach(doc => {
-                        rawData.push(doc.data());
+                        const empData = doc.data();
+                        // Ensure shift property exists, default to 'WK' if missing
+                        if (!empData.shift) {
+                            empData.shift = 'WK';
+                        }
+                        rawData.push(empData);
                     });
                     
                     // Fall back to month document employees if individual records not found
                     if (rawData.length === 0) {
-                        rawData = reportData.employees || [];
+                        rawData = (reportData.employees || []).map(emp => ({
+                            ...emp,
+                            shift: emp.shift || 'WK'
+                        }));
                         console.warn(`⚠️ No employees found in ${EMPLOYEES_COLLECTION}, using month document data`);
                     }
                     
@@ -1692,8 +1700,17 @@
                             missedDays++;
                         }
                         
+                        // Extract shift from form mapping if available
+                        let shift = 'WK'; // Default to weekday shift
+                        if (employeeFormMapping.shift && employeeFormMapping.shift.index !== undefined) {
+                            const shiftValue = (row[employeeFormMapping.shift.index] || 'WK').toString().trim().toUpperCase();
+                            if (['WK', 'FT', 'EV'].includes(shiftValue)) {
+                                shift = shiftValue;
+                            }
+                        }
+                        
                         employees.push({
-                            id, name, dept: dept || 'N/A',
+                            id, name, dept: dept || 'N/A', shift,
                             hours: (totalMinutes / 60).toFixed(2) + ' hrs',
                             lateMin: Math.round(totalLateMinutes),
                             absences: missedDays,
