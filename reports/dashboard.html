@@ -453,10 +453,10 @@
             </div>
             
             <div class="control-section">
-                <label>Department:</label>
-                <select id="deptFilter">
-                    <option value="">All Departments</option>
-                </select>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Department:</label>
+                <div id="deptFilter" style="display: flex; flex-wrap: wrap; gap: 1rem;">
+                    <!-- Radio buttons will be populated dynamically -->
+                </div>
             </div>
             <div class="control-section">
                 <button class="btn-export" onclick="exportToCSV()">Export CSV</button>
@@ -2216,36 +2216,51 @@
                 sheetSelect.appendChild(option);
             });
             
-            // Populate department filter (clear existing, keep "All Departments")
+            // Populate department filter (clear existing, create radio buttons)
             const depts = new Set(rawData.map(e => e.dept).filter(d => d && d !== 'undefined'));
-            const deptSelect = document.getElementById('deptFilter');
+            const deptContainer = document.getElementById('deptFilter');
+            deptContainer.innerHTML = '';
             
-            // Keep only the "All Departments" option
-            deptSelect.innerHTML = '<option value="">All Departments</option>';
+            // Create "All Departments" radio button
+            const allLabel = document.createElement('label');
+            allLabel.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; cursor: pointer;';
+            const allRadio = document.createElement('input');
+            allRadio.type = 'radio';
+            allRadio.name = 'department';
+            allRadio.value = '';
+            allRadio.checked = true;
+            allRadio.id = 'deptAll';
+            allLabel.appendChild(allRadio);
+            allLabel.appendChild(document.createTextNode('All Departments'));
+            deptContainer.appendChild(allLabel);
             
             // Add departments in sorted order
             const sortedDepts = Array.from(depts).sort();
             sortedDepts.forEach(dept => {
-                const option = document.createElement('option');
-                option.value = dept;
-                option.textContent = dept;
-                deptSelect.appendChild(option);
+                const label = document.createElement('label');
+                label.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; cursor: pointer;';
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'department';
+                radio.value = dept;
+                radio.id = `dept_${dept.replace(/\s+/g, '_')}`;
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(dept));
+                deptContainer.appendChild(label);
             });
             
-            // Remove old listeners by cloning the element
-            const newDeptSelect = deptSelect.cloneNode(true);
-            deptSelect.parentNode.replaceChild(newDeptSelect, deptSelect);
-            
-            // Add fresh change event listener
-            newDeptSelect.addEventListener('change', (e) => {
-                const selectedDept = e.target.value;
-                if (selectedDept) {
-                    filteredData = rawData.filter(emp => emp.dept === selectedDept);
-                } else {
-                    filteredData = [...rawData];
-                }
-                renderDashboard(filteredData);
-                displayEmployeeData(filteredData);
+            // Add event listeners to all radio buttons
+            document.querySelectorAll('input[name="department"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const selectedDept = e.target.value;
+                    if (selectedDept) {
+                        filteredData = rawData.filter(emp => emp.dept === selectedDept);
+                    } else {
+                        filteredData = [...rawData];
+                    }
+                    renderDashboard(filteredData);
+                    displayEmployeeData(filteredData);
+                });
             });
             
             // Set date inputs
@@ -4961,7 +4976,8 @@
             const results = rawData.filter(d => d.name.toLowerCase().includes(term) || d.id.toString().includes(term));
             
             // Apply department filter if set
-            const deptFilter = document.getElementById('deptFilter').value;
+            const selectedRadio = document.querySelector('input[name="department"]:checked');
+            const deptFilter = selectedRadio ? selectedRadio.value : '';
             const filtered = deptFilter ? results.filter(d => d.dept === deptFilter) : results;
             
             renderTable(filtered);
