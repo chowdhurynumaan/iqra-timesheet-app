@@ -738,7 +738,7 @@
             return deptName.replace(/\//g, '_');
         }
         
-        // Dynamic UI rendering for shift definitions - EXCEL STYLE TABLE
+        // Dynamic UI rendering for shift definitions - RESPONSIVE LAYOUT
         function renderShiftDefinitionsUI() {
             const editor = document.getElementById('deptShiftEditor');
             if (!editor) return;
@@ -746,156 +746,156 @@
             // Clear existing content
             editor.innerHTML = '';
             
-            // Create table with Excel-like styling
-            const table = document.createElement('table');
-            table.style.cssText = `
-                width: 100%;
-                border-collapse: collapse;
+            // Create responsive container
+            const container = document.createElement('div');
+            container.style.cssText = `
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1rem;
                 margin-bottom: 1rem;
-                font-family: Arial, sans-serif;
-                font-size: 0.9rem;
-                border: 2px solid #8B7355;
+                width: 100%;
             `;
             
-            // Create table header with Excel-like styling
-            const thead = document.createElement('thead');
-            const headerRow = document.createElement('tr');
-            headerRow.style.cssText = `
-                background: linear-gradient(135deg, #C8A882 0%, #D4B5A0 100%);
-                border: 1px solid #8B7355;
-            `;
-            
-            const headers = ['Shift Number', 'Shift Name', 'In Time', 'Out'];
-            headers.forEach(headerText => {
-                const th = document.createElement('th');
-                th.textContent = headerText;
-                th.style.cssText = `
-                    padding: 0.75rem;
-                    text-align: center;
-                    font-weight: 700;
-                    border: 1px solid #8B7355;
-                    color: #2c1810;
-                    background: #D4B5A0;
-                `;
-                headerRow.appendChild(th);
-            });
-            thead.appendChild(headerRow);
-            table.appendChild(thead);
-            
-            // Create table body with Excel-like alternating colors
-            const tbody = document.createElement('tbody');
             let shiftNum = 1;
             // Show only fundamental shifts (NOT compound ones with "/" or "Slot")
             Object.entries(shiftDefinitions)
                 .filter(([deptName]) => !deptName.includes('/') && !deptName.includes('Slot'))
-                .forEach(([deptName, times], idx) => {
-                const row = document.createElement('tr');
-                // Alternate between white and light orange like Excel
-                const isOdd = idx % 2 === 0;
-                row.style.cssText = `
-                    background: ${isOdd ? '#FFFBF5' : '#FFF4E6'};
-                    border: 1px solid #8B7355;
-                `;
-                
-                // Shift Number
-                const numCell = document.createElement('td');
-                numCell.textContent = shiftNum;
-                numCell.style.cssText = `
-                    padding: 0.6rem;
-                    border: 1px solid #8B7355;
-                    text-align: center;
-                    font-weight: 600;
-                    background: ${isOdd ? '#FFF9F0' : '#FFF0E6'};
-                `;
-                row.appendChild(numCell);
-                
-                // Shift Name
-                const nameCell = document.createElement('td');
-                nameCell.textContent = deptName;
-                nameCell.style.cssText = `
-                    padding: 0.6rem;
-                    border: 1px solid #8B7355;
-                    text-align: left;
-                    font-weight: 600;
-                    background: ${isOdd ? '#FFFBF5' : '#FFF4E6'};
-                `;
-                row.appendChild(nameCell);
-                
-                // Sanitize the ID for HTML safety
-                const safeId = sanitizeId(deptName);
-                
-                // In Time Input
-                const startCell = document.createElement('td');
-                startCell.style.cssText = `
-                    padding: 0.4rem;
-                    border: 1px solid #8B7355;
-                    text-align: center;
-                    background: ${isOdd ? '#FFFBF5' : '#FFF4E6'};
-                `;
-                const startInput = document.createElement('input');
-                startInput.type = 'time';
-                startInput.id = `shift${safeId}_start`;
-                startInput.value = times.start || '09:00';
-                startInput.style.cssText = `
-                    width: 95%;
-                    padding: 0.5rem;
-                    border: 1px solid #999;
-                    border-radius: 3px;
-                    font-size: 0.9rem;
-                    text-align: center;
-                `;
-                startCell.appendChild(startInput);
-                row.appendChild(startCell);
-                
-                // Out Time Input
-                const endCell = document.createElement('td');
-                endCell.style.cssText = `
-                    padding: 0.4rem;
-                    border: 1px solid #8B7355;
-                    text-align: center;
-                    background: ${isOdd ? '#FFFBF5' : '#FFF4E6'};
-                `;
-                const endInput = document.createElement('input');
-                endInput.type = 'time';
-                endInput.id = `shift${safeId}_end`;
-                endInput.value = times.end || '17:30';
-                endInput.style.cssText = `
-                    width: 95%;
-                    padding: 0.5rem;
-                    border: 1px solid #999;
-                    border-radius: 3px;
-                    font-size: 0.9rem;
-                    text-align: center;
-                `;
-                endCell.appendChild(endInput);
-                row.appendChild(endCell);
-                
-                tbody.appendChild(row);
-                shiftNum++;
-            });
-            table.appendChild(tbody);
+                .forEach(([deptName, times]) => {
+                    // Create card for each shift
+                    const card = document.createElement('div');
+                    card.style.cssText = `
+                        background: linear-gradient(135deg, #FFFBF5 0%, #FFF4E6 100%);
+                        border: 2px solid #8B7355;
+                        border-radius: 6px;
+                        padding: 1rem;
+                        font-family: Arial, sans-serif;
+                    `;
+                    
+                    // Header with shift number and name
+                    const header = document.createElement('div');
+                    header.style.cssText = `
+                        background: linear-gradient(135deg, #C8A882 0%, #D4B5A0 100%);
+                        padding: 0.8rem;
+                        border-radius: 4px;
+                        margin-bottom: 1rem;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    `;
+                    
+                    const numSpan = document.createElement('span');
+                    numSpan.textContent = `#${shiftNum}`;
+                    numSpan.style.cssText = `
+                        font-weight: 700;
+                        font-size: 1.1rem;
+                        color: #2c1810;
+                    `;
+                    
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = deptName;
+                    nameSpan.style.cssText = `
+                        font-weight: 700;
+                        font-size: 1.1rem;
+                        color: #2c1810;
+                    `;
+                    
+                    header.appendChild(numSpan);
+                    header.appendChild(nameSpan);
+                    card.appendChild(header);
+                    
+                    // Sanitize the ID for HTML safety
+                    const safeId = sanitizeId(deptName);
+                    
+                    // In Time field
+                    const startGroup = document.createElement('div');
+                    startGroup.style.cssText = `
+                        margin-bottom: 1rem;
+                    `;
+                    
+                    const startLabel = document.createElement('label');
+                    startLabel.textContent = 'In Time';
+                    startLabel.style.cssText = `
+                        display: block;
+                        font-weight: 600;
+                        margin-bottom: 0.4rem;
+                        color: #2c1810;
+                        font-size: 0.9rem;
+                    `;
+                    startGroup.appendChild(startLabel);
+                    
+                    const startInput = document.createElement('input');
+                    startInput.type = 'time';
+                    startInput.id = `shift${safeId}_start`;
+                    startInput.value = times.start || '09:00';
+                    startInput.style.cssText = `
+                        width: 100%;
+                        padding: 0.6rem;
+                        border: 1px solid #999;
+                        border-radius: 3px;
+                        font-size: 1rem;
+                        box-sizing: border-box;
+                    `;
+                    startGroup.appendChild(startInput);
+                    card.appendChild(startGroup);
+                    
+                    // Out Time field
+                    const endGroup = document.createElement('div');
+                    endGroup.style.cssText = `
+                        margin-bottom: 0.5rem;
+                    `;
+                    
+                    const endLabel = document.createElement('label');
+                    endLabel.textContent = 'Out Time';
+                    endLabel.style.cssText = `
+                        display: block;
+                        font-weight: 600;
+                        margin-bottom: 0.4rem;
+                        color: #2c1810;
+                        font-size: 0.9rem;
+                    `;
+                    endGroup.appendChild(endLabel);
+                    
+                    const endInput = document.createElement('input');
+                    endInput.type = 'time';
+                    endInput.id = `shift${safeId}_end`;
+                    endInput.value = times.end || '17:30';
+                    endInput.style.cssText = `
+                        width: 100%;
+                        padding: 0.6rem;
+                        border: 1px solid #999;
+                        border-radius: 3px;
+                        font-size: 1rem;
+                        box-sizing: border-box;
+                    `;
+                    endGroup.appendChild(endInput);
+                    card.appendChild(endGroup);
+                    
+                    container.appendChild(card);
+                    shiftNum++;
+                });
             
-            editor.appendChild(table);
+            editor.appendChild(container);
             
             // Add Save button
             const saveButton = document.createElement('button');
             saveButton.textContent = 'Save Shifts';
             saveButton.onclick = saveShiftDefinitions;
             saveButton.style.cssText = `
-                padding: 0.6rem 1.5rem;
+                padding: 0.8rem 2rem;
                 background: #059669;
                 color: white;
                 border: none;
                 border-radius: 4px;
                 cursor: pointer;
                 font-weight: 600;
-                font-size: 0.9rem;
+                font-size: 1rem;
                 margin-top: 0.5rem;
+                width: 100%;
             `;
             editor.appendChild(saveButton);
             
             const fundamentalShiftCount = Object.keys(shiftDefinitions).filter(name => !name.includes('/') && !name.includes('Slot')).length;
-            console.log(`🎯 Shift table (Excel style) rendered for ${fundamentalShiftCount} fundamental shifts (WK, EV, FT)`);
+            console.log(`🎯 Shift table (Responsive cards) rendered for ${fundamentalShiftCount} fundamental shifts (WK, EV, FT)`);
         }
         
         async function saveShiftDefinitions() {
