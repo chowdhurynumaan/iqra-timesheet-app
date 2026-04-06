@@ -980,25 +980,32 @@
                         const oldBadge = cell.querySelector('.edit-badge');
                         if (oldBadge) oldBadge.remove();
                         
-                        // Create badge
+                        // Create subtle badge
                         const badge = document.createElement('span');
                         badge.className = 'edit-badge';
                         const editCount = cellEditHistory[historyKey].length;
-                        badge.textContent = `EDITED (${editCount})`;
+                        badge.textContent = '\u270e';
+                        badge.title = `Edited ${editCount} time${editCount > 1 ? 's' : ''} - Click to view history`;
                         badge.style.cssText = `
                             position: absolute;
-                            top: -8px;
-                            right: -8px;
-                            background: #ef4444;
-                            color: white;
-                            font-size: 0.5rem;
-                            padding: 2px 4px;
-                            border-radius: 3px;
-                            cursor: pointer;
+                            top: 1px;
+                            right: 2px;
+                            background: transparent;
+                            color: #8b5cf6;
+                            font-size: 0.7rem;
+                            padding: 0;
+                            border-radius: 50%;
+                            cursor: help;
                             font-weight: bold;
                             white-space: nowrap;
-                            z-index: 1000;
+                            z-index: 500;
+                            opacity: 0.7;
+                            transition: all 0.2s ease;
                         `;
+                        
+                        // Hover effect
+                        badge.onmouseover = () => { badge.style.opacity = '1'; badge.style.color = '#a78bfa'; };
+                        badge.onmouseout = () => { badge.style.opacity = '0.7'; badge.style.color = '#8b5cf6'; };
                         
                         cell.style.position = 'relative';
                         cell.appendChild(badge);
@@ -3630,7 +3637,7 @@
             cellEditHistory[historyKey].push({
                 original: originalValue,
                 newValue: newTime,
-                timestamp: new Date(),
+                timestamp: new Date().toISOString(), // Use ISO string for Firebase compatibility
                 editCount: cellEditHistory[historyKey].length + 1
             });
             
@@ -3754,31 +3761,38 @@
             
             console.log(`✅ Updated ${type} time for ${emp.name} day ${dayIdx + 1}, pair ${pairIdx + 1}: ${newTime}, Late: ${pairIdx === 0 ? day.lateMin : 'N/A'} min`);
             
-            // Add "EDITED" badge to the cell
+            // Add "EDITED" badge to the cell (subtle indicator)
             const editCount = cellEditHistory[historyKey].length;
             
             // Remove old badge if it exists
             const oldBadge = event.target.querySelector('.edit-badge');
             if (oldBadge) oldBadge.remove();
             
-            // Create and add new badge
+            // Create subtle badge
             const badge = document.createElement('span');
             badge.className = 'edit-badge';
-            badge.textContent = `EDITED (${editCount})`;
+            badge.textContent = '✎';
+            badge.title = `Edited ${editCount} time${editCount > 1 ? 's' : ''} - Click to view history`;
             badge.style.cssText = `
                 position: absolute;
-                top: -8px;
-                right: -8px;
-                background: #ef4444;
-                color: white;
-                font-size: 0.5rem;
-                padding: 2px 4px;
-                border-radius: 3px;
-                cursor: pointer;
+                top: 1px;
+                right: 2px;
+                background: transparent;
+                color: #8b5cf6;
+                font-size: 0.7rem;
+                padding: 0;
+                border-radius: 50%;
+                cursor: help;
                 font-weight: bold;
                 white-space: nowrap;
-                z-index: 1000;
+                z-index: 500;
+                opacity: 0.7;
+                transition: all 0.2s ease;
             `;
+            
+            // Hover effect
+            badge.onmouseover = () => { badge.style.opacity = '1'; badge.style.color = '#a78bfa'; };
+            badge.onmouseout = () => { badge.style.opacity = '0.7'; badge.style.color = '#8b5cf6'; };
             
             // Make the cell position relative so badge positions correctly
             event.target.style.position = 'relative';
@@ -3799,24 +3813,30 @@
             
             const edits = cellEditHistory[historyKey] || [];
             
-            // Build tooltip content
-            let content = `<div style="font-weight: bold; margin-bottom: 8px; color: #1e293b;">📋 Edit History - ${empName}</div>`;
-            content += `<div style="font-size: 0.7rem; color: #64748b; margin-bottom: 8px;">${fieldType.toUpperCase()} time edits</div>`;
+            // Build tooltip content with close button
+            let content = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div style="font-weight: bold; color: #1e293b;">✏️ Edit History</div>
+                    <div style="font-size: 0.7rem; color: #64748b;">${fieldType.toUpperCase()} • ${empName}</div>
+                    <button id="close-tooltip" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #94a3b8; padding: 0; margin: 0;">&times;</button>
+                </div>`;
             
             edits.forEach((edit, idx) => {
                 const timestamp = new Date(edit.timestamp);
-                const timeStr = timestamp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                const dateStr = timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const isValidDate = !isNaN(timestamp.getTime());
+                const timeStr = isValidDate ? timestamp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Unknown';
+                const dateStr = isValidDate ? timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
                 
                 const originalDisplay = edit.original ? edit.original : '—';
+                const showDate = isValidDate ? `@ ${timeStr} (${dateStr})` : 'Recently';
                 
                 content += `
-                    <div style="margin: 8px 0; padding: 6px; background: #f1f5f9; border-radius: 3px; font-size: 0.75rem;">
-                        <div style="color: #64748b; margin-bottom: 3px;">Edit ${idx + 1} @ ${timeStr} (${dateStr})</div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span style="color: #dc2626; font-weight: bold;">${originalDisplay}</span>
-                            <span style="color: #64748b;">→</span>
-                            <span style="color: #16a34a; font-weight: bold;">${edit.newValue}</span>
+                    <div style="margin: 8px 0; padding: 8px; background: #f8fafc; border-left: 3px solid #8b5cf6; border-radius: 3px; font-size: 0.75rem;">
+                        <div style="color: #64748b; margin-bottom: 4px; font-size: 0.7rem;">Edit ${idx + 1} ${showDate}</div>
+                        <div style="display: flex; align-items: center; gap: 6px; font-family: 'Monaco', 'Courier', monospace;">
+                            <span style="color: #944100; background: #fef2f2; padding: 2px 4px; border-radius: 2px;">${originalDisplay}</span>
+                            <span style="color: #94a3b8;">→</span>
+                            <span style="color: #047857; background: #f0fdf4; padding: 2px 4px; border-radius: 2px;">${edit.newValue}</span>
                         </div>
                     </div>
                 `;
@@ -3829,44 +3849,85 @@
             tooltip.style.cssText = `
                 position: fixed;
                 background: white;
-                border: 2px solid #3b82f6;
-                border-radius: 6px;
-                padding: 12px;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                padding: 12px 14px;
                 font-size: 0.8rem;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
                 z-index: 10000;
-                max-width: 320px;
+                max-width: 350px;
                 max-height: 400px;
                 overflow-y: auto;
+                animation: slideIn 0.2s ease;
             `;
             
             document.body.appendChild(tooltip);
             
             // Position tooltip near the badge
             const rect = cellElement.getBoundingClientRect();
-            tooltip.style.left = (rect.right + 10) + 'px';
-            tooltip.style.top = rect.top + 'px';
+            let left = rect.right + 15;
+            let top = rect.top - 10;
             
             // Adjust if tooltip goes off-screen
             setTimeout(() => {
                 const tooltipRect = tooltip.getBoundingClientRect();
-                if (tooltipRect.right > window.innerWidth) {
-                    tooltip.style.left = (rect.left - tooltipRect.width - 10) + 'px';
+                if (tooltipRect.right > window.innerWidth - 10) {
+                    left = rect.left - tooltipRect.width - 15;
                 }
-                if (tooltipRect.bottom > window.innerHeight) {
-                    tooltip.style.top = (rect.bottom - tooltipRect.height) + 'px';
+                if (tooltipRect.bottom > window.innerHeight - 10) {
+                    top = window.innerHeight - tooltipRect.height - 10;
                 }
+                if (top < 10) {
+                    top = 10;
+                }
+                tooltip.style.left = left + 'px';
+                tooltip.style.top = top + 'px';
             }, 0);
             
-            // Close tooltip on click elsewhere
-            const closeTooltip = (e) => {
+            // Close button handler
+            const closeBtn = tooltip.querySelector('#close-tooltip');
+            const closeTooltip = () => {
+                tooltip.style.animation = 'slideOut 0.2s ease';
+                setTimeout(() => tooltip.remove(), 150);
+                document.removeEventListener('click', outsideClickHandler);
+                document.removeEventListener('keydown', escapeHandler);
+            };
+            
+            if (closeBtn) closeBtn.onclick = closeTooltip;
+            
+            // Close on click elsewhere
+            const outsideClickHandler = (e) => {
                 if (!tooltip.contains(e.target) && !e.target.classList.contains('edit-badge')) {
-                    tooltip.remove();
-                    document.removeEventListener('click', closeTooltip);
+                    closeTooltip();
                 }
             };
             
-            document.addEventListener('click', closeTooltip);
+            // Close on ESC key
+            const escapeHandler = (e) => {
+                if (e.key === 'Escape') closeTooltip();
+            };
+            
+            setTimeout(() => {
+                document.addEventListener('click', outsideClickHandler);
+                document.addEventListener('keydown', escapeHandler);
+            }, 0);
+        }
+        
+        // Add animation styles
+        if (!document.querySelector('style[data-edit-history]')) {
+            const style = document.createElement('style');
+            style.setAttribute('data-edit-history', 'true');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { opacity: 0; transform: translateY(-5px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes slideOut {
+                    from { opacity: 1; transform: translateY(0); }
+                    to { opacity: 0; transform: translateY(-5px); }
+                }
+            `;
+            document.head.appendChild(style);
         }
         
         // Attach event listeners for real-time editing
