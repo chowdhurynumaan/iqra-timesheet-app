@@ -3464,7 +3464,7 @@
                 console.log(`✅ Saved to Firestore: ${docId}`);
                 
                 // Re-calculate and update card metrics immediately
-                const card = document.querySelector(`.employee-card[data-id="${empId}"]`);
+                const card = document.querySelector(`.employee-card[data-id="${String(empId)}"]`);
                 if (card) {
                     updateCardDisplay(emp, card);
                     
@@ -3614,7 +3614,7 @@
             console.log(`   Recalculated total hours: ${emp.hours}, late: ${emp.lateMin} min`);
             
             // Update display instantly
-            const card = document.querySelector(`.employee-card[data-id="${empId}"]`);
+            const card = document.querySelector(`.employee-card[data-id="${String(empId)}"]`);
             console.log(`   Card found: ${card ? 'YES' : 'NO'}`);
             
             if (card) {
