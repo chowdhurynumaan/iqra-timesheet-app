@@ -1206,6 +1206,9 @@
                     document.getElementById('statsGrid').style.display = 'grid';
                     document.getElementById('chartSection').style.display = 'grid';
                     
+                    // Initialize department filter & shift settings
+                    initializeControlPanel();
+                    
                     // Update stats cards with actual data
                     renderDashboard(filteredData);
                     
