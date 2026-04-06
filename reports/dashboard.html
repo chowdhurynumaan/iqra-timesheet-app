@@ -3619,16 +3619,39 @@
                 newCell.addEventListener('input', (event) => {
                     const userInput = event.target.textContent.trim();
                     const type = event.target.classList.contains('editable-punch-in') ? 'in' : 'out';
+                    const empId = parseInt(event.target.dataset.empId);
+                    const dayIdx = parseInt(event.target.dataset.dayIdx);
                     
-                    // Find the same row's IN and OUT cells
+                    // Find the employee in filteredData
+                    const emp = filteredData.find(e => e.id === empId);
+                    if (!emp || !emp.dailyBreakdown || !emp.dailyBreakdown[dayIdx]) return;
+                    
+                    const day = emp.dailyBreakdown[dayIdx];
+                    if (!day.punchPairs || day.punchPairs.length === 0) return;
+                    
+                    // Get IN and OUT cells from the current row
                     const row = event.target.closest('tr');
                     if (!row) return;
                     
                     const inCell = row.querySelector('.editable-punch-in');
                     const outCell = row.querySelector('.editable-punch-out');
-                    const hoursCell = row.querySelector('[data-hours-cell="true"]');
+                    if (!inCell || !outCell) return;
                     
-                    if (!inCell || !outCell || !hoursCell) return;
+                    // Find the hours cell by looking for the first row with data-hours-cell for this day
+                    const table = card.querySelector('table');
+                    if (!table) return;
+                    
+                    // Find all rows with this dayIdx
+                    const dayRows = Array.from(table.querySelectorAll('tbody tr')).filter(r => {
+                        const firstInCell = r.querySelector(`[data-day-idx="${dayIdx}"]`);
+                        return firstInCell !== null;
+                    });
+                    
+                    if (dayRows.length === 0) return;
+                    
+                    // The hours cell should be in the first row of this day (which has the rowspan)
+                    const hoursCell = dayRows[0].querySelector('[data-hours-cell="true"]');
+                    if (!hoursCell) return;
                     
                     // Parse both times to attempt live calculation
                     const inTime = parseTime(inCell.textContent.trim());
