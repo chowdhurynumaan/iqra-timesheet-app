@@ -3450,6 +3450,13 @@
             try {
                 console.log(`💾 Saving changes for ${emp.name}...`);
                 
+                // Get the currently selected month from the dropdown
+                const currentMonth = document.getElementById('monthSelector').value;
+                if (!currentMonth) {
+                    alert('❌ Please select a month first');
+                    return;
+                }
+                
                 // Update Firestore with the modified employee data
                 const docId = `emp_${emp.id}_${currentMonth}`;
                 await saveToFirestore(TIMESHEET_COLLECTION, docId, emp);

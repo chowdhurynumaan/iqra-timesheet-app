@@ -5,7 +5,7 @@ $RepoPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $RepoPath
 
 # Commit all changes
-Write-Host "📝 Committing changes..." -ForegroundColor Green
+Write-Host "Committing changes..." -ForegroundColor Green
 git add -A
 $Status = git status --porcelain
 
@@ -15,9 +15,9 @@ if ($Status) {
     git commit -m $Message
     
     # Push to remote
-    Write-Host "📤 Pushing to GitHub..." -ForegroundColor Cyan
+    Write-Host "Pushing to GitHub..." -ForegroundColor Cyan
     git push origin main
-    Write-Host "✅ Auto-sync complete!" -ForegroundColor Green
+    Write-Host "Auto-sync complete!" -ForegroundColor Green
 } else {
-    Write-Host "✓ No changes to commit" -ForegroundColor Yellow
+    Write-Host "No changes to commit" -ForegroundColor Yellow
 }
