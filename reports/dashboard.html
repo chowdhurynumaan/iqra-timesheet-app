@@ -443,6 +443,12 @@
                     <input type="file" id="csvFile" accept=".csv,.xlsx,.xls">
                 </label>
             </div>
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+                <button class="btn-export" onclick="exportToCSV()">Export CSV</button>
+                <button class="btn-export" onclick="exportToExcel()">Export Excel</button>
+                <button class="btn-export" onclick="saveReportToFirebase()">☁️ Save to Cloud</button>
+                <button class="btn-export" onclick="printSelected()" style="background: #059669;">Print Selected</button>
+            </div>
         </div>
 
         <div id="controlPanel" class="control-panel">
@@ -469,12 +475,6 @@
                 <div id="deptFilter" style="display: flex; flex-wrap: wrap; gap: 1rem;">
                     <!-- Radio buttons will be populated dynamically -->
                 </div>
-            </div>
-            <div class="control-section">
-                <button class="btn-export" onclick="exportToCSV()">Export CSV</button>
-                <button class="btn-export" onclick="exportToExcel()">Export Excel</button>
-                <button class="btn-export" onclick="saveReportToFirebase()">☁️ Save to Cloud</button>
-                <button class="btn-export" onclick="printSelected()" style="background: #059669;">Print Selected</button>
             </div>
         </div>
 
