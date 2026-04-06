@@ -1027,6 +1027,7 @@
                 const card = document.createElement('div');
                 card.className = 'employee-card';
                 card.setAttribute('data-tier', tier);
+                card.setAttribute('data-id', emp.id);
                 card.innerHTML = `
                     <div class="employee-header">
                         <input type="checkbox" class="employee-checkbox" data-id="${emp.id}" style="margin-right: 0.75rem; width: 20px; height: 20px; cursor: pointer; flex-shrink: 0;">
