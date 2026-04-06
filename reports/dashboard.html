@@ -1131,7 +1131,8 @@
                             </div>
                             <div class="metric-card hours-card">
                                 <div class="metric-card-title">Hours</div>
-                                <div class="metric-card-value">${hoursNum.toFixed(0)}</div>
+                                <div class="metric-card-value">${hoursNum.toFixed(2)}</div>
+                                <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>
                                 <div class="metric-card-sub">hrs</div>
                             </div>
                             <div class="metric-card late-card">
@@ -2875,7 +2876,8 @@
                                     </div>
                                     <div class="metric-card hours-card">
                                         <div class="metric-card-title">Hours</div>
-                                        <div class="metric-card-value">${hoursNum.toFixed(0)}</div>
+                                        <div class="metric-card-value">${hoursNum.toFixed(2)}</div>
+                                        <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>
                                         <div class="metric-card-sub">hrs</div>
                                     </div>
                                     <div class="metric-card late-card">
@@ -3361,7 +3363,8 @@
                                 </div>
                                 <div class="metric-card hours-card">
                                     <div class="metric-card-title">Hours</div>
-                                    <div class="metric-card-value">${hoursNum.toFixed(0)}</div>
+                                    <div class="metric-card-value">${hoursNum.toFixed(2)}</div>
+                                    <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>
                                     <div class="metric-card-sub">hrs</div>
                                 </div>
                                 <div class="metric-card late-card">
@@ -4486,7 +4489,7 @@
                 console.log(`      BEFORE: metric[2]="${metrics[2].textContent}"`);
                 metrics[0].textContent = attendancePercent.toFixed(0) + '%'; // Attendance
                 metrics[1].textContent = punctualityPercent + (punctualityPercent !== '-' ? '%' : ''); // Punctuality
-                metrics[2].textContent = hoursNum.toFixed(0); // Hours
+                metrics[2].textContent = hoursNum.toFixed(2); // Hours
                 if (metrics.length > 3) metrics[3].textContent = (emp.lateMin || 0); // Late Min
                 if (metrics.length > 4) metrics[4].textContent = absences; // Absences
                 if (metrics.length > 5) metrics[5].textContent = daysWorked; // Worked
