@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -765,9 +765,7 @@
                     uploadedMonths.push({
                         id: doc.id,
                         data: doc.data()
-                    });
-                
-                // Sort by year and month (descending - newest first)
+                    });`n                });`n`n                // Sort by year and month (descending - newest first)
                 uploadedMonths.sort((a, b) => {
                     const [aYear, aMonth] = a.id.split('_').map(Number);
                     const [bYear, bMonth] = b.id.split('_').map(Number);
@@ -1282,9 +1280,68 @@ Then re-upload the file.`;
                 
                 const isExcel = /\.(xlsx?|xls)$/.test(file.name.toLowerCase());
                 
-                console.log('ðŸ“¥ FILE UPLOAD DETECTED
-File Name:', file.name, '
-File Type:', isExcel ? 'Excel' : 'CSV');
+                console.log('file upload detected');
+
+
+                if (isExcel) {
+                if (isExcel) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        try {
+                            const data = new Uint8Array(ev.target.result);
+                            currentWorkbook = XLSX.read(data, { type: 'array' });
+                            console.log('ðŸ“Š Sheet names in workbook:', currentWorkbook.SheetNames);
+                            
+                            // Parse all sheets
+                            allSheetData = {};
+                            currentWorkbook.SheetNames.forEach(sheetName => {
+                                const sheet = currentWorkbook.Sheets[sheetName];
+                                allSheetData[sheetName] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                            
+                            processMultiSheetData(allSheetData);
+                        } catch (err) {
+                            console.error('âŒ Error parsing Excel:', err);
+                            alert('âŒ Error parsing Excel file. Please ensure it\'s valid. Error: ' + err.message);
+                        }
+                    };
+                    reader.onerror = () => {
+                        console.error('âŒ Error reading file');
+                        alert('âŒ Error reading file');
+                    };
+                    reader.readAsArrayBuffer(file);
+                } else {
+                    if (typeof Papa === 'undefined') {
+                        console.error('âŒ PapaParse library not loaded');
+                        alert('âŒ CSV parser not loaded. Please refresh the page.');
+                        return;
+                    }
+                    
+                    Papa.parse(file, {
+                        header: false,
+                        skipEmptyLines: false,
+                        complete: (results) => {
+                            console.log('ðŸ“Š Parsed CSV data rows:', results.data.length);
+                            allSheetData = { 'CSV Data': results.data };
+                            processMultiSheetData(allSheetData);
+                        },
+                        error: (err) => {
+                            console.error('âŒ Error parsing CSV:', err);
+                            alert('âŒ Error parsing CSV file. Error: ' + err.message);
+                        }
+                    });
+                }
+            });
+            
+            // ========== EMPLOYEE FORM FILE UPLOAD ==========
+            const employeeFormInput = document.getElementById('employeeFormFile');
+            
+            if (employeeFormInput) {
+                employeeFormInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    const isExcel = /\.(xlsx?|xls)$/.test(file.name.toLowerCase());
+                console.log('📥 FILE UPLOAD DETECTED - File: ' + file.name + ', Type: ' + (isExcel ? 'Excel' : 'CSV'));
 
                 if (isExcel) {
                     const reader = new FileReader();
@@ -1651,6 +1708,7 @@ File Type:', isExcel ? 'Excel' : 'CSV');
                             if (cellContent) {
                                 // Method 1: Split by newlines or line breaks
                                 const lines = cellContent.split(/[
+
 ]+/);
                                 lines.forEach(line => {
                                     const matches = line.match(/(\d{1,2}):(\d{2})/g);
@@ -3206,6 +3264,7 @@ Detected Title:', titleCell);
                                 };
                                 
                                 const times = cellContent.split(/[
+
 ]+/).filter(t => t.trim() && /^\d{2}:\d{2}/.test(t.trim()));
                                 
                                 if (times.length === 0) {
