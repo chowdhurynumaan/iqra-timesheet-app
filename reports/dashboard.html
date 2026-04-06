@@ -733,6 +733,11 @@
             }
         }
         
+        // Sanitize shift name for HTML ID (convert "/" to underscore)
+        function sanitizeId(deptName) {
+            return deptName.replace(/\//g, '_');
+        }
+        
         // Dynamic UI rendering for shift definitions - EXCEL STYLE TABLE
         function renderShiftDefinitionsUI() {
             const editor = document.getElementById('deptShiftEditor');
@@ -760,7 +765,7 @@
                 border: 1px solid #8B7355;
             `;
             
-            const headers = ['Shift Number', 'Shift Name', 'In Time', 'Out Time'];
+            const headers = ['Shift Number', 'Shift Name', 'In Time', 'Out'];
             headers.forEach(headerText => {
                 const th = document.createElement('th');
                 th.textContent = headerText;
@@ -813,6 +818,9 @@
                 `;
                 row.appendChild(nameCell);
                 
+                // Sanitize the ID for HTML safety
+                const safeId = sanitizeId(deptName);
+                
                 // In Time Input
                 const startCell = document.createElement('td');
                 startCell.style.cssText = `
@@ -823,7 +831,7 @@
                 `;
                 const startInput = document.createElement('input');
                 startInput.type = 'time';
-                startInput.id = `shift${deptName}_start`;
+                startInput.id = `shift${safeId}_start`;
                 startInput.value = times.start || '09:00';
                 startInput.style.cssText = `
                     width: 95%;
@@ -846,7 +854,7 @@
                 `;
                 const endInput = document.createElement('input');
                 endInput.type = 'time';
-                endInput.id = `shift${deptName}_end`;
+                endInput.id = `shift${safeId}_end`;
                 endInput.value = times.end || '17:30';
                 endInput.style.cssText = `
                     width: 95%;
@@ -891,8 +899,9 @@
                 // Dynamically read values from ALL shift input fields
                 const newDefs = {};
                 Object.keys(shiftDefinitions).forEach(deptName => {
-                    const startId = `shift${deptName}_start`;
-                    const endId = `shift${deptName}_end`;
+                    const safeId = sanitizeId(deptName);
+                    const startId = `shift${safeId}_start`;
+                    const endId = `shift${safeId}_end`;
                     const startInput = document.getElementById(startId);
                     const endInput = document.getElementById(endId);
                     
