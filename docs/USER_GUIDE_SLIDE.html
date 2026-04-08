@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeSheet Dashboard - User Guide Slide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        
+        .slide {
+            width: 100%;
+            max-width: 1400px;
+            height: 800px;
+            background: white;
+            margin: 20px auto;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr;
+            gap: 20px;
+            overflow: hidden;
+            page-break-after: always;
+        }
+        
+        .header {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 32px;
+            margin: 0;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .workflow {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-y: auto;
+        }
+        
+        .workflow h3 {
+            color: #667eea;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .step {
+            margin-bottom: 8px;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            border-left: 3px solid #764ba2;
+        }
+        
+        .step-num {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 22px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .errors {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b6b;
+            font-size: 13px;
+            overflow-y: auto;
+        }
+        
+        .errors h3 {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .error-item {
+            margin-bottom: 8px;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            border-left: 3px solid #ff6b6b;
+        }
+        
+        .error-item strong {
+            color: #ff6b6b;
+        }
+        
+        .error-item .solution {
+            color: #28a745;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+        
+        .features {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+            font-size: 13px;
+            overflow-y: auto;
+        }
+        
+        .features h3 {
+            color: #2196F3;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .feature-item {
+            background: white;
+            padding: 8px;
+            border-radius: 4px;
+            border-left: 2px solid #2196F3;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .icon {
+            margin-right: 5px;
+        }
+        
+        .button-style {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+            margin: 2px;
+        }
+        
+        .code {
+            background: #f5f5f5;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #d63384;
+        }
+        
+        .tip {
+            background: #d4edda;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 3px solid #28a745;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #155724;
+        }
+        
+        @media print {
+            body { padding: 0; }
+            .slide { margin: 0; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="header">
+            <h1>📊 TimeSheet Attendance Dashboard - Complete User Guide</h1>
+            <p>Upload reports → Detect month → Review data → Save to cloud → Edit as needed | All steps tracked with full audit history</p>
+        </div>
+        
+        <div class="workflow">
+            <h3><span class="icon">🚀</span>HOW TO USE (5 Steps)</h3>
+            <div class="step"><span class="step-num">1</span><strong>Open:</strong> Go to https://chowdhurynumaan.github.io/iqra-timesheet-app/</div>
+            <div class="step"><span class="step-num">2</span><strong>Select Month:</strong> Choose from dropdown (auto-populates available months)</div>
+            <div class="step"><span class="step-num">3</span><strong>Upload Report:</strong> Click <span class="button-style">📄 Upload Report</span> → Select Excel file (All Reports.xls/.xlsx or CSV)</div>
+            <div class="step"><span class="step-num">4</span><strong>Review Data:</strong> Check employee cards → See metrics (hours, late mins, absences) → Compare with existing data</div>
+            <div class="step"><span class="step-num">5</span><strong>Save:</strong> Click <span class="button-style">☁️ Save to Cloud</span> → Confirm changes → Data saved with timestamps</div>
+            <div class="step" style="margin-top: 10px;"><strong>BONUS:</strong> Click <span class="button-style">✏️ Edit</span> on any card to modify → Edit Tracking shows all changes made</div>
+            <div class="tip">
+                💡 <strong>Tip:</strong> Month is auto-detected from file. Data stays in cloud, file doesn't. Firebase handles backups automatically.
+            </div>
+        </div>
+        
+        <div class="errors">
+            <h3><span class="icon">⚠️</span>COMMON ERRORS & SOLUTIONS</h3>
+            
+            <div class="error-item">
+                <strong>❌ 404 File not found</strong><br/>
+                <em>Page shows "404 - File not found"</em><br/>
+                <span class="solution">✅ Try: Hard refresh (Ctrl+F5) or clear cache. Site uses GitHub Pages which rebuilds in ~1 min.</span>
+            </div>
+            
+            <div class="error-item">
+                <strong>❌ "Cannot read properties of undefined"</strong><br/>
+                <em>Console error when uploading</em><br/>
+                <span class="solution">✅ Try: Ensure Excel file has header row with "Date", "Name", "Hours", "Late" columns. CSV must be comma-separated.</span>
+            </div>
+            
+            <div class="error-item">
+                <strong>❌ Upload button doesn't work</strong><br/>
+                <em>File selected but nothing happens</em><br/>
+                <span class="solution">✅ Try: Check file format (must be .xls, .xlsx, or .csv). File size should be <5MB. Works on Chrome/Firefox/Safari.</span>
+            </div>
+            
+            <div class="error-item">
+                <strong>❌ "No month detected"</strong><br/>
+                <em>Month dropdown empty or month not recognized</em><br/>
+                <span class="solution">✅ Try: Ensure file has date range in format "DD-MM-YYYY ~ DD-MM-YYYY" or month name like "March 2026" in first 5 rows.</span>
+            </div>
+            
+            <div class="error-item">
+                <strong>❌ Data not saving to cloud</strong><br/>
+                <em>Click save but nothing happens</em><br/>
+                <span class="solution">✅ Try: Check internet connection. Open Console (F12) → Look for error messages. Verify Firebase initialized in browser Network tab.</span>
+            </div>
+        </div>
+        
+        <div class="features">
+            <h3><span class="icon">✨</span>KEY FEATURES AT A GLANCE</h3>
+            
+            <div class="feature-grid">
+                <div class="feature-item"><strong>📊 Analytics:</strong> Attendance %, late mins, absences by department, color-coded performance tiers (Good/Fair/Low)</div>
+                
+                <div class="feature-item"><strong>📅 Smart Month Detect:</strong> Auto-extracts month from file date ranges or sheet names</div>
+                
+                <div class="feature-item"><strong>🔄 Merge Logic:</strong> Compares new data with cloud → Shows NEW / MODIFIED / UNCHANGED employees</div>
+                
+                <div class="feature-item"><strong>📋 Daily Breakdown:</strong> Punch times for each day → See attendance pattern per employee</div>
+                
+                <div class="feature-item"><strong>📈 Charts:</strong> Department summaries, attendance trends, late arrival patterns (Chart.js powered)</div>
+                
+                <div class="feature-item"><strong>🖨️ Export Options:</strong> Download as CSV, Excel, or print-ready format with formatting</div>
+                
+                <div class="feature-item"><strong>🔐 Secure Cloud:</strong> Data in Firebase Firestore → Encrypted, backed up, isolated per project</div>
+                
+                <div class="feature-item"><strong>📝 Full Audit Trail:</strong> Every edit logged with timestamp, user, old→new values, change type</div>
+                
+                <div class="feature-item"><strong>🧹 Cleanup Tools:</strong> One-click duplicate removal if data imported multiple times</div>
+                
+                <div class="feature-item"><strong>⚙️ Shift Settings:</strong> Customize work hours, break times, late threshold (minutes)</div>
+            </div>
+            
+            <div class="tip" style="margin-top: 8px; font-size: 11px;">
+                <strong>📌 Remember:</strong> All edits are tracked. Cloud keeps history. Old files safe in GitHub. Settings saved per month.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
