@@ -2309,37 +2309,39 @@
             console.log(`🏢 DEBUG: Sample employee data (first 3):`, rawData.slice(0, 3).map(e => ({id: e.id, name: e.name, dept: e.dept})));
             
             const deptContainer = document.getElementById('deptFilter');
-            deptContainer.innerHTML = '';
-            
-            // Create "All Departments" radio button
-            const allLabel = document.createElement('label');
-            allLabel.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; cursor: pointer;';
-            const allRadio = document.createElement('input');
-            allRadio.type = 'radio';
-            allRadio.name = 'department';
-            allRadio.value = '';
-            allRadio.checked = true;
-            allRadio.id = 'deptAll';
-            allLabel.appendChild(allRadio);
-            allLabel.appendChild(document.createTextNode('All Departments'));
-            deptContainer.appendChild(allLabel);
-            
-            // Add departments in sorted order
-            const sortedDepts = Array.from(depts).sort();
-            console.log(`🏢 DEBUG: Creating radio buttons for ${sortedDepts.length} departments:`, sortedDepts);
-            sortedDepts.forEach(dept => {
-                const label = document.createElement('label');
-                label.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; cursor: pointer;';
-                const radio = document.createElement('input');
-                radio.type = 'radio';
-                radio.name = 'department';
-                radio.value = dept;
-                radio.id = `dept_${dept.replace(/\s+/g, '_')}`;
-                label.appendChild(radio);
-                label.appendChild(document.createTextNode(dept));
-                deptContainer.appendChild(label);
-            });
-            console.log(`✅ DEBUG: Department radio buttons rendered. Total options: ${deptContainer.children.length} (1 "All" + ${sortedDepts.length} departments)`);
+            if (deptContainer) {
+                deptContainer.innerHTML = '';
+                
+                // Create "All Departments" radio button
+                const allLabel = document.createElement('label');
+                allLabel.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; cursor: pointer;';
+                const allRadio = document.createElement('input');
+                allRadio.type = 'radio';
+                allRadio.name = 'department';
+                allRadio.value = '';
+                allRadio.checked = true;
+                allRadio.id = 'deptAll';
+                allLabel.appendChild(allRadio);
+                allLabel.appendChild(document.createTextNode('All Departments'));
+                deptContainer.appendChild(allLabel);
+                
+                // Add departments in sorted order
+                const sortedDepts = Array.from(depts).sort();
+                console.log(`🏢 DEBUG: Creating radio buttons for ${sortedDepts.length} departments:`, sortedDepts);
+                sortedDepts.forEach(dept => {
+                    const label = document.createElement('label');
+                    label.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; cursor: pointer;';
+                    const radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = 'department';
+                    radio.value = dept;
+                    radio.id = `dept_${dept.replace(/\s+/g, '_')}`;
+                    label.appendChild(radio);
+                    label.appendChild(document.createTextNode(dept));
+                    deptContainer.appendChild(label);
+                });
+                console.log(`✅ DEBUG: Department radio buttons rendered. Total options: ${deptContainer.children.length} (1 "All" + ${Array.from(depts).sort().length} departments)`);
+            }
             
             // Show the department filter container
             const deptFilterContainer = document.getElementById('deptFilterContainer');
