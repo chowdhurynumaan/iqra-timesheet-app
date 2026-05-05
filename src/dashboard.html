@@ -2291,14 +2291,16 @@
         }
 
         function initializeControlPanel() {
-            // Populate sheet selector
+            // Populate sheet selector (if element exists)
             const sheetSelect = document.getElementById('sheetSelector');
-            Object.keys(allSheetData).forEach(sheetName => {
-                const option = document.createElement('option');
-                option.value = sheetName;
-                option.textContent = sheetName;
-                sheetSelect.appendChild(option);
-            });
+            if (sheetSelect) {
+                Object.keys(allSheetData).forEach(sheetName => {
+                    const option = document.createElement('option');
+                    option.value = sheetName;
+                    option.textContent = sheetName;
+                    sheetSelect.appendChild(option);
+                });
+            }
             
             // Populate department filter (clear existing, create radio buttons)
             const depts = new Set(rawData.map(e => e.dept).filter(d => d && d !== 'undefined'));
