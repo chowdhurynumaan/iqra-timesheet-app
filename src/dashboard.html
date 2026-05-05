@@ -1964,7 +1964,7 @@
                                     
                                     // DEBUG: Log the calculation
                                     const dateStr = dayDate.toISOString().split('T')[0];
-                                    if (emp.id === '7' || emp.id === 7) { // ABDUR RASHID
+                                    if (id === '7' || id === 7) { // ABDUR RASHID
                                         console.log(`[ID 7 DEBUG] ${dateStr}: dept="${dept}", actual=${times[0]} (${actualStart} min), expected=${expectedStart} min (${Math.floor(expectedStart/60)}:${String(expectedStart%60).padStart(2,'0')})`);
                                     }
                                     
@@ -1973,11 +1973,11 @@
                                         dayRecord.lateMin = lateMin;
                                         totalLateMinutes += lateMin;
                                         
-                                        if (emp.id === '7' || emp.id === 7) {
+                                        if (id === '7' || id === 7) {
                                             console.log(`  → LATE by ${lateMin} minutes`);
                                         }
                                     } else {
-                                        if (emp.id === '7' || emp.id === 7) {
+                                        if (id === '7' || id === 7) {
                                             console.log(`  → EARLY by ${expectedStart - actualStart} minutes`);
                                         }
                                     }
