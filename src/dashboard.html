@@ -2628,9 +2628,7 @@ Authentication: Include X-API-Key header with your API key
             initializeControlPanel();
             renderDashboard(filteredData);
             displayEmployeeData(filteredData);
-            document.getElementById('statsGrid').style.display = 'grid';
-            document.getElementById('filtersStation').style.display = 'block';
-            document.getElementById('chartsContainer').style.display = 'grid';
+            // New UI: Only show employee cards, hide stats/filters/charts
             document.getElementById('employeeCardsSection').style.display = 'block';
             notify(`Parsed ${rawData.length} active employees from ${bestResult.source}`, 'indigo');
         }
@@ -3494,10 +3492,7 @@ Authentication: Include X-API-Key header with your API key
                     console.log(`✅ Loaded ${rawData.length} employees from ${monthId}`);
                     console.log(`📅 Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);
                     
-                    // Show data panels
-                    document.getElementById('statsGrid').style.display = 'grid';
-                    document.getElementById('filtersStation').style.display = 'block';
-                    document.getElementById('chartsContainer').style.display = 'grid';
+                    // Show only employee cards (new UI design)
                     document.getElementById('employeeCardsSection').style.display = 'block';
                     
                     // Initialize department filter & shift settings
