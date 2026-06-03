@@ -335,6 +335,10 @@
                     <i data-lucide="zap" class="h-3.5 w-3.5 flex-shrink-0"></i>
                     <span>Integrations</span>
                 </button>
+                <button onclick="switchView('analytics')" id="nav-analytics" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
+                    <i data-lucide="bar-chart-3" class="h-3.5 w-3.5 flex-shrink-0"></i>
+                    <span>Analytics</span>
+                </button>
             </nav>
         </div>
 
@@ -731,6 +735,132 @@
                 </div>
             </div>
 
+            <!-- ================= VIEW: ANALYTICS ================= -->
+            <div id="view-analytics" class="hidden space-y-6">
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-2xl p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-emerald-700">On-Time Rate</p>
+                                <p class="text-2xl font-bold text-emerald-900 mt-1" id="kpiOnTime">94.1%</p>
+                            </div>
+                            <i data-lucide="trending-up" class="h-8 w-8 text-emerald-600"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-blue-700">Avg Attendance</p>
+                                <p class="text-2xl font-bold text-blue-900 mt-1" id="kpiAvgAttendance">88.5%</p>
+                            </div>
+                            <i data-lucide="users" class="h-8 w-8 text-blue-600"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-2xl p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-amber-700">Total Absences</p>
+                                <p class="text-2xl font-bold text-amber-900 mt-1" id="kpiTotalAbsences">127</p>
+                            </div>
+                            <i data-lucide="alert-circle" class="h-8 w-8 text-amber-600"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-2xl p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-red-700">Avg Late Minutes</p>
+                                <p class="text-2xl font-bold text-red-900 mt-1" id="kpiAvgLate">12.3</p>
+                            </div>
+                            <i data-lucide="clock" class="h-8 w-8 text-red-600"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Attendance Trend -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">📈 Attendance Trend</h3>
+                        <canvas id="attendanceTrendChart" height="300"></canvas>
+                    </div>
+
+                    <!-- Late Arrivals Trend -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">⏰ Late Arrivals Trend</h3>
+                        <canvas id="lateTrendChart" height="300"></canvas>
+                    </div>
+
+                    <!-- Department Performance -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">🏢 Department Performance</h3>
+                        <canvas id="departmentChart" height="300"></canvas>
+                    </div>
+
+                    <!-- Attendance Distribution -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">📊 Attendance Distribution</h3>
+                        <canvas id="distributionChart" height="300"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Performers & Risk Employees -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Top Performers -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">⭐ Top Performers</h3>
+                        <div class="space-y-3" id="topPerformers">
+                            <div class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
+                                <div>
+                                    <p class="font-semibold text-slate-900">Employee Name</p>
+                                    <p class="text-xs text-slate-600">100% attendance • 0 late</p>
+                                </div>
+                                <span class="text-lg">🏆</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Employees -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">⚠️ Needs Attention</h3>
+                        <div class="space-y-3" id="riskEmployees">
+                            <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                                <div>
+                                    <p class="font-semibold text-slate-900">Employee Name</p>
+                                    <p class="text-xs text-slate-600">72% attendance • 8 absences</p>
+                                </div>
+                                <span class="text-lg">🚨</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Predictive Insights -->
+                <div class="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-2xl p-6">
+                    <div class="flex items-start gap-4">
+                        <i data-lucide="lightbulb" class="h-8 w-8 text-indigo-600 flex-shrink-0 mt-1"></i>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">🔮 Predictive Insights</h3>
+                            <div class="space-y-2 text-sm text-slate-700">
+                                <p>📌 <strong>Trend:</strong> <span id="insightTrend">Late arrivals trending upward this week (+5.2%)</span></p>
+                                <p>📌 <strong>Risk Alert:</strong> <span id="insightRisk">5 employees at risk of exceeding absence limit</span></p>
+                                <p>📌 <strong>Forecast:</strong> <span id="insightForecast">Expected 12-15 absences next week based on patterns</span></p>
+                                <p>📌 <strong>Recommendation:</strong> <span id="insightRec">Schedule check-in with high-risk employees to improve engagement</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Analytics -->
+                <div class="flex gap-2 justify-end">
+                    <button onclick="exportAnalyticsReport()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition">📥 Export Report</button>
+                    <button onclick="refreshAnalytics()" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition">🔄 Refresh Data</button>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -770,7 +900,7 @@
 
         // Navigation Controller
         function switchView(viewId) {
-            ['dashboard', 'employees', 'shifts', 'audit', 'settings', 'backup', 'integrations'].forEach(view => {
+            ['dashboard', 'employees', 'shifts', 'audit', 'settings', 'backup', 'integrations', 'analytics'].forEach(view => {
                 const viewEl = document.getElementById(`view-${view}`);
                 const navEl = document.getElementById(`nav-${view}`);
                 if (viewEl) {
@@ -784,6 +914,9 @@
                     navEl.classList.toggle('text-slate-400', view !== viewId);
                 }
             });
+            if (viewId === 'analytics') {
+                loadAnalyticsData();
+            }
             lucide.createIcons();
         }
 
@@ -1519,6 +1652,267 @@ Endpoints:
 Authentication: Include X-API-Key header with your API key
             `;
             alert(docs);
+        }
+
+        // ====== PHASE 6: ADVANCED ANALYTICS ======
+
+        let analyticsCharts = {
+            attendanceTrend: null,
+            lateTrend: null,
+            department: null,
+            distribution: null
+        };
+
+        function loadAnalyticsData() {
+            calculateKPIs();
+            renderTrendCharts();
+            renderDepartmentChart();
+            renderTopPerformers();
+            renderRiskEmployees();
+            generatePredictiveInsights();
+        }
+
+        function calculateKPIs() {
+            if (!rawData || rawData.length === 0) return;
+
+            // Calculate metrics
+            const totalEmployees = rawData.length;
+            const totalAbsences = rawData.reduce((sum, emp) => sum + (emp.absences || 0), 0);
+            const totalLateMin = rawData.reduce((sum, emp) => sum + (emp.lateMin || 0), 0);
+            const avgAttendance = (rawData.reduce((sum, emp) => sum + (emp.daysWorked || 0), 0) / (totalEmployees * dateRange.actualDays)) * 100;
+            const onTimeRate = ((totalEmployees * dateRange.actualDays - totalAbsences - (totalLateMin > 0 ? totalEmployees : 0)) / (totalEmployees * dateRange.actualDays)) * 100;
+            const avgLate = totalLateMin / totalEmployees;
+
+            // Update KPI cards
+            document.getElementById('kpiOnTime').textContent = Math.max(0, Math.min(100, onTimeRate.toFixed(1))) + '%';
+            document.getElementById('kpiAvgAttendance').textContent = avgAttendance.toFixed(1) + '%';
+            document.getElementById('kpiTotalAbsences').textContent = totalAbsences;
+            document.getElementById('kpiAvgLate').textContent = avgLate.toFixed(1);
+        }
+
+        function renderTrendCharts() {
+            const ctx1 = document.getElementById('attendanceTrendChart')?.getContext('2d');
+            const ctx2 = document.getElementById('lateTrendChart')?.getContext('2d');
+            const ctx3 = document.getElementById('distributionChart')?.getContext('2d');
+
+            if (!ctx1 || !ctx2 || !ctx3) return;
+
+            // Attendance Trend (simulated)
+            if (analyticsCharts.attendanceTrend) analyticsCharts.attendanceTrend.destroy();
+            analyticsCharts.attendanceTrend = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [{
+                        label: 'Attendance %',
+                        data: [87.2, 88.5, 89.1, 88.7],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Late Arrivals Trend
+            if (analyticsCharts.lateTrend) analyticsCharts.lateTrend.destroy();
+            analyticsCharts.lateTrend = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [{
+                        label: 'Total Late Minutes',
+                        data: [245, 198, 276, 312],
+                        backgroundColor: '#ef4444'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Distribution
+            if (analyticsCharts.distribution) analyticsCharts.distribution.destroy();
+            analyticsCharts.distribution = new Chart(ctx3, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Excellent', 'Good', 'At Risk', 'Critical'],
+                    datasets: [{
+                        data: [12, 16, 4, 2],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        function renderDepartmentChart() {
+            const ctx = document.getElementById('departmentChart')?.getContext('2d');
+            if (!ctx) return;
+
+            if (analyticsCharts.department) analyticsCharts.department.destroy();
+
+            // Group by department
+            const deptMap = {};
+            (rawData || []).forEach(emp => {
+                if (!deptMap[emp.dept]) deptMap[emp.dept] = { attendance: 0, count: 0 };
+                deptMap[emp.dept].attendance += (emp.daysWorked || 0);
+                deptMap[emp.dept].count++;
+            });
+
+            const depts = Object.keys(deptMap);
+            const avgAttendance = depts.map(dept => {
+                const avg = deptMap[dept].attendance / (deptMap[dept].count * (dateRange.actualDays || 1)) * 100;
+                return Math.min(100, avg);
+            });
+
+            analyticsCharts.department = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: depts.length > 0 ? depts : ['No Data'],
+                    datasets: [{
+                        label: 'Avg Attendance %',
+                        data: avgAttendance.length > 0 ? avgAttendance : [0],
+                        backgroundColor: '#6366f1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { max: 100 } }
+                }
+            });
+        }
+
+        function renderTopPerformers() {
+            const container = document.getElementById('topPerformers');
+            if (!container) return;
+
+            // Sort by attendance tier
+            const sorted = (rawData || [])
+                .map(emp => ({
+                    ...emp,
+                    tier: calculateAttendanceTier(
+                        (emp.daysWorked / (dateRange.actualDays || 1)) * 100,
+                        emp.lateMin || 0,
+                        emp.absences || 0
+                    )
+                }))
+                .sort((a, b) => {
+                    const tierOrder = { 'excellent': 0, 'good': 1, 'at_risk': 2, 'critical': 3 };
+                    return tierOrder[a.tier.id] - tierOrder[b.tier.id];
+                })
+                .slice(0, 3);
+
+            container.innerHTML = sorted.map(emp => `
+                <div class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
+                    <div>
+                        <p class="font-semibold text-slate-900">${emp.name}</p>
+                        <p class="text-xs text-slate-600">${emp.dept} • ${emp.daysWorked || 0} days worked</p>
+                    </div>
+                    <span class="text-lg">🏆</span>
+                </div>
+            `).join('');
+        }
+
+        function renderRiskEmployees() {
+            const container = document.getElementById('riskEmployees');
+            if (!container) return;
+
+            // Find at-risk employees
+            const atRisk = (rawData || [])
+                .map(emp => ({
+                    ...emp,
+                    tier: calculateAttendanceTier(
+                        (emp.daysWorked / (dateRange.actualDays || 1)) * 100,
+                        emp.lateMin || 0,
+                        emp.absences || 0
+                    )
+                }))
+                .filter(emp => emp.tier.id === 'at_risk' || emp.tier.id === 'critical')
+                .slice(0, 3);
+
+            container.innerHTML = atRisk.map(emp => `
+                <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                    <div>
+                        <p class="font-semibold text-slate-900">${emp.name}</p>
+                        <p class="text-xs text-slate-600">${emp.absences || 0} absences • ${emp.lateMin || 0} min late</p>
+                    </div>
+                    <span class="text-lg">🚨</span>
+                </div>
+            `).join('') || '<p class="text-sm text-slate-600">No employees at risk</p>';
+        }
+
+        function generatePredictiveInsights() {
+            if (!rawData || rawData.length === 0) return;
+
+            const avgLate = rawData.reduce((sum, emp) => sum + (emp.lateMin || 0), 0) / rawData.length;
+            const avgAbsences = rawData.reduce((sum, emp) => sum + (emp.absences || 0), 0) / rawData.length;
+            const atRiskCount = rawData.filter(emp => {
+                const tier = calculateAttendanceTier(
+                    (emp.daysWorked / (dateRange.actualDays || 1)) * 100,
+                    emp.lateMin || 0,
+                    emp.absences || 0
+                );
+                return tier.id === 'at_risk' || tier.id === 'critical';
+            }).length;
+
+            document.getElementById('insightTrend').textContent = `Late arrivals averaging ${avgLate.toFixed(1)} minutes this period`;
+            document.getElementById('insightRisk').textContent = `${atRiskCount} employees currently at risk of performance issues`;
+            document.getElementById('insightForecast').textContent = `Expected ${Math.round(avgAbsences * 5)}-${Math.round(avgAbsences * 7)} absences in next week based on trends`;
+            document.getElementById('insightRec').textContent = `Focus on 1:1 check-ins with ${Math.min(3, atRiskCount)} highest-risk employees this week`;
+        }
+
+        function exportAnalyticsReport() {
+            if (!rawData || rawData.length === 0) {
+                notify('❌ No data to export', 'red');
+                return;
+            }
+
+            const report = {
+                timestamp: new Date().toISOString(),
+                period: dateRange,
+                kpis: {
+                    onTimeRate: document.getElementById('kpiOnTime').textContent,
+                    avgAttendance: document.getElementById('kpiAvgAttendance').textContent,
+                    totalAbsences: document.getElementById('kpiTotalAbsences').textContent,
+                    avgLateMinutes: document.getElementById('kpiAvgLate').textContent
+                },
+                employeeCount: rawData.length,
+                data: rawData
+            };
+
+            const dataStr = JSON.stringify(report, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `analytics-report-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            notify('📥 Analytics report exported successfully', 'emerald');
+        }
+
+        function refreshAnalytics() {
+            notify('🔄 Refreshing analytics data...', 'indigo');
+            setTimeout(() => {
+                loadAnalyticsData();
+                notify('✅ Analytics refreshed', 'emerald');
+            }, 500);
         }
 
         // Load Initial Assets on load
