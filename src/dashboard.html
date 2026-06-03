@@ -3674,11 +3674,15 @@ Authentication: Include X-API-Key header with your API key
                 }
             });
 
-            label.textContent = allCardsExpanded ? 'Collapse All' : 'Expand All';
-            btn.innerHTML = allCardsExpanded 
-                ? '<i data-lucide="chevrons-up" class="h-4 w-4"></i><span>Collapse All</span>'
-                : '<i data-lucide="chevrons-down" class="h-4 w-4"></i><span>Expand All</span>';
-            lucide.createIcons();
+            if (label) {
+                label.textContent = allCardsExpanded ? 'Collapse All' : 'Expand All';
+            }
+            if (btn) {
+                btn.innerHTML = allCardsExpanded 
+                    ? '<i data-lucide="chevrons-up" class="h-4 w-4"></i><span>Collapse All</span>'
+                    : '<i data-lucide="chevrons-down" class="h-4 w-4"></i><span>Expand All</span>';
+                lucide.createIcons();
+            }
         }
 
         function toggleCard(empId) {
