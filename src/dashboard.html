@@ -252,12 +252,12 @@
 
     <!-- Punch Edit Modal -->
     <div id="punchEditModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-content" style="max-width: 700px; max-height: 85vh;">
             <div class="modal-title" id="punchEditTitle">Edit Punch Times</div>
-            <div id="punchEditContent" style="max-height: 400px; overflow-y-auto; margin: 16px 0;"></div>
-            <div class="modal-buttons">
-                <button class="modal-button modal-button-cancel" onclick="closePunchEditModal()">Cancel</button>
-                <button class="modal-button modal-button-confirm" onclick="savePunchEdits()">Save Edits</button>
+            <div id="punchEditContent" style="max-height: calc(85vh - 140px); overflow-y: auto; margin: 16px 0; padding: 0 4px;"></div>
+            <div class="modal-buttons" style="display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid #e5e7eb; padding-top: 12px; margin-top: 12px;">
+                <button class="modal-button modal-button-cancel" onclick="closePunchEditModal()" style="flex: 0 1 auto; padding: 8px 16px;">Cancel</button>
+                <button class="modal-button modal-button-confirm" onclick="savePunchEdits()" style="flex: 0 1 auto; padding: 8px 16px;">Save Edits</button>
             </div>
         </div>
     </div>
@@ -1155,29 +1155,29 @@
                 return;
             }
 
-            let html = '<div style="space-y: 2;">';
+            let html = '<div style="display: flex; flex-direction: column; gap: 12px;">';
             emp.dailyBreakdown.forEach((day, idx) => {
                 const inTime = day.punchPairs?.[0]?.in || day.inTime || '';
                 const outTime = day.punchPairs?.[0]?.out || day.outTime || '';
                 
                 html += `
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; padding: 12px; background: var(--bg-tertiary); border-radius: 8px;">
-                        <div>
-                            <label style="font-size: 11px; font-weight: 600; color: #6b7280; display: block; margin-bottom: 4px;">${day.date || day.dayNum}</label>
-                            <div style="font-size: 12px; color: #9ca3af;">${day.dayName}</div>
+                    <div style="display: grid; grid-template-columns: 120px 1fr 1fr auto; gap: 12px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; align-items: center;">
+                        <div style="border-right: 2px solid #cbd5e1; padding-right: 12px;">
+                            <div style="font-size: 12px; font-weight: 700; color: #1e293b;">${day.date || day.dayNum}</div>
+                            <div style="font-size: 11px; color: #64748b; margin-top: 2px;">${day.dayName || ''}</div>
                         </div>
                         <div>
-                            <label style="font-size: 11px; font-weight: 600; color: #6b7280; display: block; margin-bottom: 4px;">IN Time</label>
-                            <input type="time" data-idx="${idx}" class="punchEditInput" data-type="in" value="${inTime}" style="width: 100%; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px;">
+                            <label style="font-size: 10px; font-weight: 600; color: #6b7280; display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">IN Time</label>
+                            <input type="time" data-idx="${idx}" class="punchEditInput" data-type="in" value="${inTime}" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; font-family: 'Courier New', monospace;">
                         </div>
                         <div>
-                            <label style="font-size: 11px; font-weight: 600; color: #6b7280; display: block; margin-bottom: 4px;">OUT Time</label>
-                            <input type="time" data-idx="${idx}" class="punchEditInput" data-type="out" value="${outTime}" style="width: 100%; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px;">
+                            <label style="font-size: 10px; font-weight: 600; color: #6b7280; display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">OUT Time</label>
+                            <input type="time" data-idx="${idx}" class="punchEditInput" data-type="out" value="${outTime}" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; font-family: 'Courier New', monospace;">
                         </div>
-                        <div>
-                            <label style="font-size: 11px; font-weight: 600; color: #6b7280; display: block; margin-bottom: 4px;">Status</label>
-                            <div style="font-size: 12px; color: ${day.lateMin > 0 ? '#ef4444' : '#10b981'}; font-weight: 600;">
-                                ${day.isMissed ? '❌ Absent' : (day.lateMin > 0 ? `⚠️ +${day.lateMin}m` : '✅ On Time')}
+                        <div style="text-align: center; min-width: 70px;">
+                            <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px;">STATUS</div>
+                            <div style="font-size: 13px; font-weight: 600; color: ${day.isMissed ? '#ef4444' : (day.lateMin > 0 ? '#f59e0b' : '#10b981')};">
+                                ${day.isMissed ? '❌' : (day.lateMin > 0 ? `⚠️ +${day.lateMin}m` : '✅')}
                             </div>
                         </div>
                     </div>
@@ -1194,9 +1194,14 @@
         }
 
         function savePunchEdits() {
-            if (!currentEditingEmp) return;
+            if (!currentEditingEmp) {
+                notify('Error: No employee selected', 'red');
+                return;
+            }
             
-            const inputs = document.querySelectorAll('.punchEditInput');
+            // Get inputs ONLY from the punch edit modal
+            const modalContent = document.getElementById('punchEditContent');
+            const inputs = modalContent.querySelectorAll('.punchEditInput');
             const changes = [];
             
             inputs.forEach(input => {
@@ -1204,30 +1209,40 @@
                 const type = input.getAttribute('data-type');
                 const newValue = input.value;
                 
+                // Ensure daily breakdown exists
+                if (!currentEditingEmp.dailyBreakdown || !currentEditingEmp.dailyBreakdown[idx]) {
+                    console.warn(`Missing dailyBreakdown at index ${idx}`);
+                    return;
+                }
+                
+                const day = currentEditingEmp.dailyBreakdown[idx];
+                
                 if (type === 'in') {
-                    const oldValue = currentEditingEmp.dailyBreakdown[idx].punchPairs?.[0]?.in || currentEditingEmp.dailyBreakdown[idx].inTime || '';
-                    if (oldValue !== newValue) {
-                        if (!currentEditingEmp.dailyBreakdown[idx].punchPairs) {
-                            currentEditingEmp.dailyBreakdown[idx].punchPairs = [{}];
-                        }
-                        currentEditingEmp.dailyBreakdown[idx].punchPairs[0].in = newValue;
-                        changes.push(`${currentEditingEmp.dailyBreakdown[idx].date}: IN time changed to ${newValue}`);
+                    const oldValue = day.punchPairs?.[0]?.in || day.inTime || '';
+                    if (oldValue !== newValue && newValue) {
+                        // Ensure punchPairs array exists
+                        if (!day.punchPairs) day.punchPairs = [{}];
+                        if (!day.punchPairs[0]) day.punchPairs[0] = {};
+                        
+                        day.punchPairs[0].in = newValue;
+                        changes.push(`${day.date || day.dayNum}: IN time changed from ${oldValue} to ${newValue}`);
                     }
-                } else {
-                    const oldValue = currentEditingEmp.dailyBreakdown[idx].punchPairs?.[0]?.out || currentEditingEmp.dailyBreakdown[idx].outTime || '';
-                    if (oldValue !== newValue) {
-                        if (!currentEditingEmp.dailyBreakdown[idx].punchPairs) {
-                            currentEditingEmp.dailyBreakdown[idx].punchPairs = [{}];
-                        }
-                        currentEditingEmp.dailyBreakdown[idx].punchPairs[0].out = newValue;
-                        changes.push(`${currentEditingEmp.dailyBreakdown[idx].date}: OUT time changed to ${newValue}`);
+                } else if (type === 'out') {
+                    const oldValue = day.punchPairs?.[0]?.out || day.outTime || '';
+                    if (oldValue !== newValue && newValue) {
+                        // Ensure punchPairs array exists
+                        if (!day.punchPairs) day.punchPairs = [{}];
+                        if (!day.punchPairs[0]) day.punchPairs[0] = {};
+                        
+                        day.punchPairs[0].out = newValue;
+                        changes.push(`${day.date || day.dayNum}: OUT time changed from ${oldValue} to ${newValue}`);
                     }
                 }
             });
 
             if (changes.length > 0) {
                 recordChange(`Edited ${changes.length} punch times for ${currentEditingEmp.name}`, { changes });
-                notify(`✓ Updated ${changes.length} punch times for ${currentEditingEmp.name}`, 'emerald');
+                notify(`✓ Updated ${changes.length} punch times`, 'emerald');
             } else {
                 notify('No changes made', 'amber');
             }
