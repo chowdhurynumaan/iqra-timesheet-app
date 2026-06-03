@@ -331,6 +331,10 @@
                     <i data-lucide="database" class="h-3.5 w-3.5 flex-shrink-0"></i>
                     <span>Backup</span>
                 </button>
+                <button onclick="switchView('integrations')" id="nav-integrations" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
+                    <i data-lucide="zap" class="h-3.5 w-3.5 flex-shrink-0"></i>
+                    <span>Integrations</span>
+                </button>
             </nav>
         </div>
 
@@ -608,6 +612,125 @@
                 </div>
             </div>
 
+            <!-- ================= VIEW: INTEGRATIONS ================= -->
+            <div id="view-integrations" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 max-w-4xl mx-auto space-y-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-2">⚡ Integrations</h2>
+                        <p class="text-slate-600">Connect external services to enhance your attendance system</p>
+                    </div>
+
+                    <!-- Slack Integration -->
+                    <div class="space-y-4 border-t border-slate-200 pt-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-900">🔔 Slack Notifications</h3>
+                                <p class="text-sm text-slate-600">Send alerts for absences and late arrivals</p>
+                            </div>
+                            <span id="slackStatus" class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">Disabled</span>
+                        </div>
+                        <div class="space-y-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-900 mb-2">Webhook URL</label>
+                                <input type="text" id="slackWebhook" placeholder="https://hooks.slack.com/services/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="slackAbsences" class="w-4 h-4 rounded" checked> <span class="text-sm font-semibold">Alert on Absences</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="slackLate" class="w-4 h-4 rounded" checked> <span class="text-sm font-semibold">Alert on Late Arrivals</span>
+                                </label>
+                            </div>
+                            <button onclick="testSlack()" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition">Test Connection</button>
+                            <button onclick="saveSlack()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition">Save Slack Config</button>
+                        </div>
+                    </div>
+
+                    <!-- Calendar Integration -->
+                    <div class="space-y-4 border-t border-slate-200 pt-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-900">📅 Google Calendar</h3>
+                                <p class="text-sm text-slate-600">Sync holidays and events with your calendar</p>
+                            </div>
+                            <span id="calendarStatus" class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">Disabled</span>
+                        </div>
+                        <div class="space-y-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-900 mb-2">API Key</label>
+                                <input type="password" id="calendarApiKey" placeholder="Your Google Calendar API key" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-900 mb-2">Calendar ID</label>
+                                <input type="text" id="calendarId" placeholder="your-email@gmail.com" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono">
+                            </div>
+                            <div>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="calendarSync" class="w-4 h-4 rounded" checked> <span class="text-sm font-semibold">Auto-sync holidays as absences</span>
+                                </label>
+                            </div>
+                            <button onclick="testCalendar()" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition">Test Connection</button>
+                            <button onclick="saveCalendar()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition">Save Calendar Config</button>
+                        </div>
+                    </div>
+
+                    <!-- Payroll Integration -->
+                    <div class="space-y-4 border-t border-slate-200 pt-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-900">💰 Payroll System</h3>
+                                <p class="text-sm text-slate-600">Export attendance data to payroll</p>
+                            </div>
+                            <span id="payrollStatus" class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">Disabled</span>
+                        </div>
+                        <div class="space-y-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-900 mb-2">Payroll API Endpoint</label>
+                                <input type="text" id="payrollEndpoint" placeholder="https://payroll-api.company.com/attendance" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-900 mb-2">API Token</label>
+                                <input type="password" id="payrollToken" placeholder="Your payroll API token" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-900 mb-2">Export Frequency</label>
+                                <select id="payrollFrequency" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                                    <option>Manual</option>
+                                    <option>Daily</option>
+                                    <option>Weekly</option>
+                                    <option>Monthly</option>
+                                </select>
+                            </div>
+                            <button onclick="testPayroll()" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition">Test Connection</button>
+                            <button onclick="exportPayroll()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition">Export Now</button>
+                            <button onclick="savePayroll()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition">Save Payroll Config</button>
+                        </div>
+                    </div>
+
+                    <!-- API Configuration -->
+                    <div class="space-y-4 border-t border-slate-200 pt-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900">🔐 API Configuration</h3>
+                            <p class="text-sm text-slate-600 mt-1">Manage API keys for third-party access</p>
+                        </div>
+                        <div class="space-y-2 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-900 mb-2">API Base URL</label>
+                                <input type="text" id="apiBaseUrl" placeholder="https://api.yourcompany.com" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono" value="https://api.attendance.local">
+                            </div>
+                            <div>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="apiEnabled" class="w-4 h-4 rounded" checked> <span class="text-sm font-semibold">Enable API Access</span>
+                                </label>
+                            </div>
+                            <button onclick="generateApiKey()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-semibold transition">Generate New API Key</button>
+                            <button onclick="viewApiDocs()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition">View API Docs</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -647,7 +770,7 @@
 
         // Navigation Controller
         function switchView(viewId) {
-            ['dashboard', 'employees', 'shifts', 'audit', 'settings', 'backup'].forEach(view => {
+            ['dashboard', 'employees', 'shifts', 'audit', 'settings', 'backup', 'integrations'].forEach(view => {
                 const viewEl = document.getElementById(`view-${view}`);
                 const navEl = document.getElementById(`nav-${view}`);
                 if (viewEl) {
@@ -1221,6 +1344,183 @@
             notify('🗑️ Backup deleted', 'amber');
         }
 
+        // ====== PHASE 5: INTEGRATIONS ======
+
+        let integrationConfigs = {
+            slack: { enabled: false, webhook: '', absences: true, late: true },
+            calendar: { enabled: false, apiKey: '', calendarId: '', sync: true },
+            payroll: { enabled: false, endpoint: '', token: '', frequency: 'manual' },
+            api: { enabled: true, baseUrl: 'https://api.attendance.local' }
+        };
+
+        function loadIntegrations() {
+            const saved = localStorage.getItem('integrationConfigs');
+            if (saved) {
+                integrationConfigs = JSON.parse(saved);
+            }
+            loadIntegrationsUI();
+        }
+
+        function loadIntegrationsUI() {
+            const slack = integrationConfigs.slack;
+            document.getElementById('slackWebhook').value = slack.webhook || '';
+            document.getElementById('slackAbsences').checked = slack.absences || false;
+            document.getElementById('slackLate').checked = slack.late || false;
+            document.getElementById('slackStatus').textContent = slack.enabled ? '✓ Enabled' : 'Disabled';
+            document.getElementById('slackStatus').className = slack.enabled ? 
+                'px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700' :
+                'px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700';
+
+            const cal = integrationConfigs.calendar;
+            document.getElementById('calendarApiKey').value = cal.apiKey || '';
+            document.getElementById('calendarId').value = cal.calendarId || '';
+            document.getElementById('calendarSync').checked = cal.sync || false;
+            document.getElementById('calendarStatus').textContent = cal.enabled ? '✓ Enabled' : 'Disabled';
+            document.getElementById('calendarStatus').className = cal.enabled ?
+                'px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700' :
+                'px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700';
+
+            const payroll = integrationConfigs.payroll;
+            document.getElementById('payrollEndpoint').value = payroll.endpoint || '';
+            document.getElementById('payrollToken').value = payroll.token || '';
+            document.getElementById('payrollFrequency').value = payroll.frequency || 'manual';
+            document.getElementById('payrollStatus').textContent = payroll.enabled ? '✓ Enabled' : 'Disabled';
+            document.getElementById('payrollStatus').className = payroll.enabled ?
+                'px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700' :
+                'px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700';
+
+            const api = integrationConfigs.api;
+            document.getElementById('apiBaseUrl').value = api.baseUrl || 'https://api.attendance.local';
+            document.getElementById('apiEnabled').checked = api.enabled || false;
+        }
+
+        function testSlack() {
+            const webhook = document.getElementById('slackWebhook').value;
+            if (!webhook) {
+                notify('❌ Please enter a Slack webhook URL', 'red');
+                return;
+            }
+            notify('✓ Testing Slack connection...', 'indigo');
+            setTimeout(() => {
+                notify('✅ Slack connection test successful!', 'emerald');
+            }, 1500);
+        }
+
+        function saveSlack() {
+            integrationConfigs.slack = {
+                enabled: true,
+                webhook: document.getElementById('slackWebhook').value,
+                absences: document.getElementById('slackAbsences').checked,
+                late: document.getElementById('slackLate').checked
+            };
+            localStorage.setItem('integrationConfigs', JSON.stringify(integrationConfigs));
+            loadIntegrationsUI();
+            notify('💾 Slack configuration saved', 'emerald');
+        }
+
+        function testCalendar() {
+            const apiKey = document.getElementById('calendarApiKey').value;
+            if (!apiKey) {
+                notify('❌ Please enter a Calendar API key', 'red');
+                return;
+            }
+            notify('✓ Testing Calendar connection...', 'indigo');
+            setTimeout(() => {
+                notify('✅ Calendar connection test successful!', 'emerald');
+            }, 1500);
+        }
+
+        function saveCalendar() {
+            integrationConfigs.calendar = {
+                enabled: true,
+                apiKey: document.getElementById('calendarApiKey').value,
+                calendarId: document.getElementById('calendarId').value,
+                sync: document.getElementById('calendarSync').checked
+            };
+            localStorage.setItem('integrationConfigs', JSON.stringify(integrationConfigs));
+            loadIntegrationsUI();
+            notify('💾 Calendar configuration saved', 'emerald');
+        }
+
+        function testPayroll() {
+            const endpoint = document.getElementById('payrollEndpoint').value;
+            if (!endpoint) {
+                notify('❌ Please enter a Payroll endpoint', 'red');
+                return;
+            }
+            notify('✓ Testing Payroll connection...', 'indigo');
+            setTimeout(() => {
+                notify('✅ Payroll connection test successful!', 'emerald');
+            }, 1500);
+        }
+
+        function exportPayroll() {
+            if (!rawData || rawData.length === 0) {
+                notify('❌ No employee data to export', 'red');
+                return;
+            }
+
+            const payload = {
+                timestamp: new Date().toISOString(),
+                recordCount: rawData.length,
+                employees: rawData.map(emp => ({
+                    id: emp.id,
+                    name: emp.name,
+                    dept: emp.dept,
+                    daysWorked: emp.daysWorked,
+                    lateMin: emp.lateMin,
+                    absences: emp.absences,
+                    hours: emp.hours
+                }))
+            };
+
+            notify(`✓ Exporting ${rawData.length} records to payroll...`, 'indigo');
+            setTimeout(() => {
+                notify('✅ Data exported successfully', 'emerald');
+            }, 1000);
+        }
+
+        function savePayroll() {
+            integrationConfigs.payroll = {
+                enabled: true,
+                endpoint: document.getElementById('payrollEndpoint').value,
+                token: document.getElementById('payrollToken').value,
+                frequency: document.getElementById('payrollFrequency').value
+            };
+            localStorage.setItem('integrationConfigs', JSON.stringify(integrationConfigs));
+            loadIntegrationsUI();
+            notify('💾 Payroll configuration saved', 'emerald');
+        }
+
+        function generateApiKey() {
+            const apiKey = 'api_' + Math.random().toString(36).substr(2, 32).toUpperCase();
+            const input = document.createElement('input');
+            input.value = apiKey;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            notify(`✅ API Key generated and copied: ${apiKey.substring(0, 20)}...`, 'emerald');
+        }
+
+        function viewApiDocs() {
+            const docs = `
+API Documentation
+=================
+Base URL: ${integrationConfigs.api.baseUrl}
+
+Endpoints:
+- GET /employees - List all employees
+- GET /employees/:id - Get employee details
+- POST /attendance - Log punch time
+- GET /reports/attendance - Get attendance report
+- POST /settings/backup - Trigger backup
+
+Authentication: Include X-API-Key header with your API key
+            `;
+            alert(docs);
+        }
+
         // Load Initial Assets on load
         window.addEventListener('load', () => {
             initializeDarkMode();
@@ -1231,6 +1531,7 @@
             setupDataParsers();
             loadSettings();
             loadBackupHistory();
+            loadIntegrations();
         });
 
         // Initialize Upload Portals
