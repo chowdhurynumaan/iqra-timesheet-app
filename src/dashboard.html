@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attendance Analytics Pro</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Enterprise-grade attendance management and analytics system">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Attendance Pro">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%234f46e5' width='192' height='192' rx='45'/><text x='50%' y='50%' font-size='100' fill='white' text-anchor='middle' dominant-baseline='central'>📊</text></svg>">
+    <link rel="manifest" href="manifest.json">
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -2675,6 +2685,87 @@ Authentication: Include X-API-Key header with your API key
                 console.error('❌ Error loading month data:', error);
                 notify('Error loading data from Firestore', 'red');
             }
+        }
+
+        // ====== PHASE 7: PWA & OFFLINE FUNCTIONALITY ======
+
+        // Register Service Worker for offline support and PWA capabilities
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker registered successfully:', registration.scope);
+                        
+                        // Check for updates periodically
+                        setInterval(() => {
+                            registration.update();
+                        }, 60000); // Check every minute
+                        
+                        // Handle service worker updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New service worker available - notify user
+                                    notify('🔄 App update available. Refresh to get the latest version.', 'blue');
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.warn('⚠️ Service Worker registration failed:', error);
+                    });
+            });
+        }
+
+        // Handle PWA install prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            console.log('📱 PWA install prompt available');
+        });
+
+        // Allow install on demand (could be triggered by UI button)
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('✅ PWA installed successfully');
+                        notify('✅ App installed successfully!', 'emerald');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+
+        // Handle app installation complete
+        window.addEventListener('appinstalled', () => {
+            console.log('✅ PWA was installed');
+            notify('✅ Attendance Pro installed successfully', 'emerald');
+        });
+
+        // Detect if running as installed app
+        function isInstalledApp() {
+            return window.matchMedia('(display-mode: standalone)').matches ||
+                   window.navigator.standalone === true;
+        }
+
+        // Monitor online/offline status
+        window.addEventListener('online', () => {
+            notify('✅ Back online - syncing data...', 'emerald');
+            console.log('🌐 Connected to internet');
+        });
+
+        window.addEventListener('offline', () => {
+            notify('⚠️ Offline mode - using cached data', 'amber');
+            console.log('📴 Offline mode activated');
+        });
+
+        // Log initial connectivity state
+        if (!navigator.onLine) {
+            notify('📴 Currently offline - using cached data', 'amber');
         }
     </script>
 </body>
