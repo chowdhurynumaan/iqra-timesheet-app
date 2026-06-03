@@ -20,10 +20,8 @@
         .container { max-width: 1400px; margin: 0 auto; }
         
         /* Header */
-        .header { background: white; padding: 1rem; border-radius: 0.75rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-bottom: 2px solid #e2e8f0; display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; }
+        .header { background: white; padding: 1rem; border-radius: 0.75rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-bottom: 2px solid #e2e8f0; }
         .header-left { flex: 1; }
-        .header-right { display: flex; gap: 2rem; align-items: flex-end; }
-        .button-group { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
         h1 { font-size: 2rem; font-weight: 700; color: #1e293b; margin-bottom: 0.25rem; }
         .subtitle { font-size: 0.85rem; color: #64748b; }
         
@@ -32,12 +30,8 @@
         .btn-upload:hover { background: #1d4ed8; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
         .btn-upload input { display: none; }
         
-        /* Control Panel */
-        .control-panel { background: white; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
-        .control-section { display: flex; flex-direction: column; gap: 0.5rem; }
-        .control-section label { font-size: 0.75rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; }
-        .control-section select, .control-section input { padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 1rem; transition: all 0.2s; }
-        .control-section select:focus, .control-section input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); outline: none; }
+        .button-group { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+        
         .btn-filter, .btn-export { background: #2563eb; color: white; border: none; padding: 0.65rem 1.25rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: all 0.2s; white-space: nowrap; font-size: 0.85rem; }
         .btn-filter:hover, .btn-export:hover { background: #1d4ed8; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
         .btn-export { background: #7c3aed; }
@@ -130,7 +124,10 @@
         .metric-card-small.missed-small .metric-card-small-value { color: #dc2626; }
         
         /* Status Indicators */
-        .status-bar { padding: 0.25rem 0.6rem; border-top: 1px solid #e2e8f0; background: #fafbfc; }\n        .status-left { display: flex; flex-direction: column; gap: 0.1rem; }\n        .status-tier { font-size: 0.65rem; font-weight: 700; color: #1e293b; }\n        .status-streak { font-size: 0.55rem; color: #64748b; font-weight: 500; }
+        .status-bar { padding: 0.25rem 0.6rem; border-top: 1px solid #e2e8f0; background: #fafbfc; }
+        .status-left { display: flex; flex-direction: column; gap: 0.1rem; }
+        .status-tier { font-size: 0.65rem; font-weight: 700; color: #1e293b; }
+        .status-streak { font-size: 0.55rem; color: #64748b; font-weight: 500; }
         
         /* Daily breakdown - ultra compact */
         .daily-breakdown { display: block; padding: 0.15rem; background: #f8fafc; border-top: 1px solid #e2e8f0; max-height: 900px; overflow-y: auto; }
@@ -147,8 +144,6 @@
         @media (max-width: 768px) {
             .header { flex-direction: column; align-items: stretch; gap: 1.5rem; }
             .header-left { margin-bottom: 0.5rem; }
-            .header-right { flex-direction: column; align-items: stretch; gap: 1rem; }
-            #headerButtonsContainer { flex-direction: column !important; }
             .button-group { flex-direction: column; }
             .btn-upload, .btn-export { width: 100%; justify-content: center; }
             .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
@@ -174,7 +169,7 @@
         
         @media print {
             @page {
-                size: lettter portrait;
+                size: letter portrait;
                 margin: 0.4in;
             }
             
@@ -192,9 +187,13 @@
                 max-width: 100% !important;
             }
             
-            /* Hide unnecessary UI elements */
-            .header, .control-panel, .stats-grid, .charts-section, .section-title, .btn-upload, .search-box, .status-bar { 
+            /* Hide unnecessary UI elements during print */
+            .header, .stats-grid, .charts-section, .section-title, .btn-upload, .search-box { 
                 display: none !important; 
+            }
+            
+            .collapsible-section {
+                display: none !important;
             }
             
             /* Employees Grid - 2 cards per page */
@@ -637,6 +636,30 @@
         .shift-save-button:active {
             transform: translateY(0);
         }
+
+        /* Search Box */
+        .search-box {
+            padding: 0.75rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+            background: white;
+            transition: all 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .search-box:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+        .search-box::placeholder {
+            color: #94a3b8;
+        }
     </style>
 </head>
 <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
@@ -1029,32 +1052,6 @@
             icon.style.transform = content.classList.contains('collapsed') ? 'rotate(0deg)' : 'rotate(90deg)';
         }
 
-        function toggleHeaderButtons() {
-            const container = document.getElementById('headerButtonsContainer');
-            const icon = document.getElementById('headerCollapseIcon');
-            
-            if (container.style.display === 'none' || container.style.display === '') {
-                container.style.display = 'flex';
-                icon.style.transform = 'rotate(0deg)';
-            } else {
-                container.style.display = 'none';
-                icon.style.transform = 'rotate(180deg)';
-            }
-        }
-
-        function toggleChartsSection() {
-            const container = document.getElementById('chartsContainer');
-            const icon = document.getElementById('chartsCollapseIcon');
-            
-            if (container.style.display === 'none' || container.style.display === '') {
-                container.style.display = 'grid';
-                icon.style.transform = 'rotate(0deg)';
-            } else {
-                container.style.display = 'none';
-                icon.style.transform = 'rotate(180deg)';
-            }
-        }
-
         function toggleToolsSection(headerElement) {
             const content = headerElement.nextElementSibling;
             const icon = headerElement.querySelector('.collapse-icon');
@@ -1371,7 +1368,6 @@
         
         async function loadMonthData() {
             const monthId = document.getElementById('monthSelector').value;
-            console.log(`📅 DEBUG: loadMonthData() called with monthId="${monthId}"`);
             if (!monthId) return;
             
             try {
@@ -1380,7 +1376,7 @@
                 if (monthDoc.exists) {
                     const reportData = monthDoc.data();
                     dateRange = reportData.dateRange || { start: null, end: null, actualDays: 0 };
-                    console.log(`📅 DEBUG: Month document exists. Date range:`, dateRange);
+                    console.log(`📅 Loaded month data. Date range:`, dateRange);
                     
                     // Load individual employees from EMPLOYEES_COLLECTION (they have full dailyBreakdown data)
                     const empSnapshot = await db.collection(EMPLOYEES_COLLECTION)
