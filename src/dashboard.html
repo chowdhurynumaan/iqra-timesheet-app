@@ -258,7 +258,7 @@
             </button>
 
             <!-- Page Menu Hamburger (Dashboard only) -->
-            <button id="pageMenuBtn" onclick="togglePageMenu()" class="flex px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-xs font-semibold transition flex-shrink-0" title="Charts">
+            <button id="pageMenuBtn" onclick="switchView('charts')" class="flex px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-xs font-semibold transition flex-shrink-0" title="Charts">
                 <i data-lucide="chart-bar" class="h-3 w-3"></i>
             </button>
         </div>
@@ -594,7 +594,47 @@
                     </div>
                 </section>
 
-                <!-- Employee Cards Section -->
+                <!-- ================= VIEW: CHARTS ================= -->
+                <div id="view-charts" class="space-y-2" style="display: none;">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Late Arrivals -->
+                        <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-slate-900 mb-1">⏰ Late Arrivals</h3>
+                            <p class="text-xs text-slate-600 mb-3">Top employees by lateness</p>
+                            <div class="h-64"><canvas id="chartLateArrivals"></canvas></div>
+                        </div>
+                        <!-- Department Stats -->
+                        <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-slate-900 mb-1">📈 Department Stats</h3>
+                            <p class="text-xs text-slate-600 mb-3">Attendance by department</p>
+                            <div class="h-64"><canvas id="chartDeptStats"></canvas></div>
+                        </div>
+                        <!-- Late Minutes -->
+                        <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-slate-900 mb-1">⏱️ Late Minutes</h3>
+                            <p class="text-xs text-slate-600 mb-3">Department lateness comparison</p>
+                            <div class="h-64"><canvas id="chartLateMinutes"></canvas></div>
+                        </div>
+                        <!-- Trends -->
+                        <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-slate-900 mb-1">📊 Trends</h3>
+                            <p class="text-xs text-slate-600 mb-3">Attendance trend analysis</p>
+                            <div class="h-64"><canvas id="chartTrends"></canvas></div>
+                        </div>
+                        <!-- Late Trend -->
+                        <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-slate-900 mb-1">🔴 Late Trend</h3>
+                            <p class="text-xs text-slate-600 mb-3">Late arrivals trend</p>
+                            <div class="h-64"><canvas id="chartLateTrend"></canvas></div>
+                        </div>
+                        <!-- Distribution -->
+                        <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-slate-900 mb-1">📍 Distribution</h3>
+                            <p class="text-xs text-slate-600 mb-3">Attendance distribution chart</p>
+                            <div class="h-64"><canvas id="chartDistribution"></canvas></div>
+                        </div>
+                    </div>
+                </div>
                 <section class="space-y-4" id="employeeCardsSection">
                     <!-- Directory Grid Content -->
                     <div id="tableBody" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 print-grid">
@@ -3813,11 +3853,31 @@ Authentication: Include X-API-Key header with your API key
             }
         }
 
+        // ========== RENDER ALL CHARTS ==========
+        function renderAllCharts() {
+            const chartsData = [
+                { canvasId: 'chartLateArrivals', chartType: 'lateChart' },
+                { canvasId: 'chartDeptStats', chartType: 'deptChart' },
+                { canvasId: 'chartLateMinutes', chartType: 'deptLateChart' },
+                { canvasId: 'chartTrends', chartType: 'attendanceTrendChart' },
+                { canvasId: 'chartLateTrend', chartType: 'lateTrendChart' },
+                { canvasId: 'chartDistribution', chartType: 'distributionChart' }
+            ];
+
+            chartsData.forEach(({ canvasId, chartType }) => {
+                setTimeout(() => renderChartInModal(chartType, canvasId), 50);
+            });
+        }
+
         // Override switchView to update UI elements
         const originalSwitchView = switchView;
         switchView = function(viewId) {
             originalSwitchView(viewId);
-            setTimeout(initializeDashboardUI, 50);
+            if (viewId === 'charts') {
+                setTimeout(renderAllCharts, 50);
+            } else {
+                setTimeout(initializeDashboardUI, 50);
+            }
         };
 
         // ========== MODAL CLOSE FUNCTIONALITY ==========
