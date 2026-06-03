@@ -478,45 +478,8 @@
                 </div>
             </div>
             
-            <!-- Navigation -->
-            <nav class="p-2 flex flex-row md:flex-col gap-0.5 overflow-x-auto md:overflow-visible">
-                <button onclick="switchView('dashboard')" id="nav-dashboard" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 bg-indigo-600 text-white whitespace-nowrap">
-                    <i data-lucide="home" class="h-3.5 w-3.5 flex-shrink-0"></i>
-                    <span>Dashboard</span>
-                </button>
-                <button onclick="switchView('employees')" id="nav-employees" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
-                    <i data-lucide="users" class="h-3.5 w-3.5 flex-shrink-0"></i>
-                    <span>Employees</span>
-                </button>
-                <button onclick="switchView('shifts')" id="nav-shifts" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
-                    <i data-lucide="clock" class="h-3.5 w-3.5 flex-shrink-0"></i>
-                    <span>Shifts</span>
-                </button>
-                <button onclick="switchView('audit')" id="nav-audit" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
-                    <i data-lucide="shield-check" class="h-3.5 w-3.5 flex-shrink-0"></i>
-                    <span>Audit</span>
-                </button>
-                <button onclick="switchView('settings')" id="nav-settings" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
-                    <i data-lucide="settings" class="h-3.5 w-3.5 flex-shrink-0"></i>
-                    <span>Settings</span>
-                </button>
-                <button onclick="switchView('backup')" id="nav-backup" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
-                    <i data-lucide="database" class="h-3.5 w-3.5 flex-shrink-0"></i>
-                    <span>Backup</span>
-                </button>
-                <button onclick="switchView('integrations')" id="nav-integrations" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
-                    <i data-lucide="zap" class="h-3.5 w-3.5 flex-shrink-0"></i>
-                    <span>Integrations</span>
-                </button>
-                <button onclick="switchView('analytics')" id="nav-analytics" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
-                    <i data-lucide="bar-chart-3" class="h-3.5 w-3.5 flex-shrink-0"></i>
-                    <span>Analytics</span>
-                </button>
-                <button onclick="switchView('enterprise')" id="nav-enterprise" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
-                    <i data-lucide="shield" class="h-3.5 w-3.5 flex-shrink-0"></i>
-                    <span>Enterprise</span>
-                </button>
-            </nav>
+            <!-- Navigation (HIDDEN - only in hamburger menu) -->
+            <nav class="hidden"></nav>
         </div>
 
         <!-- Connection status -->
