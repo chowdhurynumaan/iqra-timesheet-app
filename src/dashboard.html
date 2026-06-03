@@ -607,20 +607,7 @@
                 </section>
 
                 <!-- Employee Cards Section -->
-                <section class="space-y-4" style="display: none;" id="employeeCardsSection">
-                    <!-- Search & Actions -->
-                    <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
-                        <input type="text" id="searchBox" placeholder="🔍 Search by name or ID..." class="flex-1 px-4 py-2 border border-slate-300 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <button onclick="openAdvancedFilterModal()" class="flex items-center gap-2 px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition">
-                            <i data-lucide="sliders" class="h-4 w-4"></i>
-                            Filters
-                        </button>
-                        <button onclick="exportToExcel()" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition">
-                            <i data-lucide="download" class="h-4 w-4"></i>
-                            Export Excel
-                        </button>
-                    </div>
-
+                <section class="space-y-4" id="employeeCardsSection">
                     <!-- Directory Grid Content -->
                     <div id="tableBody" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 print-grid">
                         <div class="col-span-full text-center py-12 text-slate-500">No employee data loaded yet. Upload a report first.</div>
