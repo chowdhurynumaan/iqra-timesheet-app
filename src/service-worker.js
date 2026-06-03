@@ -1,15 +1,16 @@
 // Service Worker for Attendance Analytics Pro
 // Enables offline functionality and caching
 
-const CACHE_NAME = 'attendance-pro-v1';
+const CACHE_NAME = 'attendance-pro-v2';
 const URLS_TO_CACHE = [
   './',
   './index.html',
   './dashboard.html',
-  'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js',
-  'https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js',
+  'https://cdn.jsdelivr.net/npm/chart.js@4.4.1',
+  'https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js',
   'https://cdn.tailwindcss.com',
-  'https://cdn.jsdelivr.net/npm/lucide@latest'
+  'https://unpkg.com/lucide@0.263.1',
+  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
 ];
 
 // Install event - cache resources
