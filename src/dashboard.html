@@ -331,8 +331,6 @@
         @media (max-width: 640px) {
             /* Tighter page padding */
             .mobile-compact-padding { padding: 10px !important; }
-            .mobile-compact-padding > .space-y-6 { gap: 10px; display: flex; flex-direction: column; }
-            .mobile-compact-padding > .space-y-6 > * + * { margin-top: 0; }
 
             /* Header: slim down */
             header { padding: 6px 10px !important; }
@@ -366,8 +364,8 @@
             /* Department filter pills */
             #deptFilter .rounded-full { font-size: 11px !important; padding: 4px 10px !important; }
 
-            /* Overall section spacing */
-            #view-dashboard { gap: 8px !important; }
+            <!-- Overall section spacing -->
+            #view-dashboard { gap: 8px !important; display: flex; flex-direction: column; }
             #view-dashboard.space-y-6 > * + * { margin-top: 0 !important; }
 
             /* Overflow menu for hidden actions */
@@ -672,7 +670,7 @@
         <div class="flex-1 overflow-y-auto p-4 space-y-4 mobile-compact-padding">
 
             <!-- ================= VIEW: DASHBOARD ================= -->
-            <div id="view-dashboard" class="space-y-6" style="display: flex; flex-direction: column;">
+            <div id="view-dashboard" class="space-y-6">
                 
                 <!-- Quick Upload Area / Intro Dropzone - HIDDEN -->
                 <section class="hidden no-print bg-white rounded p-2 border border-slate-200/80 shadow-sm flex items-center justify-between gap-2">
@@ -2590,6 +2588,7 @@ Authentication: Include X-API-Key header with your API key
 
         // Load Initial Assets on load
         window.addEventListener('load', () => {
+            switchView('dashboard');
             initializeDarkMode();
             setupKeyboardShortcuts();
             loadAvailableMonths();
