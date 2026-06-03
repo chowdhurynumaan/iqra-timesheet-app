@@ -420,27 +420,27 @@
             <p class="text-xs font-bold text-slate-600 uppercase">Analytics</p>
         </div>
         <button onclick="openChartModal('lateChart', 'Top 15 Late Arrivals', 'Shows employees with most late arrivals this month')" class="w-full text-left px-4 py-2.5 hover:bg-amber-50 border-b border-slate-100">
-            <p class="font-semibold text-amber-700">⏰ Late Arrivals</p>
+            <p class="font-semibold text-amber-700">Late Arrivals</p>
             <p class="text-xs text-slate-600">Top employees by lateness</p>
         </button>
         <button onclick="openChartModal('deptChart', 'Attendance by Department', 'Average attendance percentage per department')" class="w-full text-left px-4 py-2.5 hover:bg-blue-50 border-b border-slate-100">
-            <p class="font-semibold text-blue-700">📈 Department Stats</p>
+            <p class="font-semibold text-blue-700">Department Stats</p>
             <p class="text-xs text-slate-600">Attendance by department</p>
         </button>
         <button onclick="openChartModal('deptLateChart', 'Late Minutes by Dept', 'Total late minutes per department')" class="w-full text-left px-4 py-2.5 hover:bg-red-50 border-b border-slate-100">
-            <p class="font-semibold text-red-700">⏱️ Late Minutes</p>
+            <p class="font-semibold text-red-700">Late Minutes</p>
             <p class="text-xs text-slate-600">Department lateness comparison</p>
         </button>
         <button onclick="openChartModal('attendanceTrendChart', 'Attendance Trend', 'Attendance percentage trend over the month')" class="w-full text-left px-4 py-2.5 hover:bg-green-50 border-b border-slate-100">
-            <p class="font-semibold text-green-700">📊 Trends</p>
+            <p class="font-semibold text-green-700">Trends</p>
             <p class="text-xs text-slate-600">Attendance trend analysis</p>
         </button>
         <button onclick="openChartModal('lateTrendChart', 'Late Arrivals Trend', 'Late arrival incidents over time')" class="w-full text-left px-4 py-2.5 hover:bg-orange-50 border-b border-slate-100">
-            <p class="font-semibold text-orange-700">🔴 Late Trend</p>
+            <p class="font-semibold text-orange-700">Late Trend</p>
             <p class="text-xs text-slate-600">Late arrivals trend</p>
         </button>
         <button onclick="openChartModal('distributionChart', 'Attendance Distribution', 'Distribution of attendance across ranges')" class="w-full text-left px-4 py-2.5 hover:bg-purple-50">
-            <p class="font-semibold text-purple-700">📍 Distribution</p>
+            <p class="font-semibold text-purple-700">Distribution</p>
             <p class="text-xs text-slate-600">Attendance distribution chart</p>
         </button>
     </div>
@@ -483,7 +483,7 @@
             <div class="modal-buttons" style="display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid #e5e7eb; padding-top: 12px; margin-top: 12px;">
                 <button class="modal-button modal-button-cancel" onclick="closeDayModal()" style="flex: 0 1 auto; padding: 8px 16px;" id="dayModalCancelBtn">Close</button>
                 <button class="modal-button modal-button-confirm" onclick="toggleDayEditMode()" id="dayModalEditBtn" style="flex: 0 1 auto; padding: 8px 16px;">Edit</button>
-                <button class="modal-button modal-button-confirm" onclick="saveDayEdit()" id="dayModalSaveBtn" style="flex: 0 1 auto; padding: 8px 16px; display: none; background-color: #10b981;">💾 Save</button>
+                <button class="modal-button modal-button-confirm" onclick="saveDayEdit()" id="dayModalSaveBtn" style="flex: 0 1 auto; padding: 8px 16px; display: none; background-color: #10b981;">Save</button>
             </div>
         </div>
     </div>
@@ -507,7 +507,7 @@
             <div class="modal-buttons" style="display: flex; gap: 8px; justify-content: flex-end;">
                 <button class="modal-button modal-button-cancel" onclick="closeWebhookItemModal()" id="webhookModalCancelBtn">Close</button>
                 <button class="modal-button modal-button-confirm" onclick="toggleWebhookEditMode()" id="webhookModalEditBtn">Edit</button>
-                <button class="modal-button modal-button-confirm" onclick="saveWebhookEdit()" id="webhookModalSaveBtn" style="display: none; background-color: #10b981;">💾 Save</button>
+                <button class="modal-button modal-button-confirm" onclick="saveWebhookEdit()" id="webhookModalSaveBtn" style="display: none; background-color: #10b981;">Save</button>
             </div>
         </div>
     </div>
@@ -520,7 +520,7 @@
             <div class="modal-buttons" style="display: flex; gap: 8px; justify-content: flex-end;">
                 <button class="modal-button modal-button-cancel" onclick="closeRoleItemModal()" id="roleModalCancelBtn">Close</button>
                 <button class="modal-button modal-button-confirm" onclick="toggleRoleEditMode()" id="roleModalEditBtn">Edit</button>
-                <button class="modal-button modal-button-confirm" onclick="saveRoleEdit()" id="roleModalSaveBtn" style="display: none; background-color: #10b981;">💾 Save</button>
+                <button class="modal-button modal-button-confirm" onclick="saveRoleEdit()" id="roleModalSaveBtn" style="display: none; background-color: #10b981;">Save</button>
             </div>
         </div>
     </div>
@@ -540,7 +540,7 @@
     <!-- Advanced Filter Modal -->
     <div id="advancedFilterModal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-title">⚙️ Advanced Filters</div>
+            <div class="modal-title">Advanced Filters</div>
             <div style="margin: 16px 0; space-y: 3;">
                 <div style="margin-bottom: 12px;">
                     <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 6px;">Min Attendance %</label>
@@ -653,13 +653,13 @@
                         </div>
                     </div>
                     <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                        <h3 class="text-lg font-bold text-slate-900 mb-4">📈 Attendance by Department</h3>
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">Attendance by Department</h3>
                         <div class="h-80">
                             <canvas id="deptChart"></canvas>
                         </div>
                     </div>
                     <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                        <h3 class="text-lg font-bold text-slate-900 mb-4">⏱️ Late Minutes by Department</h3>
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">Late Minutes by Department</h3>
                         <div class="h-80">
                             <canvas id="deptLateChart"></canvas>
                         </div>
@@ -680,7 +680,7 @@
                 <div class="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] flex flex-col">
                     <!-- Modal Header -->
                     <div class="flex items-center justify-between p-4 border-b border-slate-200 flex-shrink-0">
-                        <h2 class="text-xl font-bold text-slate-900">📊 All Charts</h2>
+                        <h2 class="text-xl font-bold text-slate-900">All Charts</h2>
                         <button onclick="closeChartsModal()" class="text-slate-500 hover:text-slate-700 text-2xl" title="Close">×</button>
                     </div>
                     <!-- Scrollable Content -->
@@ -689,37 +689,37 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <!-- Late Arrivals -->
                                 <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                                    <h3 class="font-bold text-slate-900 mb-1">⏰ Late Arrivals</h3>
+                                    <h3 class="font-bold text-slate-900 mb-1">Late Arrivals</h3>
                                     <p class="text-xs text-slate-600 mb-3">Top employees by lateness</p>
                                     <canvas id="chartLateArrivals" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
                                 </div>
                                 <!-- Department Stats -->
                                 <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                                    <h3 class="font-bold text-slate-900 mb-1">📈 Department Stats</h3>
+                                    <h3 class="font-bold text-slate-900 mb-1">Department Stats</h3>
                                     <p class="text-xs text-slate-600 mb-3">Attendance by department</p>
                                     <canvas id="chartDeptStats" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
                                 </div>
                                 <!-- Late Minutes -->
                                 <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                                    <h3 class="font-bold text-slate-900 mb-1">⏱️ Late Minutes</h3>
+                                    <h3 class="font-bold text-slate-900 mb-1">Late Minutes</h3>
                                     <p class="text-xs text-slate-600 mb-3">Department lateness comparison</p>
                                     <canvas id="chartLateMinutes" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
                                 </div>
                                 <!-- Trends -->
                                 <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                                    <h3 class="font-bold text-slate-900 mb-1">📊 Trends</h3>
+                                    <h3 class="font-bold text-slate-900 mb-1">Trends</h3>
                                     <p class="text-xs text-slate-600 mb-3">Attendance trend analysis</p>
                                     <canvas id="chartTrends" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
                                 </div>
                                 <!-- Late Trend -->
                                 <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                                    <h3 class="font-bold text-slate-900 mb-1">🔴 Late Trend</h3>
+                                    <h3 class="font-bold text-slate-900 mb-1">Late Trend</h3>
                                     <p class="text-xs text-slate-600 mb-3">Late arrivals trend</p>
                                     <canvas id="chartLateTrend" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
                                 </div>
                                 <!-- Distribution -->
                                 <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                                    <h3 class="font-bold text-slate-900 mb-1">📍 Distribution</h3>
+                                    <h3 class="font-bold text-slate-900 mb-1">Distribution</h3>
                                     <p class="text-xs text-slate-600 mb-3">Attendance distribution chart</p>
                                     <canvas id="chartDistribution" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
                                 </div>
@@ -736,7 +736,7 @@
             <div id="view-shifts" class="hidden space-y-6">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 max-w-4xl mx-auto space-y-6">
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-900 mb-2">⏥ Shift Definitions</h2>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-2">Shift Definitions</h2>
                         <p class="text-slate-600">Configure shift start and end times</p>
                     </div>
                     <div id="deptShiftEditor" class="space-y-6"></div>
@@ -747,7 +747,7 @@
             <div id="view-audit" class="hidden space-y-6">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 max-w-4xl mx-auto space-y-6">
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-900 mb-4">🔍 Audit Trail</h2>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-4">Audit Trail</h2>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
@@ -773,13 +773,13 @@
             <div id="view-settings" class="hidden space-y-6">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 max-w-4xl mx-auto space-y-6">
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-900 mb-2">⚙️ System Settings</h2>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-2">System Settings</h2>
                         <p class="text-slate-600">Configure shifts, defaults, and system preferences</p>
                     </div>
 
                     <!-- Shift Settings Section -->
                     <div class="space-y-4 border-t border-slate-200 pt-6">
-                        <h3 class="text-lg font-bold text-slate-900">📅 Shift Definitions</h3>
+                        <h3 class="text-lg font-bold text-slate-900">Shift Definitions</h3>
                         <div id="settingsShiftContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                         <button onclick="addNewShift()" class="mt-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition">
                             <i data-lucide="plus" class="inline h-4 w-4 mr-2"></i>Add Shift
@@ -788,7 +788,7 @@
 
                     <!-- System Preferences Section -->
                     <div class="space-y-4 border-t border-slate-200 pt-6">
-                        <h3 class="text-lg font-bold text-slate-900">🔧 Preferences</h3>
+                        <h3 class="text-lg font-bold text-slate-900">Preferences</h3>
                         <div class="space-y-3">
                             <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
                                 <input type="checkbox" id="prefAutoBackup" class="w-4 h-4 rounded border-slate-300" checked>
@@ -810,10 +810,10 @@
                     <!-- Save Settings -->
                     <div class="flex gap-2 border-t border-slate-200 pt-6">
                         <button onclick="saveSettings()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition">
-                            💾 Save Settings
+                            Save Settings
                         </button>
                         <button onclick="resetSettings()" class="px-6 py-2 bg-slate-200 hover:bg-slate-300 text-slate-900 rounded-lg font-semibold transition">
-                            ↺ Reset
+                            Reset
                         </button>
                     </div>
                 </div>
@@ -823,21 +823,21 @@
             <div id="view-backup" class="hidden space-y-6">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 max-w-4xl mx-auto space-y-6">
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-900 mb-2">💾 Backup & Restore</h2>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-2">Backup & Restore</h2>
                         <p class="text-slate-600">Manage system backups and restore data</p>
                     </div>
 
                     <!-- Quick Backup Section -->
                     <div class="space-y-4 border-t border-slate-200 pt-6">
-                        <h3 class="text-lg font-bold text-slate-900">🚀 Quick Actions</h3>
+                        <h3 class="text-lg font-bold text-slate-900">Quick Actions</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <button onclick="triggerBackup()" class="p-4 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-semibold transition shadow-md">
-                                <div class="text-2xl mb-2">⬇️</div>
+                                <div class="text-2xl mb-2">↓</div>
                                 <div>Create Backup Now</div>
                                 <div class="text-xs opacity-90 mt-1">Backup all data to file</div>
                             </button>
                             <button onclick="triggerRestore()" class="p-4 bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg font-semibold transition shadow-md">
-                                <div class="text-2xl mb-2">⬆️</div>
+                                <div class="text-2xl mb-2">↑</div>
                                 <div>Restore from Backup</div>
                                 <div class="text-xs opacity-90 mt-1">Restore previous data</div>
                             </button>
@@ -846,7 +846,7 @@
 
                     <!-- Backup History Section -->
                     <div class="space-y-4 border-t border-slate-200 pt-6">
-                        <h3 class="text-lg font-bold text-slate-900">📋 Backup History</h3>
+                        <h3 class="text-lg font-bold text-slate-900">Backup History</h3>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm">
                                 <thead class="bg-slate-50 border-b border-slate-200">
@@ -871,7 +871,7 @@
             <div id="view-integrations" class="hidden space-y-6">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 max-w-4xl mx-auto space-y-6">
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-900 mb-2">⚡ Integrations</h2>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-2">Integrations</h2>
                         <p class="text-slate-600">Connect external services to enhance your attendance system</p>
                     </div>
 
@@ -879,7 +879,7 @@
                     <div class="space-y-4 border-t border-slate-200 pt-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h3 class="text-lg font-bold text-slate-900">🔔 Slack Notifications</h3>
+                                <h3 class="text-lg font-bold text-slate-900">Slack Notifications</h3>
                                 <p class="text-sm text-slate-600">Send alerts for absences and late arrivals</p>
                             </div>
                             <span id="slackStatus" class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">Disabled</span>
@@ -906,7 +906,7 @@
                     <div class="space-y-4 border-t border-slate-200 pt-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h3 class="text-lg font-bold text-slate-900">📅 Google Calendar</h3>
+                                <h3 class="text-lg font-bold text-slate-900">Google Calendar</h3>
                                 <p class="text-sm text-slate-600">Sync holidays and events with your calendar</p>
                             </div>
                             <span id="calendarStatus" class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">Disabled</span>
@@ -934,7 +934,7 @@
                     <div class="space-y-4 border-t border-slate-200 pt-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h3 class="text-lg font-bold text-slate-900">💰 Payroll System</h3>
+                                <h3 class="text-lg font-bold text-slate-900">Payroll System</h3>
                                 <p class="text-sm text-slate-600">Export attendance data to payroll</p>
                             </div>
                             <span id="payrollStatus" class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">Disabled</span>
@@ -966,7 +966,7 @@
                     <!-- API Configuration -->
                     <div class="space-y-4 border-t border-slate-200 pt-6">
                         <div>
-                            <h3 class="text-lg font-bold text-slate-900">🔐 API Configuration</h3>
+                            <h3 class="text-lg font-bold text-slate-900">API Configuration</h3>
                             <p class="text-sm text-slate-600 mt-1">Manage API keys for third-party access</p>
                         </div>
                         <div class="space-y-2 p-4 bg-slate-50 rounded-lg border border-slate-200">
@@ -1035,7 +1035,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Attendance Trend -->
                     <div class="bg-white p-6 rounded-2xl border border-slate-200">
-                        <h3 class="text-lg font-bold text-slate-900 mb-4">📈 Attendance Trend</h3>
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">Attendance Trend</h3>
                         <div style="position: relative; height: 300px; width: 100%;">
                             <canvas id="attendanceTrendChart"></canvas>
                         </div>
@@ -1043,7 +1043,7 @@
 
                     <!-- Late Arrivals Trend -->
                     <div class="bg-white p-6 rounded-2xl border border-slate-200">
-                        <h3 class="text-lg font-bold text-slate-900 mb-4">⏰ Late Arrivals Trend</h3>
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">Late Arrivals Trend</h3>
                         <div style="position: relative; height: 300px; width: 100%;">
                             <canvas id="lateTrendChart"></canvas>
                         </div>
@@ -1051,7 +1051,7 @@
 
                     <!-- Department Performance -->
                     <div class="bg-white p-6 rounded-2xl border border-slate-200">
-                        <h3 class="text-lg font-bold text-slate-900 mb-4">🏢 Department Performance</h3>
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">Department Performance</h3>
                         <div style="position: relative; height: 300px; width: 100%;">
                             <canvas id="departmentChart"></canvas>
                         </div>
@@ -1077,7 +1077,7 @@
                                     <p class="font-semibold text-slate-900">Employee Name</p>
                                     <p class="text-xs text-slate-600">100% attendance • 0 late</p>
                                 </div>
-                                <span class="text-lg">🏆</span>
+                                <span class="text-lg font-bold text-amber-600">•</span>
                             </div>
                         </div>
                     </div>
@@ -1091,7 +1091,7 @@
                                     <p class="font-semibold text-slate-900">Employee Name</p>
                                     <p class="text-xs text-slate-600">72% attendance • 8 absences</p>
                                 </div>
-                                <span class="text-lg">🚨</span>
+                                <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500"></span>
                             </div>
                         </div>
                     </div>
@@ -1102,12 +1102,12 @@
                     <div class="flex items-start gap-4">
                         <i data-lucide="lightbulb" class="h-8 w-8 text-indigo-600 flex-shrink-0 mt-1"></i>
                         <div class="flex-1">
-                            <h3 class="text-lg font-bold text-slate-900 mb-2">🔮 Predictive Insights</h3>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">Predictive Insights</h3>
                             <div class="space-y-2 text-sm text-slate-700">
-                                <p>📌 <strong>Trend:</strong> <span id="insightTrend">Late arrivals trending upward this week (+5.2%)</span></p>
-                                <p>📌 <strong>Risk Alert:</strong> <span id="insightRisk">5 employees at risk of exceeding absence limit</span></p>
-                                <p>📌 <strong>Forecast:</strong> <span id="insightForecast">Expected 12-15 absences next week based on patterns</span></p>
-                                <p>📌 <strong>Recommendation:</strong> <span id="insightRec">Schedule check-in with high-risk employees to improve engagement</span></p>
+                                <p><strong>Trend:</strong> <span id="insightTrend">Late arrivals trending upward this week (+5.2%)</span></p>
+                                <p><strong>Risk Alert:</strong> <span id="insightRisk">5 employees at risk of exceeding absence limit</span></p>
+                                <p><strong>Forecast:</strong> <span id="insightForecast">Expected 12-15 absences next week based on patterns</span></p>
+                                <p><strong>Recommendation:</strong> <span id="insightRec">Schedule check-in with high-risk employees to improve engagement</span></p>
                             </div>
                         </div>
                     </div>
@@ -1115,19 +1115,19 @@
 
                 <!-- Export Analytics -->
                 <div class="flex gap-2 justify-end">
-                    <button onclick="exportAnalyticsReport()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition">📥 Export Report</button>
-                    <button onclick="refreshAnalytics()" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition">🔄 Refresh Data</button>
+                    <button onclick="exportAnalyticsReport()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition">Export Report</button>
+                    <button onclick="refreshAnalytics()" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition">Refresh Data</button>
                 </div>
             </div>
 
             <!-- PHASE 8: ENTERPRISE VIEW -->
             <div id="view-enterprise" class="hidden space-y-6">
-                <h2 class="text-3xl font-bold text-slate-900 mb-6">🏢 Enterprise Administration</h2>
+                <h2 class="text-3xl font-bold text-slate-900 mb-6">Enterprise Administration</h2>
 
                 <!-- SSO Configuration -->
                 <div class="bg-white p-6 rounded-2xl border border-slate-200">
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-slate-900">🔐 Single Sign-On (SSO)</h3>
+                        <h3 class="text-xl font-bold text-slate-900">Single Sign-On (SSO)</h3>
                         <span class="text-xs bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full font-semibold">Phase 8</span>
                     </div>
                     
@@ -1175,14 +1175,14 @@
                             <input type="text" placeholder="User Search Base" id="ldapSearchBase" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
                         </div>
 
-                        <button onclick="saveSSOConfig()" class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition">💾 Save SSO Configuration</button>
+                        <button onclick="saveSSOConfig()" class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition">Save SSO Configuration</button>
                     </div>
                 </div>
 
                 <!-- Webhook Management -->
                 <div class="bg-white p-6 rounded-2xl border border-slate-200">
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-slate-900">🔗 Webhook Management</h3>
+                        <h3 class="text-xl font-bold text-slate-900">Webhook Management</h3>
                         <button onclick="openAddWebhookModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition">+ Add Webhook</button>
                     </div>
                     
@@ -1194,7 +1194,7 @@
                 <!-- Multi-tenant Configuration -->
                 <div class="bg-white p-6 rounded-2xl border border-slate-200">
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-slate-900">🏢 Multi-tenant Settings</h3>
+                        <h3 class="text-xl font-bold text-slate-900">Multi-tenant Settings</h3>
                         <span class="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">Organizations</span>
                     </div>
                     
@@ -1227,14 +1227,14 @@
                             </div>
                         </div>
 
-                        <button onclick="openCreateOrgModal()" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition">➕ Create New Organization</button>
+                        <button onclick="openCreateOrgModal()" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition">Create New Organization</button>
                     </div>
                 </div>
 
                 <!-- Advanced RBAC -->
                 <div class="bg-white p-6 rounded-2xl border border-slate-200">
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-slate-900">👥 Role-Based Access Control</h3>
+                        <h3 class="text-xl font-bold text-slate-900">Role-Based Access Control</h3>
                         <button onclick="openAddRoleModal()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-semibold transition">+ Add Role</button>
                     </div>
                     
@@ -1282,7 +1282,7 @@
                 <!-- API Rate Limiting -->
                 <div class="bg-white p-6 rounded-2xl border border-slate-200">
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-slate-900">⚡ API Rate Limiting</h3>
+                        <h3 class="text-xl font-bold text-slate-900">API Rate Limiting</h3>
                         <span class="text-xs bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-semibold">Quotas</span>
                     </div>
                     
@@ -1311,17 +1311,17 @@
                             </div>
                         </div>
 
-                        <button onclick="saveApiRateLimits()" class="w-full px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold transition">💾 Save Rate Limits</button>
+                        <button onclick="saveApiRateLimits()" class="w-full px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold transition">Save Rate Limits</button>
                     </div>
                 </div>
 
                 <!-- Audit Log Enhancement -->
                 <div class="bg-white p-6 rounded-2xl border border-slate-200">
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-slate-900">📋 Audit Log</h3>
+                        <h3 class="text-xl font-bold text-slate-900">Audit Log</h3>
                         <div class="flex gap-2">
                             <input type="text" placeholder="Search logs..." id="auditSearchBox" class="px-3 py-2 border border-slate-300 rounded-lg text-sm" style="width: 200px;">
-                            <button onclick="exportAuditLog()" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition">📥 Export</button>
+                            <button onclick="exportAuditLog()" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition">Export</button>
                         </div>
                     </div>
                     
@@ -1357,25 +1357,25 @@
                         <div class="space-y-3 text-sm">
                             <div class="flex justify-between">
                                 <span class="text-green-800">Database</span>
-                                <span class="font-semibold text-green-900">🟢 Connected</span>
+                                <span class="font-semibold text-green-900"><span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span> Connected</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-green-800">SSO Provider</span>
-                                <span class="font-semibold text-green-900">🟢 Active</span>
+                                <span class="font-semibold text-green-900"><span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span> Active</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-green-800">Webhooks</span>
-                                <span class="font-semibold text-green-900">🟢 Operational</span>
+                                <span class="font-semibold text-green-900"><span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span> Operational</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-green-800">API Rate Limits</span>
-                                <span class="font-semibold text-green-900">🟢 Enforced</span>
+                                <span class="font-semibold text-green-900"><span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span> Enforced</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 p-6 rounded-2xl">
-                        <h3 class="text-lg font-bold text-blue-900 mb-4">📊 Enterprise Metrics</h3>
+                        <h3 class="text-lg font-bold text-blue-900 mb-4">Enterprise Metrics</h3>
                         <div class="space-y-3 text-sm">
                             <div class="flex justify-between">
                                 <span class="text-blue-800">Total Organizations</span>
@@ -1474,7 +1474,7 @@
         const auth = firebase.auth();
         
         auth.signInAnonymously().catch((error) => {
-            console.error('❌ Anonymous Authentication error:', error);
+            console.error('Anonymous Authentication error:', error);
             notify('Firebase system connection failure', 'red');
         });
         
@@ -1548,7 +1548,7 @@
             };
             undoStack.push(change);
             redoStack = []; // Clear redo stack when new change is made
-            console.log(`✅ Change recorded: ${description}`);
+            console.log(`Change recorded: ${description}`);
         }
 
         function undo() {
@@ -1772,7 +1772,7 @@
 
             if (changes.length > 0) {
                 recordChange(`Edited ${changes.length} punch times for ${currentEditingEmp.name}`, { changes });
-                notify(`✓ Updated ${changes.length} punch times`, 'emerald');
+                notify(`Updated ${changes.length} punch times`, 'emerald');
             } else {
                 notify('No changes made', 'amber');
             }
@@ -1836,7 +1836,7 @@
 
             renderDashboard(filteredData);
             displayEmployeeData(filteredData);
-            notify(`📊 Filtered to ${filteredData.length} employees matching criteria`, 'indigo');
+            notify(`Filtered to ${filteredData.length} employees matching criteria`, 'indigo');
             closeAdvancedFilter();
         }
 
@@ -1907,7 +1907,7 @@
             systemSettings.notifications = document.getElementById('prefNotifications').checked;
             localStorage.setItem('systemSettings', JSON.stringify(systemSettings));
             localStorage.setItem('shiftDefinitions', JSON.stringify(shiftDefinitions));
-            notify('✅ Settings saved successfully', 'emerald');
+            notify('Settings saved successfully', 'emerald');
         }
 
         function resetSettings() {
@@ -1982,7 +1982,7 @@
             URL.revokeObjectURL(url);
             
             displayBackupHistory();
-            notify(`💾 Backup created: ${rawData.length} records`, 'emerald');
+            notify(`Backup created: ${rawData.length} records`, 'emerald');
         }
 
         function triggerRestore() {
@@ -2003,9 +2003,9 @@
                         systemSettings = backup.systemSettings || systemSettings;
                         
                         displayEmployeeData(rawData);
-                        notify(`✅ Data restored: ${rawData.length} records`, 'emerald');
+                        notify(`Data restored: ${rawData.length} records`, 'emerald');
                     } catch (err) {
-                        notify('❌ Failed to restore backup. Invalid file.', 'red');
+                        notify('Failed to restore backup. Invalid file.', 'red');
                     }
                 };
                 reader.readAsText(file);
@@ -2028,7 +2028,7 @@
             systemSettings = backup.data.systemSettings || systemSettings;
             
             displayEmployeeData(rawData);
-            notify(`✅ Restored backup from ${new Date(timestamp).toLocaleString()}`, 'emerald');
+            notify(`Restored backup from ${new Date(timestamp).toLocaleString()}`, 'emerald');
             switchView('dashboard');
         }
 
@@ -2037,7 +2037,7 @@
             backupHistory = backupHistory.filter(b => b.timestamp !== timestamp);
             localStorage.setItem('backupHistory', JSON.stringify(backupHistory));
             displayBackupHistory();
-            notify('🗑️ Backup deleted', 'amber');
+            notify('Backup deleted', 'amber');
         }
 
         // ====== PHASE 5: INTEGRATIONS ======
@@ -2093,12 +2093,12 @@
         function testSlack() {
             const webhook = document.getElementById('slackWebhook').value;
             if (!webhook) {
-                notify('❌ Please enter a Slack webhook URL', 'red');
+                notify('Please enter a Slack webhook URL', 'red');
                 return;
             }
-            notify('✓ Testing Slack connection...', 'indigo');
+            notify('Testing Slack connection...', 'indigo');
             setTimeout(() => {
-                notify('✅ Slack connection test successful!', 'emerald');
+                notify('Slack connection test successful!', 'emerald');
             }, 1500);
         }
 
@@ -2111,18 +2111,18 @@
             };
             localStorage.setItem('integrationConfigs', JSON.stringify(integrationConfigs));
             loadIntegrationsUI();
-            notify('💾 Slack configuration saved', 'emerald');
+            notify('Slack configuration saved', 'emerald');
         }
 
         function testCalendar() {
             const apiKey = document.getElementById('calendarApiKey').value;
             if (!apiKey) {
-                notify('❌ Please enter a Calendar API key', 'red');
+                notify('Please enter a Calendar API key', 'red');
                 return;
             }
-            notify('✓ Testing Calendar connection...', 'indigo');
+            notify('Testing Calendar connection...', 'indigo');
             setTimeout(() => {
-                notify('✅ Calendar connection test successful!', 'emerald');
+                notify('Calendar connection test successful!', 'emerald');
             }, 1500);
         }
 
@@ -2135,24 +2135,24 @@
             };
             localStorage.setItem('integrationConfigs', JSON.stringify(integrationConfigs));
             loadIntegrationsUI();
-            notify('💾 Calendar configuration saved', 'emerald');
+            notify('Calendar configuration saved', 'emerald');
         }
 
         function testPayroll() {
             const endpoint = document.getElementById('payrollEndpoint').value;
             if (!endpoint) {
-                notify('❌ Please enter a Payroll endpoint', 'red');
+                notify('Please enter a Payroll endpoint', 'red');
                 return;
             }
-            notify('✓ Testing Payroll connection...', 'indigo');
+            notify('Testing Payroll connection...', 'indigo');
             setTimeout(() => {
-                notify('✅ Payroll connection test successful!', 'emerald');
+                notify('Payroll connection test successful!', 'emerald');
             }, 1500);
         }
 
         function exportPayroll() {
             if (!rawData || rawData.length === 0) {
-                notify('❌ No employee data to export', 'red');
+                notify('No employee data to export', 'red');
                 return;
             }
 
@@ -2170,9 +2170,9 @@
                 }))
             };
 
-            notify(`✓ Exporting ${rawData.length} records to payroll...`, 'indigo');
+            notify(`Exporting ${rawData.length} records to payroll...`, 'indigo');
             setTimeout(() => {
-                notify('✅ Data exported successfully', 'emerald');
+                notify('Data exported successfully', 'emerald');
             }, 1000);
         }
 
@@ -2185,7 +2185,7 @@
             };
             localStorage.setItem('integrationConfigs', JSON.stringify(integrationConfigs));
             loadIntegrationsUI();
-            notify('💾 Payroll configuration saved', 'emerald');
+            notify('Payroll configuration saved', 'emerald');
         }
 
         function generateApiKey() {
@@ -2196,7 +2196,7 @@
             input.select();
             document.execCommand('copy');
             document.body.removeChild(input);
-            notify(`✅ API Key generated and copied: ${apiKey.substring(0, 20)}...`, 'emerald');
+            notify(`API Key generated and copied: ${apiKey.substring(0, 20)}...`, 'emerald');
         }
 
         function viewApiDocs() {
@@ -2387,7 +2387,7 @@ Authentication: Include X-API-Key header with your API key
                         <p class="font-semibold text-slate-900">${emp.name}</p>
                         <p class="text-xs text-slate-600">${emp.dept} • ${emp.daysWorked || 0} days worked</p>
                     </div>
-                    <span class="text-lg">🏆</span>
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                 </div>
             `).join('');
         }
@@ -2415,7 +2415,7 @@ Authentication: Include X-API-Key header with your API key
                         <p class="font-semibold text-slate-900">${emp.name}</p>
                         <p class="text-xs text-slate-600">${emp.absences || 0} absences • ${emp.lateMin || 0} min late</p>
                     </div>
-                    <span class="text-lg">🚨</span>
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500"></span>
                 </div>
             `).join('') || '<p class="text-sm text-slate-600">No employees at risk</p>';
         }
@@ -2442,7 +2442,7 @@ Authentication: Include X-API-Key header with your API key
 
         function exportAnalyticsReport() {
             if (!rawData || rawData.length === 0) {
-                notify('❌ No data to export', 'red');
+                notify('No data to export', 'red');
                 return;
             }
 
@@ -2467,14 +2467,14 @@ Authentication: Include X-API-Key header with your API key
             link.download = `analytics-report-${new Date().toISOString().split('T')[0]}.json`;
             link.click();
             URL.revokeObjectURL(url);
-            notify('📥 Analytics report exported successfully', 'emerald');
+            notify('Analytics report exported successfully', 'emerald');
         }
 
         function refreshAnalytics() {
-            notify('🔄 Refreshing analytics data...', 'indigo');
+            notify('Refreshing analytics data...', 'indigo');
             setTimeout(() => {
                 loadAnalyticsData();
-                notify('✅ Analytics refreshed', 'emerald');
+                notify('Analytics refreshed', 'emerald');
             }, 500);
         }
 
@@ -2532,7 +2532,7 @@ Authentication: Include X-API-Key header with your API key
                     loadMonthData();
                 }
             } catch (error) {
-                console.error('❌ Month load failed:', error);
+                console.error('Month load failed:', error);
                 notify('Database Month retrieval failed', 'red');
             }
         }
@@ -2565,7 +2565,7 @@ Authentication: Include X-API-Key header with your API key
                 }
                 renderShiftDefinitionsUI();
             } catch (error) {
-                console.error('❌ Default shift loading failed:', error);
+                console.error('Default shift loading failed:', error);
             }
         }
 
@@ -2623,7 +2623,7 @@ Authentication: Include X-API-Key header with your API key
             
             const saveBtn = document.createElement('button');
             saveBtn.className = 'w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition duration-200 uppercase tracking-wider shadow-lg shadow-indigo-600/10 mt-6';
-            saveBtn.textContent = '💾 Save Shift Guidelines';
+            saveBtn.textContent = 'Save Shift Guidelines';
             saveBtn.onclick = saveShiftDefinitions;
             editor.appendChild(saveBtn);
         }
@@ -3003,7 +3003,7 @@ Authentication: Include X-API-Key header with your API key
         function openDayModal(empId, dayIdx) {
             const emp = rawData.find(e => e.id === empId);
             if (!emp || !emp.dailyBreakdown || !emp.dailyBreakdown[dayIdx]) {
-                notify('⚠️ Day data not found', 'amber');
+                notify('Day data not found', 'amber');
                 return;
             }
 
@@ -3026,7 +3026,7 @@ Authentication: Include X-API-Key header with your API key
 
             if (isEditMode) {
                 // EDIT MODE: Show editable fields
-                document.getElementById('dayModalTitle').textContent = `✏️ Edit ${dayName}, ${dateStr}`;
+                document.getElementById('dayModalTitle').textContent = `Edit ${dayName}, ${dateStr}`;
                 document.getElementById('dayModalContent').innerHTML = `
                     <div class="space-y-4">
                         <div class="p-3 bg-indigo-50 rounded-lg border border-indigo-200">
@@ -3063,7 +3063,7 @@ Authentication: Include X-API-Key header with your API key
                 document.getElementById('dayModalCancelBtn').textContent = 'Cancel';
             } else {
                 // VIEW MODE: Show read-only data
-                document.getElementById('dayModalTitle').textContent = `📅 ${dayName}, ${dateStr}`;
+                document.getElementById('dayModalTitle').textContent = `${dayName}, ${dateStr}`;
                 document.getElementById('dayModalContent').innerHTML = `
                     <div class="space-y-4">
                         <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
@@ -3104,7 +3104,7 @@ Authentication: Include X-API-Key header with your API key
                         <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
                             <p class="text-xs font-semibold text-slate-600 uppercase mb-2">Status</p>
                             <p class="text-lg font-bold text-slate-900">
-                                ${day.isMissed ? '❌ Absent' : (day.lateMin > 0 ? '⚠️ Late Arrival' : '✅ Present')}
+                                ${day.isMissed ? '<span class="text-red-600">Absent</span>' : (day.lateMin > 0 ? '<span class="text-amber-600">Late Arrival</span>' : '<span class="text-emerald-600">Present</span>')}
                             </p>
                         </div>
                     </div>
@@ -3135,7 +3135,7 @@ Authentication: Include X-API-Key header with your API key
             const emp = rawData.find(e => e.id === empId);
             
             if (!emp || !emp.dailyBreakdown || !emp.dailyBreakdown[dayIdx]) {
-                notify('⚠️ Day data not found', 'amber');
+                notify('Day data not found', 'amber');
                 return;
             }
 
@@ -3163,8 +3163,8 @@ Authentication: Include X-API-Key header with your API key
             // Log audit event
             logAuditEvent('punch.update', 'Current User', `Updated ${emp.name} on ${day.date}`, 'success');
 
-            notify('✅ Changes saved!', 'emerald');
-            console.log('💾 Day edited:', { empId, dayIdx, day });
+            notify('Changes saved!', 'emerald');
+            console.log('Day edited:', { empId, dayIdx, day });
             
             // Close modal and refresh display
             dayModalEditMode = false;
@@ -3190,7 +3190,7 @@ Authentication: Include X-API-Key header with your API key
             const wh = webhooks.find(w => w.id === currentWebhookId);
             if (!wh) return;
 
-            document.getElementById('webhookModalTitle').textContent = isEditMode ? `✏️ Edit Webhook` : `🔗 Webhook Details`;
+            document.getElementById('webhookModalTitle').textContent = isEditMode ? `Edit Webhook` : `Webhook Details`;
 
             if (isEditMode) {
                 // EDIT MODE
@@ -3250,7 +3250,7 @@ Authentication: Include X-API-Key header with your API key
                         </div>
                         <div class="p-3 ${wh.active ? 'bg-green-50' : 'bg-slate-50'} rounded-lg">
                             <p class="text-xs font-semibold uppercase mb-1">Status</p>
-                            <p class="font-bold">${wh.active ? '🟢 Active' : '🔴 Inactive'}</p>
+                            <p class="font-bold">${wh.active ? '<span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span> Active' : '<span class="inline-block w-2 h-2 rounded-full bg-red-500 mr-1"></span> Inactive'}</p>
                         </div>
                     </div>
                 `;
@@ -3281,11 +3281,11 @@ Authentication: Include X-API-Key header with your API key
             wh.active = document.getElementById('webhookEditActive').checked;
 
             localStorage.setItem('webhooks', JSON.stringify(webhooks));
-            notify('✅ Webhook updated!', 'emerald');
+            notify('Webhook updated!', 'emerald');
 
             webhookModalEditMode = false;
             renderWebhookModalContent(false);
-            console.log('💾 Webhook saved:', wh);
+            console.log('Webhook saved:', wh);
         }
 
         // ===== PATTERN APPLICATION: Role Items (Single Modal Toggle) =====
@@ -3306,7 +3306,7 @@ Authentication: Include X-API-Key header with your API key
             const role = roles[currentRoleId];
             if (!role) return;
 
-            document.getElementById('roleModalTitle').textContent = isEditMode ? `✏️ Edit Role` : `👥 Role Details`;
+            document.getElementById('roleModalTitle').textContent = isEditMode ? `Edit Role` : `Role Details`;
 
             if (isEditMode) {
                 // EDIT MODE
@@ -3388,11 +3388,11 @@ Authentication: Include X-API-Key header with your API key
             role.permissions = Array.from(document.querySelectorAll('.permissionCheckbox:checked')).map(cb => cb.value);
 
             localStorage.setItem('enterpriseRoles', JSON.stringify(roles));
-            notify('✅ Role updated!', 'emerald');
+            notify('Role updated!', 'emerald');
 
             roleModalEditMode = false;
             renderRoleModalContent(false);
-            console.log('💾 Role saved:', role);
+            console.log('Role saved:', role);
         }
 
         function updateCharts(data) {
@@ -3508,7 +3508,7 @@ Authentication: Include X-API-Key header with your API key
                     totalEmployees: rawData.length
                 });
                 recordChange('Workspace backup', { employees: rawData.length });
-                notify('💾 Workspace backup complete! (Ctrl+S)', 'emerald');
+                notify('Workspace backup complete! (Ctrl+S)', 'emerald');
             } catch (error) {
                 notify('Failed to backup data', 'red');
             }
@@ -3516,7 +3516,7 @@ Authentication: Include X-API-Key header with your API key
 
         function printSelected() {
             recordChange('Print report', { timestamp: new Date() });
-            notify('🖨️ Opening print preview...', 'indigo');
+            notify('Opening print preview...', 'indigo');
             setTimeout(() => {
                 window.print();
             }, 500);
@@ -3541,14 +3541,14 @@ Authentication: Include X-API-Key header with your API key
         async function cleanupDuplicateEmployees() {
             const duplicateCount = rawData.length - new Set(rawData.map(e => e.id)).size;
             showConfirmation(
-                '⚠️ Clean Up Duplicates',
+                'Clean Up Duplicates',
                 `Found ${duplicateCount} duplicate records. This action cannot be undone. Continue?`,
                 () => {
                     const unique = new Set(rawData.map(e => e.id));
                     const beforeCount = rawData.length;
                     rawData = Array.from(unique).map(id => rawData.find(e => e.id === id));
                     recordChange('Cleanup duplicates', { before: beforeCount, after: rawData.length });
-                    notify(`✓ Removed ${beforeCount - rawData.length} duplicates. ${rawData.length} unique employees remain.`, 'emerald');
+                    notify(`Removed ${beforeCount - rawData.length} duplicates. ${rawData.length} unique employees remain.`, 'emerald');
                 }
             );
         }
@@ -3563,7 +3563,7 @@ Authentication: Include X-API-Key header with your API key
                 if (monthDoc.exists) {
                     const reportData = monthDoc.data();
                     dateRange = reportData.dateRange || { start: null, end: null, actualDays: 0 };
-                    console.log(`📅 Loaded month data. Date range:`, dateRange);
+                    console.log(`Loaded month data. Date range:`, dateRange);
                     
                     // Load individual employees from EMPLOYEES_COLLECTION (they have full dailyBreakdown data)
                     const empSnapshot = await db.collection(EMPLOYEES_COLLECTION)
@@ -3603,8 +3603,8 @@ Authentication: Include X-API-Key header with your API key
                     
                     filteredData = [...rawData];
                     
-                    console.log(`✅ Loaded ${rawData.length} employees from ${monthId}`);
-                    console.log(`📅 Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);
+                    console.log(`Loaded ${rawData.length} employees from ${monthId}`);
+                    console.log(`Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);
                     
                     // Show employee cards and KPI sections
                     document.getElementById('employeeCardsSection').style.display = 'block';
@@ -3620,13 +3620,13 @@ Authentication: Include X-API-Key header with your API key
                     // Display employee data in the table
                     displayEmployeeData(rawData);
                     
-                    notify(`✅ Loaded ${rawData.length} employees from ${monthId}`, 'emerald');
+                    notify(`Loaded ${rawData.length} employees from ${monthId}`, 'emerald');
                 } else {
                     console.warn(`⚠️ No data found for month: ${monthId}`);
                     notify('No data found for selected month', 'amber');
                 }
             } catch (error) {
-                console.error('❌ Error loading month data:', error);
+                console.error('Error loading month data:', error);
                 notify('Error loading data from Firestore', 'red');
             }
         }
@@ -3638,7 +3638,7 @@ Authentication: Include X-API-Key header with your API key
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('service-worker.js')
                     .then(registration => {
-                        console.log('✅ Service Worker registered successfully:', registration.scope);
+                        console.log('Service Worker registered successfully:', registration.scope);
                         
                         // Check for updates periodically
                         setInterval(() => {
@@ -3651,7 +3651,7 @@ Authentication: Include X-API-Key header with your API key
                             newWorker.addEventListener('statechange', () => {
                                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                                     // New service worker available - notify user
-                                    notify('🔄 App update available. Refresh to get the latest version.', 'blue');
+                                    notify('App update available. Refresh to get the latest version.', 'blue');
                                 }
                             });
                         });
@@ -3667,7 +3667,7 @@ Authentication: Include X-API-Key header with your API key
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            console.log('📱 PWA install prompt available');
+            console.log('PWA install prompt available');
         });
 
         // Allow install on demand (could be triggered by UI button)
@@ -3676,8 +3676,8 @@ Authentication: Include X-API-Key header with your API key
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        console.log('✅ PWA installed successfully');
-                        notify('✅ App installed successfully!', 'emerald');
+                        console.log('PWA installed successfully');
+                        notify('App installed successfully!', 'emerald');
                     }
                     deferredPrompt = null;
                 });
@@ -3686,8 +3686,8 @@ Authentication: Include X-API-Key header with your API key
 
         // Handle app installation complete
         window.addEventListener('appinstalled', () => {
-            console.log('✅ PWA was installed');
-            notify('✅ Attendance Pro installed successfully', 'emerald');
+            console.log('PWA was installed');
+            notify('Attendance Pro installed successfully', 'emerald');
         });
 
         // Detect if running as installed app
@@ -3698,18 +3698,18 @@ Authentication: Include X-API-Key header with your API key
 
         // Monitor online/offline status
         window.addEventListener('online', () => {
-            notify('✅ Back online - syncing data...', 'emerald');
-            console.log('🌐 Connected to internet');
+            notify('Back online - syncing data...', 'emerald');
+            console.log('Connected to internet');
         });
 
         window.addEventListener('offline', () => {
-            notify('⚠️ Offline mode - using cached data', 'amber');
-            console.log('📴 Offline mode activated');
+            notify('Offline mode - using cached data', 'amber');
+            console.log('Offline mode activated');
         });
 
         // Log initial connectivity state
         if (!navigator.onLine) {
-            notify('📴 Currently offline - using cached data', 'amber');
+            notify('Currently offline - using cached data', 'amber');
         }
 
         // ========== NEW UI: NAVIGATION & MODALS ==========
@@ -4023,13 +4023,13 @@ Authentication: Include X-API-Key header with your API key
             document.getElementById('oauth2Config').style.display = method === 'oauth2' ? 'block' : 'none';
             document.getElementById('samlConfig').style.display = method === 'saml' ? 'block' : 'none';
             document.getElementById('ldapConfig').style.display = method === 'ldap' ? 'block' : 'none';
-            console.log('🔐 SSO Method selected:', method);
+            console.log('SSO Method selected:', method);
         }
 
         function saveSSOConfig() {
             const method = document.querySelector('input[name="ssoMethod"]:checked')?.value;
             if (!method) {
-                notify('⚠️ Please select an authentication method', 'amber');
+                notify('Please select an authentication method', 'amber');
                 return;
             }
 
@@ -4057,8 +4057,8 @@ Authentication: Include X-API-Key header with your API key
             }
 
             localStorage.setItem('ssoConfig_' + method, JSON.stringify(config));
-            notify('✅ SSO Configuration saved successfully!', 'emerald');
-            console.log('🔐 SSO Config saved:', config);
+            notify('SSO Configuration saved successfully!', 'emerald');
+            console.log('SSO Config saved:', config);
         }
 
         // Webhook Management
@@ -4084,8 +4084,8 @@ Authentication: Include X-API-Key header with your API key
             webhooks.push(webhook);
             localStorage.setItem('webhooks', JSON.stringify(webhooks));
             renderWebhooks();
-            notify('✅ Webhook created successfully!', 'emerald');
-            console.log('🔗 Webhook added:', webhook);
+            notify('Webhook created successfully!', 'emerald');
+            console.log('Webhook added:', webhook);
         }
 
         function renderWebhooks() {
@@ -4104,7 +4104,7 @@ Authentication: Include X-API-Key header with your API key
                         </div>
                         <div class="flex gap-2">
                             <button onclick="toggleWebhook('${wh.id}')" class="px-3 py-1 text-xs rounded ${wh.active ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-800'}">
-                                ${wh.active ? '🟢 Active' : '🔴 Inactive'}
+                                ${wh.active ? '<span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span> Active' : '<span class="inline-block w-2 h-2 rounded-full bg-red-500 mr-1"></span> Inactive'}
                             </button>
                             <button onclick="deleteWebhook('${wh.id}')" class="px-3 py-1 text-xs bg-red-100 text-red-800 rounded">Delete</button>
                         </div>
@@ -4120,7 +4120,7 @@ Authentication: Include X-API-Key header with your API key
                 wh.active = !wh.active;
                 localStorage.setItem('webhooks', JSON.stringify(webhooks));
                 renderWebhooks();
-                notify('✅ Webhook ' + (wh.active ? 'activated' : 'deactivated'), 'emerald');
+                notify('Webhook ' + (wh.active ? 'activated' : 'deactivated'), 'emerald');
             }
         }
 
@@ -4128,7 +4128,7 @@ Authentication: Include X-API-Key header with your API key
             webhooks = webhooks.filter(w => w.id !== id);
             localStorage.setItem('webhooks', JSON.stringify(webhooks));
             renderWebhooks();
-            notify('✅ Webhook deleted', 'emerald');
+            notify('Webhook deleted', 'emerald');
         }
 
         // Multi-tenant Management
@@ -4152,8 +4152,8 @@ Authentication: Include X-API-Key header with your API key
             organizations.push(org);
             localStorage.setItem('organizations', JSON.stringify(organizations));
             updateOrgDisplay();
-            notify('✅ Organization created: ' + name, 'emerald');
-            console.log('🏢 Organization created:', org);
+            notify('Organization created: ' + name, 'emerald');
+            console.log('Organization created:', org);
         }
 
         function updateOrgDisplay() {
@@ -4185,8 +4185,8 @@ Authentication: Include X-API-Key header with your API key
 
             roles[name.toLowerCase()] = role;
             localStorage.setItem('enterpriseRoles', JSON.stringify(roles));
-            notify('✅ Role created: ' + name, 'emerald');
-            console.log('👥 Role created:', role);
+            notify('Role created: ' + name, 'emerald');
+            console.log('Role created:', role);
         }
 
         function editRole(roleId) {
@@ -4208,8 +4208,8 @@ Authentication: Include X-API-Key header with your API key
             };
 
             localStorage.setItem('apiRateLimits', JSON.stringify(config));
-            notify('✅ API rate limits updated!', 'emerald');
-            console.log('⚡ Rate limits saved:', config);
+            notify('API rate limits updated!', 'emerald');
+            console.log('Rate limits saved:', config);
         }
 
         // Audit Logging Enhancement
@@ -4242,16 +4242,16 @@ Authentication: Include X-API-Key header with your API key
             a.href = url;
             a.download = 'audit_log_' + new Date().toISOString().slice(0, 10) + '.csv';
             a.click();
-            notify('✅ Audit log exported!', 'emerald');
-            console.log('📋 Audit log exported');
+            notify('Audit log exported!', 'emerald');
+            console.log('Audit log exported');
         }
 
         // Initialize Phase 8 on page load
         function initializePhase8() {
             renderWebhooks();
             updateOrgDisplay();
-            console.log('✅ Phase 8 Enterprise Features Initialized');
-            console.log('🔐 SSO, 🔗 Webhooks, 🏢 Multi-tenant, 👥 RBAC, ⚡ Rate Limiting, 📋 Audit Logs');
+            console.log('Phase 8 Enterprise Features Initialized');
+            console.log('SSO, Webhooks, Multi-tenant, RBAC, Rate Limiting, Audit Logs');
         }
 
         // Run initialization when DOM is ready
