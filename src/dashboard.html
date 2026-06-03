@@ -454,18 +454,46 @@
             border-bottom: 2px solid #e2e8f0;
             cursor: pointer; 
             user-select: none;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .section-header:hover {
             background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-bottom-color: #2563eb;
         }
 
         .section-header .collapse-icon { 
-            font-size: 1rem; 
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 0.375rem;
+            background: rgba(37, 99, 235, 0.08);
             color: #2563eb;
-            font-weight: 700;
+            font-size: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .section-header .collapse-icon::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-right: 2px solid #2563eb;
+            border-bottom: 2px solid #2563eb;
+            transform: rotate(-45deg);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .section-header:hover .collapse-icon {
+            background: rgba(37, 99, 235, 0.15);
+            transform: scale(1.1);
+        }
+
+        .section-header .collapse-icon.collapsed::before {
+            transform: rotate(45deg);
         }
 
         .section-header h2 { 
@@ -677,7 +705,7 @@
         <!-- ========== TOOLS SECTION ========== -->
         <div class="collapsible-section">
             <div class="section-header" onclick="toggleToolsSection(this)">
-                <span class="collapse-icon">▼</span>
+                <span class="collapse-icon"></span>
                 <h2>🛠️ Tools</h2>
             </div>
             <div class="section-content">
@@ -735,7 +763,7 @@
         <!-- ========== SHIFT SETTINGS SECTION ========== -->
         <div class="collapsible-section">
             <div class="section-header" onclick="toggleShiftSettings(this)">
-                <span class="collapse-icon">▶</span>
+                <span class="collapse-icon collapsed"></span>
                 <h2>🏢 Shift Settings</h2>
             </div>
             <div class="section-content collapsed" id="shiftSettingsContent">
@@ -746,7 +774,7 @@
         <!-- ========== ANALYTICS & FILTERS SECTION ========== -->
         <div class="collapsible-section">
             <div class="section-header" onclick="toggleAnalyticsSection(this)">
-                <span class="collapse-icon">▼</span>
+                <span class="collapse-icon"></span>
                 <h2>📊 Analytics & Filters</h2>
             </div>
             <div class="section-content">
@@ -1049,7 +1077,7 @@
             const icon = headerElement.querySelector('.collapse-icon');
             
             content.classList.toggle('collapsed');
-            icon.style.transform = content.classList.contains('collapsed') ? 'rotate(0deg)' : 'rotate(90deg)';
+            icon.classList.toggle('collapsed', content.classList.contains('collapsed'));
         }
 
         function toggleToolsSection(headerElement) {
@@ -1057,7 +1085,7 @@
             const icon = headerElement.querySelector('.collapse-icon');
             
             content.classList.toggle('collapsed');
-            icon.style.transform = content.classList.contains('collapsed') ? 'rotate(0deg)' : 'rotate(180deg)';
+            icon.classList.toggle('collapsed', content.classList.contains('collapsed'));
         }
 
         function toggleAnalyticsSection(headerElement) {
@@ -1065,7 +1093,7 @@
             const icon = headerElement.querySelector('.collapse-icon');
             
             content.classList.toggle('collapsed');
-            icon.style.transform = content.classList.contains('collapsed') ? 'rotate(0deg)' : 'rotate(180deg)';
+            icon.classList.toggle('collapsed', content.classList.contains('collapsed'));
         }
         
         // Dynamic UI rendering for shift definitions - RESPONSIVE LAYOUT
