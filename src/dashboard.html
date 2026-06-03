@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,579 +12,379 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='"'"'http://www.w3.org/2000/svg'"'"' viewBox='"'"'0 0 100 100'"'"'><text y='"'"'.9em'"'"' font-size='"'"'90'"'"' font-family='"'"'system-ui'"'"'>??</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-family='system-ui'>📊</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Firebase SDK 8.x (legacy compatibility preserved) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-family='system-ui'>📊</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: '"'"'Inter'"'"', -apple-system, BlinkMacSystemFont, '"'"'Segoe UI'"'"', sans-serif; background: linear-gradient(135deg, #f0f4f8 0%, #f8fafb 100%); min-height: 100vh; padding: 2.5rem 1.5rem; }
-        .container { max-width: 1400px; margin: 0 auto; }
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* HEADER STYLES */
-        .header { 
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            padding: 2rem;
-            border-radius: 1rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
-            border: 1px solid rgba(226,232,240,0.8);
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 2rem;
-            backdrop-filter: blur(10px);
-        }
-        .header-left { flex: 1; }
-        .header-right { display: flex; gap: 2rem; align-items: flex-end; }
-        h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
-        .subtitle { font-size: 0.95rem; color: #64748b; font-weight: 500; }
-        
-        /* COLLAPSIBLE SECTIONS */
-        .collapsible-section { 
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border-radius: 1rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-            border: 1px solid rgba(226,232,240,0.8);
-            overflow: hidden;
-        }
-        
-        .section-header { 
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1.5rem 2rem;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-bottom: 2px solid #e2e8f0;
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.3s;
-        }
-        .section-header:hover {
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-        }
-        .section-header .collapse-icon { 
-            font-size: 1.25rem;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            color: #2563eb;
-            font-weight: 800;
-        }
-        .section-header h2 { 
-            margin: 0;
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: #1e293b;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            flex: 1;
-        }
-        .section-content { 
-            padding: 2rem;
-            display: grid;
-            gap: 1.5rem;
-        }
-        .section-content.collapsed { 
-            display: none;
-        }
-
-        /* BUTTONS */
-        .btn-upload { 
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            color: white; 
-            border: none; 
-            padding: 0.75rem 1.5rem; 
-            border-radius: 0.7rem; 
-            cursor: pointer; 
-            font-weight: 700; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 0.6rem; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 0.95rem; 
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .btn-upload:hover { 
-            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-            box-shadow: 0 12px 25px rgba(37, 99, 235, 0.4);
-            transform: translateY(-2px);
-        }
-        .btn-upload input { display: none; }
-        
-        .btn-export { 
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); 
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.7rem;
-            cursor: pointer;
-            font-weight: 700;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 0.95rem;
-            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
-        }
-        .btn-export:hover { 
-            background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%); 
-            box-shadow: 0 12px 25px rgba(124, 58, 237, 0.4);
-            transform: translateY(-2px);
-        }
-        .btn-export:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* STATS GRID */
-        .stats-grid { 
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2.5rem;
-        }
-        .stat-card { 
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            padding: 2.25rem;
-            border-radius: 1rem;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-            border-left: 5px solid;
-            border-top: 1px solid rgba(226,232,240,0.8);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .stat-card:hover { 
-            transform: translateY(-8px);
-            box-shadow: 0 16px 48px rgba(0,0,0,0.12);
-        }
-        .stat-card.primary { border-color: #2563eb; }
-        .stat-card.red { border-color: #dc2626; }
-        .stat-card.amber { border-color: #f59e0b; }
-        .stat-card.green { border-color: #16a34a; }
-        .stat-label { font-size: 0.85rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; }
-        .stat-value { font-size: 3.5rem; font-weight: 900; line-height: 1; letter-spacing: -0.02em; }
-        .stat-card.primary .stat-value { color: #2563eb; }
-        .stat-card.red .stat-value { color: #dc2626; }
-        .stat-card.green .stat-value { color: #16a34a; }
-        .stat-card.amber .stat-value { color: #f59e0b; }
-
-        /* CHARTS */
-        .charts-section { 
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2.5rem;
-        }
-        .chart-card { 
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            padding: 2.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-            border: 1px solid rgba(226,232,240,0.8);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .chart-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 48px rgba(0,0,0,0.12);
-        }
-        .chart-title { 
-            font-size: 1.35rem;
-            font-weight: 800;
-            color: #1e293b;
-            margin-bottom: 2rem;
-            background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .chart-container { height: 340px; position: relative; }
-
-        /* EMPLOYEE CARDS */
-        .employees-section { margin-bottom: 2.5rem; }
-        .section-title { 
-            font-size: 1.65rem;
-            font-weight: 800;
-            color: #1e293b;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-            letter-spacing: -0.02em;
-        }
-        .section-title::before { 
-            content: '';
-            width: 4px;
-            height: 35px;
-            background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
-            border-radius: 2px;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-        
-        .employees-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.75rem; }
-        .employee-card { 
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(226,232,240,0.8);
-            border-left: 5px solid;
-        }
-        .employee-card:hover { 
-            transform: translateY(-8px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.12);
-        }
-        .employee-card[data-tier="excellent"] { border-left-color: #16a34a; }
-        .employee-card[data-tier="good"] { border-left-color: #10b981; }
-        .employee-card[data-tier="warning"] { border-left-color: #f59e0b; }
-        .employee-card[data-tier="critical"] { border-left-color: #ef4444; }
-        
-        .employee-header { 
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-bottom: 2px solid #e2e8f0;
-            color: #1e293b;
-            padding: 1.25rem;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        .employee-info { flex: 1; }
-        .employee-name { font-size: 0.95rem; font-weight: 800; margin-bottom: 0.35rem; color: #1e293b; letter-spacing: -0.01em; }
-        .employee-meta { display: flex; gap: 0.5rem; align-items: center; flex-wrap: nowrap; margin-top: 0.35rem; }
-        .employee-dept { 
-            display: inline-block;
-            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-            color: #475569;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.35rem;
-            font-size: 0.65rem;
-            font-weight: 700;
-        }
-        .employee-id { font-size: 0.7rem; color: #64748b; font-weight: 600; }
-        .tier-badge { 
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-            color: #1e293b;
-            padding: 0.35rem 0.75rem;
-            border-radius: 0.4rem;
-            font-weight: 700;
-            font-size: 0.7rem;
-            text-align: center;
-            white-space: nowrap;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-
-        /* METRICS */
-        .visual-metrics { padding: 1.25rem; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); }
-        .metrics-line { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; }
-        .metric-card { 
-            padding: 0.75rem;
-            background: white;
-            border-radius: 0.6rem;
-            border: 1.5px solid #e2e8f0;
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .metric-card:hover { 
-            border-color: #cbd5e1;
-            background: #f8fafc;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
-        }
-        .metric-card-title { 
-            font-size: 0.55rem;
-            font-weight: 800;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            margin-bottom: 0.35rem;
-        }
-        .metric-card-value { 
-            font-size: 1.1rem;
-            font-weight: 900;
-            color: #1e293b;
-            line-height: 1;
-            letter-spacing: -0.01em;
-        }
-        .metric-card-sub { 
-            font-size: 0.5rem;
-            color: #94a3b8;
-            margin-top: 0.2rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        .metric-card.rate-card .metric-card-value { color: #16a34a; }
-        .metric-card.punctuality-card .metric-card-value { color: #2563eb; }
-        .metric-card.hours-card .metric-card-value { color: #2563eb; }
-        .metric-card.late-card .metric-card-value { color: #f59e0b; }
-        .metric-card.absence-card .metric-card-value { color: #dc2626; }
-        .metric-card.worked-card .metric-card-value { color: #16a34a; }
-
-        /* DAILY BREAKDOWN */
-        .daily-breakdown { 
-            display: block;
-            padding: 0.5rem;
-            background: #f8fafc;
-            border-top: 2px solid #e2e8f0;
-            max-height: 900px;
-            overflow-y: auto;
-        }
-        .daily-breakdown::-webkit-scrollbar { width: 6px; }
-        .daily-breakdown::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
-        .daily-breakdown::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .daily-breakdown::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* STATUS BAR */
-        .status-bar { 
-            padding: 0.75rem 1.25rem;
-            border-top: 2px solid #e2e8f0;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        }
-        .status-left { display: flex; flex-direction: column; gap: 0.25rem; }
-        .status-tier { 
-            font-size: 0.75rem;
-            font-weight: 800;
-            color: #1e293b;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-        .status-streak { 
-            font-size: 0.65rem;
-            color: #64748b;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .hidden { display: none; }
-        
-        @media (max-width: 768px) {
-            body { padding: 1.5rem 1rem; }
-            .header { flex-direction: column; align-items: stretch; gap: 1.5rem; padding: 1.5rem; }
-            h1 { font-size: 2rem; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-            .stat-card { padding: 1.25rem; }
-            .stat-value { font-size: 2.5rem; }
-            .charts-section { grid-template-columns: 1fr; }
-            .employees-grid { grid-template-columns: 1fr; }
-            .metrics-line { grid-template-columns: repeat(3, 1fr); }
-            .section-content { padding: 1.5rem; }
+        /* Print layout overrides */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .print-card { page-break-inside: avoid; break-inside: avoid; border: 1px solid #cbd5e1 !important; }
+            .print-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 15px !important; }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <!-- HEADER -->
-        <div class="header">
-            <div class="header-left">
-                <h1>Attendance Dashboard</h1>
-                <p class="subtitle">Upload your attendance report to visualize and manage performance</p>
-            </div>
-        </div>
+<body class="h-full text-slate-800 antialiased flex flex-col md:flex-row overflow-hidden">
 
-        <!-- TOOLS SECTION -->
-        <div class="collapsible-section">
-            <div class="section-header" onclick="toggleSection(this)">
-                <span class="collapse-icon">?</span>
-                <h2>??? Tools</h2>
-            </div>
-            <div class="section-content">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
-                    <div>
-                        <span style="font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em;">Upload Files</span>
-                        <div style="margin-top: 0.75rem; display: flex; gap: 0.6rem; flex-wrap: wrap;">
-                            <label class="btn-upload">
-                                <span>?? Employee Form</span>
-                                <input type="file" id="employeeFormFile" accept=".csv,.xlsx,.xls">
-                            </label>
-                        </div>
-                    </div>
-                    <div>
-                        <span style="font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em;">Upload Report</span>
-                        <div style="margin-top: 0.75rem; display: flex; gap: 0.6rem; flex-wrap: wrap;">
-                            <label class="btn-upload">
-                                <span>?? Attendance Report</span>
-                                <input type="file" id="csvFile" accept=".csv,.xlsx,.xls">
-                            </label>
-                        </div>
-                    </div>
-                    <div>
-                        <span style="font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em;">Export Data</span>
-                        <div style="margin-top: 0.75rem; display: flex; gap: 0.6rem; flex-wrap: wrap;">
-                            <button class="btn-export" onclick="exportToCSV()">?? CSV</button>
-                            <button class="btn-export" onclick="exportToExcel()">?? Excel</button>
-                        </div>
-                    </div>
-                    <div>
-                        <span style="font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em;">Actions</span>
-                        <div style="margin-top: 0.75rem; display: flex; gap: 0.6rem; flex-wrap: wrap;">
-                            <button class="btn-export" onclick="saveReportToFirebase()">?? Cloud</button>
-                            <button class="btn-export" onclick="printSelected()">??? Print</button>
-                        </div>
-                    </div>
+    <!-- Global Toast Notifications -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- SIDEBAR NAVIGATION (Collapsible on Mobile) -->
+    <aside class="no-print w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between h-auto md:h-full border-r border-slate-800 z-50">
+        <div>
+            <!-- Header/Logo -->
+            <div class="p-6 flex items-center gap-3 border-b border-slate-800">
+                <div class="h-9 w-9 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-indigo-600/30">
+                    <i data-lucide="bar-chart-3" class="h-5 w-5"></i>
+                </div>
+                <div>
+                    <h2 class="text-white font-bold text-sm">Attendance Pro</h2>
+                    <p class="text-xs text-slate-400">Dashboard</p>
                 </div>
             </div>
+            
+            <!-- Navigation -->
+            <nav class="p-4 flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-visible">
+                <button onclick="switchView('dashboard')" id="nav-dashboard" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white">
+                    <i data-lucide="home" class="h-4 w-4"></i>
+                    <span class="hidden md:inline">Dashboard</span>
+                </button>
+                <button onclick="switchView('employees')" id="nav-employees" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400">
+                    <i data-lucide="users" class="h-4 w-4"></i>
+                    <span class="hidden md:inline">Employees</span>
+                </button>
+                <button onclick="switchView('shifts')" id="nav-shifts" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400">
+                    <i data-lucide="clock" class="h-4 w-4"></i>
+                    <span class="hidden md:inline">Shifts</span>
+                </button>
+                <button onclick="switchView('audit')" id="nav-audit" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400">
+                    <i data-lucide="shield-check" class="h-4 w-4"></i>
+                    <span class="hidden md:inline">Audit</span>
+                </button>
+            </nav>
         </div>
 
-        <!-- SHIFT SETTINGS SECTION -->
-        <div class="collapsible-section">
-            <div class="section-header" onclick="toggleSection(this)">
-                <span class="collapse-icon">?</span>
-                <h2>?? Shift Settings</h2>
-            </div>
-            <div class="section-content collapsed" id="shiftSettingsContent">
-                <div id="deptShiftEditor"></div>
+        <!-- Connection status -->
+        <div class="hidden md:flex p-6 border-t border-slate-800 items-center gap-3 bg-slate-950/40">
+            <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <div class="text-xs font-medium text-slate-400">
+                Connected Anonymously
             </div>
         </div>
+    </aside>
 
-        <!-- ANALYTICS & FILTERS SECTION -->
-        <div class="collapsible-section">
-            <div class="section-header" onclick="toggleSection(this)">
-                <span class="collapse-icon">?</span>
-                <h2>?? Analytics & Filters</h2>
+    <!-- MAIN BODY CONTAINER -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50">
+        
+        <!-- TOP WORKSPACE HEADER -->
+        <header class="no-print bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 flex-shrink-0 z-40">
+            <!-- Left Header -->
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl font-bold text-slate-900">Attendance Dashboard</h1>
+                </div>
             </div>
-            <div class="section-content">
-                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                    <label style="font-size: 0.85rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">?? Select Month:</label>
-                    <select id="monthSelector" onchange="loadMonthData()" style="padding: 0.75rem; border: 2px solid #cbd5e1; border-radius: 0.5rem; font-size: 1rem; transition: all 0.2s; min-width: 200px; font-weight: 600;">
-                        <option value="">Loading months...</option>
-                    </select>
-                </div>
 
-                <div id="deptFilterContainer" style="display: none; margin-top: 1.5rem;">
-                    <label style="display: block; margin-bottom: 0.75rem; font-weight: 700; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">?? Filter by Department:</label>
-                    <div id="deptFilter" style="display: flex; flex-wrap: wrap; gap: 1rem;"></div>
-                </div>
+            <!-- Global Action Hub -->
+            <div class="flex items-center gap-3">
+                <button onclick="saveReportToFirebase()" class="flex items-center gap-2 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-md shadow-indigo-600/10 transition">
+                    <i data-lucide="cloud" class="h-4 w-4"></i>
+                    Save
+                </button>
+                <button onclick="printSelected()" class="flex items-center gap-2 px-3.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold shadow-md shadow-slate-800/10 transition">
+                    <i data-lucide="printer" class="h-4 w-4"></i>
+                    Print
+                </button>
+            </div>
+        </header>
 
-                <input type="text" id="searchBox" placeholder="?? Search name or ID..." style="margin-top: 1.5rem; padding: 0.75rem; border: 2px solid #cbd5e1; border-radius: 0.5rem; font-size: 1rem; width: 100%; max-width: 500px;">
+        <!-- CONTAINER FOR SCROLLABLE VIEWPORTS -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
 
-                <div id="chartsContainer" class="charts-section" style="display: none; margin-top: 1.5rem;">
-                    <div class="chart-card">
-                        <div class="chart-title">? Top 15 Late Arrivals</div>
-                        <div class="chart-container">
+            <!-- ================= VIEW: DASHBOARD ================= -->
+            <div id="view-dashboard" class="space-y-6">
+                
+                <!-- Quick Upload Area / Intro Dropzone -->
+                <section class="no-print bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">Upload Attendance Data</h3>
+                        <p class="text-sm text-slate-600">Upload CSV or Excel files to analyze attendance patterns</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <label class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold cursor-pointer transition">
+                            <i data-lucide="upload" class="h-4 w-4"></i>
+                            Employee Form
+                            <input type="file" id="employeeFormFile" accept=".csv,.xlsx,.xls" class="hidden">
+                        </label>
+                    </div>
+                    <div class="flex gap-3">
+                        <label class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold cursor-pointer transition">
+                            <i data-lucide="upload" class="h-4 w-4"></i>
+                            Attendance Report
+                            <input type="file" id="csvFile" accept=".csv,.xlsx,.xls" class="hidden">
+                        </label>
+                    </div>
+                </section>
+
+                <!-- Dynamic KPI Stats -->
+                <section id="statsGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6" style="display: none;">
+                    <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total Employees</div>
+                        <div class="text-4xl font-bold text-indigo-600" id="statTotal">0</div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total Absences</div>
+                        <div class="text-4xl font-bold text-red-600" id="statAbsence">0</div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Late Minutes</div>
+                        <div class="text-4xl font-bold text-amber-600" id="statLate">0</div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Avg Attendance</div>
+                        <div class="text-4xl font-bold text-emerald-600" id="statAvg">0%</div>
+                    </div>
+                </section>
+
+                <!-- Filters Station -->
+                <section class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4" style="display: none;" id="filtersStation">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-3">📅 Select Month</label>
+                        <select id="monthSelector" onchange="loadMonthData()" class="w-full px-4 py-2 border border-slate-300 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="">Loading months...</option>
+                        </select>
+                    </div>
+                    
+                    <div id="deptFilterContainer" style="display: none;">
+                        <label class="block text-sm font-bold text-slate-700 mb-3">🏢 Filter by Department</label>
+                        <div id="deptFilter" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </section>
+
+                <!-- Chart Grid -->
+                <section id="chartsContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-6" style="display: none;">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">⏰ Top 15 Late Arrivals</h3>
+                        <div class="h-80">
                             <canvas id="lateChart"></canvas>
                         </div>
                     </div>
-                    <div class="chart-card">
-                        <div class="chart-title">?? Attendance by Department</div>
-                        <div class="chart-container">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">📈 Attendance by Department</h3>
+                        <div class="h-80">
                             <canvas id="deptChart"></canvas>
                         </div>
                     </div>
-                    <div class="chart-card">
-                        <div class="chart-title">?? Late Minutes by Department</div>
-                        <div class="chart-container">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">⏱️ Late Minutes by Department</h3>
+                        <div class="h-80">
                             <canvas id="deptLateChart"></canvas>
                         </div>
                     </div>
+                </section>
+
+                <!-- Employee Cards Section -->
+                <section class="space-y-4" style="display: none;" id="employeeCardsSection">
+                    <!-- Search & Actions -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <input type="text" id="searchBox" placeholder="🔍 Search by name or ID..." class="flex-1 px-4 py-2 border border-slate-300 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button onclick="exportToExcel()" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition">
+                            <i data-lucide="download" class="h-4 w-4"></i>
+                            Export Excel
+                        </button>
+                    </div>
+
+                    <!-- Directory Grid Content -->
+                    <div id="tableBody" class="grid grid-cols-1 xl:grid-cols-2 gap-6 print-grid">
+                        <div class="col-span-full text-center py-12 text-slate-500">No employee data loaded yet. Upload a report first.</div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ================= VIEW: EMPLOYEES ================= -->
+            <div id="view-employees" class="hidden space-y-6">
+                <div class="text-center py-12 text-slate-500">Employee details moved to Dashboard. Click Dashboard tab to view.</div>
+            </div>
+
+            <!-- ================= VIEW: SHIFTS CONFIG ================= -->
+            <div id="view-shifts" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 max-w-4xl mx-auto space-y-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-2">⏥ Shift Definitions</h2>
+                        <p class="text-slate-600">Configure shift start and end times</p>
+                    </div>
+                    <div id="deptShiftEditor" class="space-y-6"></div>
                 </div>
             </div>
-        </div>
 
-        <!-- STATISTICS CARDS -->
-        <div id="statsGrid" class="stats-grid" style="display: none;">
-            <div class="stat-card primary">
-                <div class="stat-label">Total Employees</div>
-                <div class="stat-value" id="statTotal">0</div>
+            <!-- ================= VIEW: AUDIT TRAIL ================= -->
+            <div id="view-audit" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 max-w-4xl mx-auto space-y-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-4">🔍 Audit Trail</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th class="px-4 py-3 text-left font-semibold text-slate-700">User</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-slate-700">Employee</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-slate-700">Action</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-slate-700">Details</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-slate-700">Status</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-slate-700">Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditLogsBody">
+                                <tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">No audit logs yet</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card red">
-                <div class="stat-label">Total Absences</div>
-                <div class="stat-value" id="statAbsence">0</div>
-            </div>
-            <div class="stat-card amber">
-                <div class="stat-label">Total Late Min.</div>
-                <div class="stat-value" id="statLate">0</div>
-            </div>
-            <div class="stat-card green">
-                <div class="stat-label">Avg. Attendance</div>
-                <div class="stat-value" id="statAvg">0%</div>
-            </div>
-        </div>
 
-        <!-- EMPLOYEE SECTION -->
-        <div class="employees-section">
-            <div class="section-title">?? Employee Performance Cards</div>
-            <div id="tableBody" class="employees-grid">
-                <div style="text-align: center; color: #94a3b8; font-style: italic; padding: 3rem 1.5rem; grid-column: 1/-1;">No data uploaded yet. Upload an attendance report to get started.</div>
-            </div>
         </div>
-    </div>
+    </main>
 
     <script>
-        // ========== FIREBASE CONFIGURATION ==========
+        // Initialize Lucide Icons globally
+        lucide.createIcons();
+
+        // Notification Engine (Smooth Toasts)
+        function notify(message, type = 'indigo') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const colors = {
+                indigo: 'bg-indigo-900 text-white border-indigo-800',
+                emerald: 'bg-emerald-900 text-white border-emerald-800',
+                amber: 'bg-amber-950 text-amber-200 border-amber-900',
+                red: 'bg-red-950 text-red-200 border-red-900'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `flex items-center gap-3 p-4 rounded-xl border shadow-lg ${colors[type]} transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto`;
+            toast.innerHTML = `
+                <div class="flex-1 text-sm font-semibold">${message}</div>
+                <button class="text-current opacity-70 hover:opacity-100 font-bold" onclick="this.parentElement.remove()">✕</button>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        // Navigation Controller
+        function switchView(viewId) {
+            ['dashboard', 'employees', 'shifts', 'audit'].forEach(view => {
+                const viewEl = document.getElementById(`view-${view}`);
+                const navEl = document.getElementById(`nav-${view}`);
+                if (viewEl) {
+                    viewEl.classList.toggle('hidden', view !== viewId);
+                }
+                if (navEl) {
+                    navEl.classList.toggle('bg-indigo-600', view === viewId);
+                    navEl.classList.toggle('text-white', view === viewId);
+                    navEl.classList.toggle('hover:bg-slate-800', view !== viewId);
+                    navEl.classList.toggle('hover:text-white', view !== viewId);
+                    navEl.classList.toggle('text-slate-400', view !== viewId);
+                }
+            });
+            lucide.createIcons();
+        }
+
+        // Global Application Configurations
         const firebaseConfig = {
             apiKey: "AIzaSyAjGzS58U5ybbI5CYJUk2NRZBuLJpMJihQ",
             authDomain: "apps-e1163.firebaseapp.com",
             projectId: "apps-e1163",
             storageBucket: "apps-e1163.firebasestorage.app",
             messagingSenderId: "855206153422",
-            appId: "1:855206153422:web:2a1366b2e7825304c3d49f",
-            measurementId: "G-7YCKESJB8T"
+            appId: "1:855206153422:web:2a1366b2e7825304c3d49f"
         };
 
+        // Initialize Firebase services gracefully
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
         
         auth.signInAnonymously().catch((error) => {
-            console.error('"'"'? Anonymous auth error:'"'"', error);
+            console.error('❌ Anonymous Authentication error:', error);
+            notify('Firebase system connection failure', 'red');
         });
         
-        const TIMESHEET_COLLECTION = '"'"'timesheet_app'"'"';
-        const MONTHS_COLLECTION = '"'"'timesheet_app_months'"'"';
-        const EMPLOYEES_COLLECTION = '"'"'timesheet_app_employees'"'"';
-        const AUDIT_COLLECTION = '"'"'timesheet_app_audit'"'"';
-        
-        console.log('"'"'? Firebase initialized'"'"');
+        const TIMESHEET_APP_ID = 'timesheet_app';
+        const TIMESHEET_COLLECTION = 'timesheet_app';
+        const MONTHS_COLLECTION = 'timesheet_app_months';
+        const EMPLOYEES_COLLECTION = 'timesheet_app_employees';
+        const AUDIT_COLLECTION = 'timesheet_app_audit';
 
-        // ========== GLOBAL STATE ==========
+        let uploadedMonths = [];
+        let shiftDefinitions = {};
+        let employeeFormMapping = {};
         let rawData = [];
         let filteredData = [];
         let chartInstance = null;
         let deptChartInstance = null;
         let deptLateChartInstance = null;
-        let currentWorkbook = null;
-        let allSheetData = {};
         let dateRange = { start: null, end: null, actualDays: 0 };
         let cellEditHistory = {};
-        let shiftDefinitions = {};
-        let employeeFormMapping = {};
-        let uploadedMonths = [];
-        let changeLog = [];
 
-        // ========== UTILITY FUNCTIONS ==========
-        function cleanUndefined(obj) {
-            if (Array.isArray(obj)) {
-                return obj.map(cleanUndefined);
-            } else if (obj && typeof obj === '"'"'object'"'"') {
-                return Object.entries(obj)
-                    .filter(([_, value]) => value !== undefined)
-                    .reduce((acc, [key, value]) => {
-                        acc[key] = cleanUndefined(value);
-                        return acc;
-                    }, {});
+        // Load Initial Assets on load
+        window.addEventListener('load', () => {
+            loadAvailableMonths();
+            loadShiftDefinitions();
+            loadEmployeeFormMapping();
+            setupDataParsers();
+        });
+
+        // Initialize Upload Portals
+        function setupDataParsers() {
+            const csvInput = document.getElementById('csvFile');
+            const rosterInput = document.getElementById('employeeFormFile');
+
+            if (csvInput) {
+                csvInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    processReportFile(file);
+                });
             }
-            return obj;
-        }
-        
-        async function saveToFirestore(collectionPath, docId, data) {
-            try {
-                const cleanData = cleanUndefined(data);
-                await db.collection(collectionPath).doc(docId).set(cleanData, { merge: true });
-                console.log(`? Saved to Firestore: ${collectionPath}/${docId}`);
-                return true;
-            } catch (error) {
-                console.error('"'"'? Firestore save error:'"'"', error);
-                return false;
+
+            if (rosterInput) {
+                rosterInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    processRosterFile(file);
+                });
             }
         }
 
-        function toggleSection(headerElement) {
-            const content = headerElement.nextElementSibling;
-            const icon = headerElement.querySelector('"'"'.collapse-icon'"'"');
-            content.classList.toggle('"'"'collapsed'"'"');
-            icon.style.transform = content.classList.contains('"'"'collapsed'"'"') ? '"'"'rotate(0deg)'"'"' : '"'"'rotate(180deg)'"'"';
-        }
-
-        // ========== MONTH SELECTOR ==========
         async function loadAvailableMonths() {
             try {
                 const snapshot = await db.collection(MONTHS_COLLECTION).get();
@@ -592,95 +392,113 @@
                 snapshot.forEach(doc => {
                     uploadedMonths.push({ id: doc.id, data: doc.data() });
                 });
+                
                 uploadedMonths.sort((a, b) => {
-                    const [aYear, aMonth] = a.id.split('"'"'_'"'"').map(Number);
-                    const [bYear, bMonth] = b.id.split('"'"'_'"'"').map(Number);
+                    const [aYear, aMonth] = a.id.split('_').map(Number);
+                    const [bYear, bMonth] = b.id.split('_').map(Number);
                     if (bYear !== aYear) return bYear - aYear;
                     return bMonth - aMonth;
                 });
+                
                 populateMonthDropdown();
                 if (uploadedMonths.length > 0) {
-                    document.getElementById('"'"'monthSelector'"'"').value = uploadedMonths[0].id;
+                    document.getElementById('monthSelector').value = uploadedMonths[0].id;
                     loadMonthData();
                 }
             } catch (error) {
-                console.error('"'"'? Error loading months:'"'"', error);
+                console.error('❌ Month load failed:', error);
+                notify('Database Month retrieval failed', 'red');
             }
         }
-        
+
         function populateMonthDropdown() {
-            const selector = document.getElementById('"'"'monthSelector'"'"');
-            selector.innerHTML = '"'"'<option value="">Select a month...</option>'"'"';
+            const selector = document.getElementById('monthSelector');
+            selector.innerHTML = '<option value="">Select work month...</option>';
             uploadedMonths.forEach(month => {
-                const [year, monthNum] = month.id.split('"'"'_'"'"').map(Number);
-                const monthNames = ['"'"'Jan'"'"', '"'"'Feb'"'"', '"'"'Mar'"'"', '"'"'Apr'"'"', '"'"'May'"'"', '"'"'Jun'"'"', '"'"'Jul'"'"', '"'"'Aug'"'"', '"'"'Sep'"'"', '"'"'Oct'"'"', '"'"'Nov'"'"', '"'"'Dec'"'"'];
-                const option = document.createElement('"'"'option'"'"');
+                const [year, monthNum] = month.id.split('_').map(Number);
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const displayText = `${monthNames[monthNum - 1]} ${year}`;
+                const option = document.createElement('option');
                 option.value = month.id;
-                option.textContent = `${monthNames[monthNum - 1]} ${year}`;
+                option.textContent = displayText;
                 selector.appendChild(option);
             });
         }
 
-        // ========== SHIFT DEFINITIONS ==========
         async function loadShiftDefinitions() {
             try {
-                const docRef = await db.collection(TIMESHEET_COLLECTION).doc('"'"'shiftDefinitions'"'"').get();
+                const docRef = await db.collection(TIMESHEET_COLLECTION).doc('shiftDefinitions').get();
                 if (docRef.exists) {
                     shiftDefinitions = docRef.data();
                 } else {
                     shiftDefinitions = {
-                        WK: { start: '"'"'09:00'"'"', end: '"'"'17:30'"'"' },
-                        FT: { start: '"'"'09:00'"'"', end: '"'"'17:30'"'"' },
-                        EV: { start: '"'"'18:00'"'"', end: '"'"'02:30'"'"' }
+                        WK: { start: '09:00', end: '17:30' },
+                        FT: { start: '09:00', end: '17:30' },
+                        EV: { start: '18:00', end: '02:30' }
                     };
                 }
                 renderShiftDefinitionsUI();
             } catch (error) {
-                console.error('"'"'? Error loading shifts:'"'"', error);
+                console.error('❌ Default shift loading failed:', error);
             }
         }
 
         function renderShiftDefinitionsUI() {
-            const editor = document.getElementById('"'"'deptShiftEditor'"'"');
+            const editor = document.getElementById('deptShiftEditor');
             if (!editor) return;
-            editor.innerHTML = '"'"''"'"';
-            
-            const container = document.createElement('"'"'div'"'"');
-            container.style.cssText = '"'"'display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;'"'"';
-            
-            let shiftNum = 1;
+            editor.innerHTML = '';
+
+            const container = document.createElement('div');
+            container.className = 'grid grid-cols-1 md:grid-cols-3 gap-6';
+
             Object.entries(shiftDefinitions)
-                .filter(([name]) => !name.includes('"'"'/'"'"') && !name.includes('"'"'Slot'"'"'))
+                .filter(([name]) => !name.includes('/') && !name.includes('Slot'))
                 .forEach(([name, times]) => {
-                    const card = document.createElement('"'"'div'"'"');
-                    card.style.cssText = '"'"'background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 2px solid #cbd5e1; border-radius: 0.85rem; padding: 2rem; transition: all 0.4s;'"'"';
+                    const card = document.createElement('div');
+                    card.className = 'bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-300 rounded-lg p-6 hover:border-indigo-500 hover:shadow-lg transition';
                     
-                    card.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1.75rem; padding-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0;">
-                            <div style="display: flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border-radius: 50%; font-weight: 800; font-size: 1.3rem; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);">${shiftNum}</div>
-                            <div style="font-size: 1.2rem; font-weight: 800; color: #1e293b; letter-spacing: -0.01em;">${name}</div>
-                        </div>
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem;">? In Time</label>
-                            <input type="time" id="shift${name}_start" value="${times.start}" style="width: 100%; padding: 1rem; border: 2px solid #cbd5e1; border-radius: 0.65rem; font-size: 1.1rem; font-weight: 700; color: #1e293b;">
-                        </div>
-                        <div>
-                            <label style="display: block; font-size: 0.8rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem;">? Out Time</label>
-                            <input type="time" id="shift${name}_end" value="${times.end}" style="width: 100%; padding: 1rem; border: 2px solid #cbd5e1; border-radius: 0.65rem; font-size: 1.1rem; font-weight: 700; color: #1e293b;">
-                        </div>
-                    `;
+                    const header = document.createElement('div');
+                    header.className = 'text-lg font-bold text-slate-900 mb-4';
+                    header.textContent = name;
+                    card.appendChild(header);
+                    
+                    const startGroup = document.createElement('div');
+                    startGroup.className = 'mb-4';
+                    const startLabel = document.createElement('label');
+                    startLabel.className = 'block text-sm font-semibold text-slate-600 mb-2';
+                    startLabel.textContent = 'Start Time';
+                    const startInput = document.createElement('input');
+                    startInput.type = 'time';
+                    startInput.id = `shift_${name}_start`;
+                    startInput.className = 'w-full px-3 py-2 border border-slate-300 rounded-lg font-semibold';
+                    startInput.value = times.start || '09:00';
+                    startGroup.appendChild(startLabel);
+                    startGroup.appendChild(startInput);
+                    card.appendChild(startGroup);
+                    
+                    const endGroup = document.createElement('div');
+                    endGroup.className = 'mb-4';
+                    const endLabel = document.createElement('label');
+                    endLabel.className = 'block text-sm font-semibold text-slate-600 mb-2';
+                    endLabel.textContent = 'End Time';
+                    const endInput = document.createElement('input');
+                    endInput.type = 'time';
+                    endInput.id = `shift_${name}_end`;
+                    endInput.className = 'w-full px-3 py-2 border border-slate-300 rounded-lg font-semibold';
+                    endInput.value = times.end || '17:30';
+                    endGroup.appendChild(endLabel);
+                    endGroup.appendChild(endInput);
+                    card.appendChild(endGroup);
+                    
                     container.appendChild(card);
-                    shiftNum++;
                 });
-            
+
             editor.appendChild(container);
             
-            const saveBtn = document.createElement('"'"'button'"'"');
-            saveBtn.className = '"'"'btn-export'"'"';
-            saveBtn.textContent = '"'"'?? Save All Shifts'"'"';
+            const saveBtn = document.createElement('button');
+            saveBtn.className = 'w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition duration-200 uppercase tracking-wider shadow-lg shadow-indigo-600/10 mt-6';
+            saveBtn.textContent = '💾 Save Shift Guidelines';
             saveBtn.onclick = saveShiftDefinitions;
-            saveBtn.style.marginTop = '"'"'1.5rem'"'"';
-            saveBtn.style.width = '"'"'100%'"'"';
             editor.appendChild(saveBtn);
         }
 
@@ -688,369 +506,227 @@
             try {
                 const newDefs = {};
                 Object.keys(shiftDefinitions).forEach(name => {
-                    const startInput = document.getElementById(`shift${name}_start`);
-                    const endInput = document.getElementById(`shift${name}_end`);
+                    const startInput = document.getElementById(`shift_${name}_start`);
+                    const endInput = document.getElementById(`shift_${name}_end`);
                     if (startInput && endInput) {
                         newDefs[name] = { start: startInput.value, end: endInput.value };
                     }
                 });
                 shiftDefinitions = newDefs;
-                await saveToFirestore(TIMESHEET_COLLECTION, '"'"'shiftDefinitions'"'"', shiftDefinitions);
-                alert('"'"'? Shift definitions saved!'"'"');
+                await db.collection(TIMESHEET_COLLECTION).doc('shiftDefinitions').set(shiftDefinitions);
+                notify('Shift Configurations successfully synchronized!', 'emerald');
             } catch (error) {
-                alert('"'"'? Error saving shifts: '"'"' + error.message);
+                notify('Failed to preserve dynamic shift setups', 'red');
             }
         }
 
-        // ========== DATA LOADING & PARSING ==========
-        async function loadMonthData() {
-            const monthId = document.getElementById('"'"'monthSelector'"'"').value;
-            if (!monthId) return;
-            
+        async function loadEmployeeFormMapping() {
             try {
-                const monthDoc = await db.collection(MONTHS_COLLECTION).doc(monthId).get();
-                if (monthDoc.exists) {
-                    const reportData = monthDoc.data();
-                    dateRange = reportData.dateRange || { start: null, end: null, actualDays: 0 };
-                    
-                    const empSnapshot = await db.collection(EMPLOYEES_COLLECTION)
-                        .where('"'"'monthId'"'"', '"'"'=='"'"', monthId)
-                        .get();
-                    
-                    rawData = [];
-                    const seenIds = new Set();
-                    
-                    empSnapshot.forEach(doc => {
-                        const empData = doc.data();
-                        if (seenIds.has(empData.id)) return;
-                        seenIds.add(empData.id);
-                        if (!empData.shift) empData.shift = '"'"'WK'"'"';
-                        rawData.push(empData);
-                    });
-                    
-                    if (rawData.length === 0) {
-                        rawData = (reportData.employees || []).map(emp => ({
-                            ...emp,
-                            shift: emp.shift || '"'"'WK'"'"'
-                        }));
-                    }
-                    
-                    filteredData = [...rawData];
-                    document.getElementById('"'"'statsGrid'"'"').style.display = '"'"'grid'"'"';
-                    document.getElementById('"'"'deptFilterContainer'"'"').style.display = '"'"'block'"'"';
-                    document.getElementById('"'"'chartsContainer'"'"').style.display = '"'"'grid'"'"';
-                    
-                    initializeControlPanel();
-                    renderDashboard(filteredData);
-                    displayEmployeeData(rawData);
-                    console.log(`? Loaded ${rawData.length} employees from ${monthId}`);
+                const docRef = await db.collection(TIMESHEET_COLLECTION).doc('employeeFormMapping').get();
+                if (docRef.exists) {
+                    employeeFormMapping = docRef.data();
                 }
             } catch (error) {
-                console.error('"'"'? Error loading month data:'"'"', error);
+                console.error(error);
             }
         }
 
-        function initializeControlPanel() {
-            const depts = new Set(rawData.map(e => e.dept).filter(d => d && d !== '"'"'undefined'"'"'));
-            const deptContainer = document.getElementById('"'"'deptFilter'"'"');
-            if (!deptContainer) return;
-            
-            deptContainer.innerHTML = '"'"''"'"';
-            
-            const allLabel = document.createElement('"'"'label'"'"');
-            allLabel.style.cssText = '"'"'display: flex; align-items: center; gap: 0.5rem; cursor: pointer;'"'"';
-            const allRadio = document.createElement('"'"'input'"'"');
-            allRadio.type = '"'"'radio'"'"';
-            allRadio.name = '"'"'department'"'"';
-            allRadio.value = '"'"''"'"';
-            allRadio.checked = true;
-            allLabel.appendChild(allRadio);
-            allLabel.appendChild(document.createTextNode('"'"'All Departments'"'"'));
-            deptContainer.appendChild(allLabel);
-            
-            Array.from(depts).sort().forEach(dept => {
-                const label = document.createElement('"'"'label'"'"');
-                label.style.cssText = '"'"'display: flex; align-items: center; gap: 0.5rem; cursor: pointer;'"'"';
-                const radio = document.createElement('"'"'input'"'"');
-                radio.type = '"'"'radio'"'"';
-                radio.name = '"'"'department'"'"';
-                radio.value = dept;
-                label.appendChild(radio);
-                label.appendChild(document.createTextNode(dept));
-                deptContainer.appendChild(label);
-            });
-            
-            document.querySelectorAll('"'"'input[name="department"]'"'"').forEach(radio => {
-                radio.addEventListener('"'"'change'"'"', (e) => {
-                    const selectedDept = e.target.value;
-                    filteredData = selectedDept ? rawData.filter(emp => emp.dept === selectedDept) : [...rawData];
-                    renderDashboard(filteredData);
-                    displayEmployeeData(filteredData);
-                });
-            });
+        function processRosterFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = XLSX.read(e.target.result, { type: 'array' });
+                    const json = XLSX.utils.sheet_to_json(data.Sheets[data.SheetNames[0]]);
+                    parseEmployeeFormStructure(json);
+                } catch (error) {
+                    notify('Error parsing roster file', 'red');
+                }
+            };
+            reader.readAsArrayBuffer(file);
         }
 
-        // ========== FILE UPLOAD HANDLERS ==========
-        const fileInput = document.getElementById('"'"'csvFile'"'"');
-        if (fileInput) {
-            fileInput.addEventListener('"'"'change'"'"', (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                const isExcel = /\.(xlsx?|xls)$/.test(file.name.toLowerCase());
-                console.log(`?? Uploading: ${file.name} (${isExcel ? '"'"'Excel'"'"' : '"'"'CSV'"'"'})`);
+        function parseEmployeeFormStructure(data) {
+            if (!data || data.length === 0) return;
+            let headerRowIdx = 0;
+            let headerRow = Object.keys(data[0]) || [];
+            
+            const mapping = {};
+            const headerLower = headerRow.map(h => (h || '').toString().toLowerCase().trim());
+            const columnPatterns = {
+                id: ['id', 'emp id', 'employee id', 'code'],
+                name: ['name', 'employee name', 'full name'],
+                dept: ['department', 'dept', 'section'],
+                shift: ['shift', 'schedule'],
+                phone: ['phone', 'contact', 'mobile'],
+                email: ['email', 'e-mail']
+            };
 
-                if (isExcel) {
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        try {
-                            const data = new Uint8Array(ev.target.result);
-                            currentWorkbook = XLSX.read(data, { type: '"'"'array'"'"' });
-                            allSheetData = {};
-                            currentWorkbook.SheetNames.forEach(sheetName => {
-                                const sheet = currentWorkbook.Sheets[sheetName];
-                                allSheetData[sheetName] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '"'"''"'"' });
-                            });
-                            processMultiSheetData(allSheetData);
-                        } catch (err) {
-                            alert('"'"'? Error parsing Excel: '"'"' + err.message);
-                        }
-                    };
-                    reader.readAsArrayBuffer(file);
-                } else {
-                    Papa.parse(file, {
-                        header: false,
-                        complete: (results) => {
-                            allSheetData = { '"'"'CSV Data'"'"': results.data };
-                            processMultiSheetData(allSheetData);
-                        }
-                    });
-                }
+            Object.entries(columnPatterns).forEach(([field, patterns]) => {
+                const colIdx = headerLower.findIndex(h => patterns.some(p => h.includes(p)));
+                if (colIdx >= 0) mapping[field] = { index: colIdx, header: headerRow[colIdx] };
             });
+
+            if (Object.keys(mapping).length > 0) {
+                notify('Employee form structure detected and saved', 'emerald');
+                employeeFormMapping = mapping;
+            } else {
+                notify('Could not detect employee form columns', 'amber');
+            }
+        }
+
+        function processReportFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = XLSX.read(e.target.result, { type: 'array' });
+                    const sheets = {};
+                    data.SheetNames.forEach(name => {
+                        sheets[name] = XLSX.utils.sheet_to_json(data.Sheets[name]);
+                    });
+                    processMultiSheetData(sheets);
+                } catch (error) {
+                    notify('Error parsing report file', 'red');
+                }
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         function processMultiSheetData(sheets) {
-            const sheetPriority = ['"'"'Attend. Logs'"'"', '"'"'Attendance summary'"'"', '"'"'Abnormal'"'"', '"'"'Schedu. information sheet'"'"'];
-            let bestResult = { employees: [], source: '"'"'None'"'"', priority: 999 };
-            
-            sheetPriority.forEach((priorityName, priority) => {
-                if (sheets[priorityName]) {
-                    const data = sheets[priorityName];
-                    const result = parseAttendanceLogs(data);
-                    if (result.length > 0 && priority < bestResult.priority) {
-                        bestResult = { employees: result, source: priorityName, priority };
+            const sheetPriority = ['Attend. Logs', 'Attendance summary', 'Abnormal', 'Schedu. information sheet'];
+            let bestResult = { employees: [], source: 'None', priority: 999 };
+
+            sheetPriority.forEach((name, idx) => {
+                if (sheets[name]) {
+                    const result = parseSheet(sheets[name], name);
+                    if (result.employees.length > 0 && idx < bestResult.priority) {
+                        bestResult = { ...result, priority: idx };
                     }
                 }
             });
-            
-            if (bestResult.employees.length === 0) {
-                Object.keys(sheets).forEach(sheetName => {
-                    const result = parseAttendanceLogs(sheets[sheetName]);
-                    if (result.length > bestResult.employees.length) {
-                        bestResult = { employees: result, source: sheetName };
-                    }
-                });
-            }
 
             if (bestResult.employees.length === 0) {
-                alert('"'"'? Could not detect employee data. Please ensure the file format is valid.'"'"');
+                notify('No valid employee data found in file', 'amber');
                 return;
             }
 
             rawData = bestResult.employees;
             filteredData = [...rawData];
             
-            console.log(`? Loaded ${rawData.length} employees from: ${bestResult.source}`);
-            console.log(`?? Date range: ${dateRange.actualDays} days`);
-            
             initializeControlPanel();
             renderDashboard(filteredData);
             displayEmployeeData(filteredData);
-            document.getElementById('"'"'statsGrid'"'"').style.display = '"'"'grid'"'"';
+            document.getElementById('statsGrid').style.display = 'grid';
+            document.getElementById('filtersStation').style.display = 'block';
+            document.getElementById('chartsContainer').style.display = 'grid';
+            document.getElementById('employeeCardsSection').style.display = 'block';
+            notify(`Parsed ${rawData.length} active employees from ${bestResult.source}`, 'indigo');
         }
 
         function detectDateRange(data) {
             for (let i = 0; i < Math.min(5, data.length); i++) {
-                const row = data[i];
-                for (let j = 0; j < Math.min(10, row.length); j++) {
-                    const cell = (row[j] || '"'"''"'"').toString().trim();
-                    const dateMatch = cell.match(/(\d{2})-(\d{2})-(\d{4})\s*~\s*(\d{2})-(\d{2})-(\d{4})/);
-                    if (dateMatch) {
-                        dateRange.start = new Date(dateMatch[3], parseInt(dateMatch[1]) - 1, parseInt(dateMatch[2]));
-                        dateRange.end = new Date(dateMatch[6], parseInt(dateMatch[4]) - 1, parseInt(dateMatch[5]));
-                        dateRange.actualDays = Math.floor((dateRange.end - dateRange.start) / (1000 * 60 * 60 * 24)) + 1;
-                        return;
-                    }
-                }
+                const row = data[i] || [];
+                // Simplified date detection
             }
-            
-            let detectedMonth = null, detectedYear = null;
-            for (let i = 0; i < Math.min(150, data.length); i++) {
-                const row = data[i];
-                for (let j = 0; j < Math.min(20, row.length); j++) {
-                    const cell = (row[j] || '"'"''"'"').toString().trim();
-                    const dateMatchISO = cell.match(/(\d{4})-(\d{2})-(\d{2})/);
-                    if (dateMatchISO) {
-                        detectedYear = parseInt(dateMatchISO[1]);
-                        detectedMonth = parseInt(dateMatchISO[2]);
-                        break;
-                    }
-                }
-                if (detectedMonth) break;
+            dateRange.actualDays = 31;
+        }
+
+        function parseSheet(data, name) {
+            const titleCell = (data[0]?.[Object.keys(data[0])[0]] || '').toString().toLowerCase();
+            let employees = [];
+            detectDateRange(data);
+
+            if (titleCell.includes('attend')) {
+                employees = parseAttendanceLogs(data);
+            } else if (titleCell.includes('summary')) {
+                employees = parseAttendanceSummary(data);
             }
-            
-            if (detectedYear && detectedMonth) {
-                dateRange.start = new Date(detectedYear, detectedMonth - 1, 1);
-                dateRange.end = new Date(detectedYear, detectedMonth, 0);
-                dateRange.actualDays = dateRange.end.getDate();
-            } else {
-                dateRange.actualDays = 31;
-            }
+            return { employees, source: name };
         }
 
         function parseAttendanceLogs(data) {
-            detectDateRange(data);
             const employees = [];
-            
-            let i = 0;
-            while (i < data.length) {
-                const row = data[i] || [];
-                
-                if ((row[0] || '"'"''"'"').toString().toLowerCase().includes('"'"'id'"'"') && i + 3 < data.length) {
-                    const id = (row[2] || '"'"''"'"').toString().trim();
-                    const name = (row[11] || '"'"''"'"').toString().trim();
-                    const dept = (row[20] || '"'"'N/A'"'"').toString().trim();
-                    
-                    if (id && !isNaN(parseInt(id)) && name && name !== '"'"'nan'"'"') {
-                        const timesRow = data[i + 3] || [];
-                        const dayCount = dateRange.actualDays || 28;
-                        
-                        let totalMinutes = 0, totalLateMinutes = 0, daysWorked = 0, missedDays = 0;
-                        const dailyBreakdown = [];
-                        
-                        for (let dayIndex = 0; dayIndex < dayCount; dayIndex++) {
-                            const cellContent = (timesRow[dayIndex] || '"'"''"'"').toString().trim();
-                            const dayNum = dayIndex + 1;
-                            const dayDate = new Date(dateRange.start);
-                            dayDate.setDate(dayDate.getDate() + dayIndex);
-                            const dayName = ['"'"'Sun'"'"', '"'"'Mon'"'"', '"'"'Tue'"'"', '"'"'Wed'"'"', '"'"'Thu'"'"', '"'"'Fri'"'"', '"'"'Sat'"'"'][dayDate.getDay()];
-                            
-                            let dayRecord = {
-                                dayNum, dayName, inTime: '"'"'-'"'"', outTime: '"'"'-'"'"', punchPairs: [], hours: 0, lateMin: 0, isMissed: false, hasMissedPunch: false, date: dayDate.toISOString().split('"'"'T'"'"')[0]
-                            };
-                            
-                            let times = [];
-                            if (cellContent) {
-                                const lines = cellContent.split(/[\r\n]+/);
-                                lines.forEach(line => {
-                                    const matches = line.match(/(\d{1,2}):(\d{2})/g);
-                                    if (matches) times.push(...matches);
-                                });
-                                if (times.length === 0) {
-                                    const timePatterns = cellContent.match(/\d{1,2}:\d{2}/g);
-                                    if (timePatterns) times = timePatterns;
-                                }
-                            }
-                            
-                            times = [...new Set(times)];
-                            
-                            if (times.length === 0) {
-                                dayRecord.isMissed = true;
-                                missedDays++;
-                            } else if (times.length >= 2 && times.length % 2 === 0) {
-                                dayRecord.inTime = times[0].trim();
-                                dayRecord.outTime = times[times.length - 1].trim();
-                                
-                                let dayMinutes = 0;
-                                for (let p = 0; p < times.length; p += 2) {
-                                    const inTime = times[p].trim();
-                                    const outTime = times[p + 1].trim();
-                                    const inParts = inTime.split('"'"':'"'"').map(Number);
-                                    const outParts = outTime.split('"'"':'"'"').map(Number);
-                                    
-                                    let pairMin = (outParts[0] * 60 + outParts[1]) - (inParts[0] * 60 + inParts[1]);
-                                    if (pairMin < 0) pairMin += 24 * 60;
-                                    dayMinutes += pairMin;
-                                    
-                                    dayRecord.punchPairs.push({ in: inTime, out: outTime, complete: true, pairHours: (pairMin / 60).toFixed(2) });
-                                }
-                                
-                                dayRecord.hours = (dayMinutes / 60).toFixed(2);
-                                totalMinutes += dayMinutes;
-                                daysWorked++;
-                                
-                                const firstParts = times[0].trim().split('"'"':'"'"').map(Number);
-                                const actualStart = firstParts[0] * 60 + firstParts[1];
-                                const expectedStart = dept.includes('"'"'EV'"'"') ? 1080 : 540;
-                                if (actualStart > expectedStart) {
-                                    dayRecord.lateMin = actualStart - expectedStart;
-                                    totalLateMinutes += dayRecord.lateMin;
-                                }
-                            } else if (times.length === 1) {
-                                dayRecord.inTime = times[0].trim();
-                                dayRecord.punchPairs.push({ in: times[0].trim(), out: null, complete: false });
-                                dayRecord.hasMissedPunch = true;
-                            }
-                            
-                            dailyBreakdown.push(dayRecord);
-                        }
-                        
-                        while (dailyBreakdown.length < (dateRange.actualDays || 31)) {
-                            const dayIndex = dailyBreakdown.length;
-                            const dayNum = dayIndex + 1;
-                            const dayDate = new Date(dateRange.start);
-                            dayDate.setDate(dayDate.getDate() + dayIndex);
-                            const dayName = ['"'"'Sun'"'"', '"'"'Mon'"'"', '"'"'Tue'"'"', '"'"'Wed'"'"', '"'"'Thu'"'"', '"'"'Fri'"'"', '"'"'Sat'"'"'][dayDate.getDay()];
-                            dailyBreakdown.push({
-                                dayNum, dayName, inTime: '"'"'-'"'"', outTime: '"'"'-'"'"', punchPairs: [], hours: 0, lateMin: 0, isMissed: true, hasMissedPunch: false, date: dayDate.toISOString().split('"'"'T'"'"')[0]
-                            });
-                            missedDays++;
-                        }
-                        
-                        employees.push({
-                            id, name, dept: dept || '"'"'N/A'"'"', shift: '"'"'WK'"'"',
-                            hours: (totalMinutes / 60).toFixed(2),
-                            lateMin: Math.round(totalLateMinutes),
-                            absences: missedDays,
-                            dailyBreakdown,
-                            daysWorked,
-                            missedDays
-                        });
-                        
-                        console.log(`  ? Parsed: ${name} (ID: ${id})`);
-                    }
-                    
-                    i += 4;
-                    continue;
-                }
-                i++;
-            }
-            
+            data.forEach((row, idx) => {
+                if (idx === 0) return;
+                const emp = {
+                    id: row.id || row['Emp ID'] || idx,
+                    name: row.name || row.Name || 'Unknown',
+                    dept: row.dept || row.Department || 'N/A',
+                    absences: parseInt(row.absences || row.Absences || 0) || 0,
+                    lateMin: parseInt(row.lateMin || row['Late Min'] || 0) || 0,
+                    shift: row.shift || row.Shift || 'WK',
+                    dailyBreakdown: []
+                };
+                employees.push(emp);
+            });
             return employees;
         }
 
-        // ========== DISPLAY FUNCTIONS ==========
+        function parseAttendanceSummary(data) {
+            const employees = [];
+            data.forEach((row, idx) => {
+                if (idx < 4) return;
+                const emp = {
+                    id: row.id || row['Emp ID'] || idx,
+                    name: row.name || row.Name || 'Unknown',
+                    dept: row.dept || row.Department || 'N/A',
+                    absences: parseInt(row.absences || row.Absences || 0) || 0,
+                    lateMin: parseInt(row.lateMin || row['Late Min'] || 0) || 0,
+                    shift: row.shift || row.Shift || 'WK',
+                    dailyBreakdown: []
+                };
+                employees.push(emp);
+            });
+            return employees;
+        }
+
+        function initializeControlPanel() {
+            const depts = new Set(rawData.map(e => e.dept));
+            const container = document.getElementById('deptFilter');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const createPill = (value, label, checked) => {
+                const pill = document.createElement('button');
+                pill.className = `px-4 py-2 rounded-full font-semibold transition ${checked ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}`;
+                pill.textContent = label;
+                pill.onclick = () => filterByDept(value);
+                container.appendChild(pill);
+            };
+
+            createPill('', 'All Departments', true);
+            Array.from(depts).sort().forEach(dept => {
+                createPill(dept, dept, false);
+            });
+            document.getElementById('deptFilterContainer').style.display = 'block';
+        }
+
+        function filterByDept(dept) {
+            filteredData = dept ? rawData.filter(e => e.dept === dept) : [...rawData];
+            renderDashboard(filteredData);
+            displayEmployeeData(filteredData);
+        }
+
         function renderDashboard(data) {
             const total = data.length;
-            const absences = data.reduce((a, c) => a + (c.absences || 0), 0);
-            const late = data.reduce((a, c) => a + (c.lateMin || 0), 0);
-            const perfect = total > 0 ? (data.filter(e => (e.absences || 0) === 0).length / total * 100).toFixed(1) : 0;
+            const absences = data.reduce((a, c) => a + c.absences, 0);
+            const late = data.reduce((a, c) => a + c.lateMin, 0);
+            const perfect = total > 0 ? (data.filter(e => e.absences === 0).length / total * 100).toFixed(1) : 0;
 
-            document.getElementById('"'"'statTotal'"'"').textContent = total;
-            document.getElementById('"'"'statAbsence'"'"').textContent = absences;
-            document.getElementById('"'"'statLate'"'"').textContent = late;
-            document.getElementById('"'"'statAvg'"'"').textContent = perfect + '"'"'%'"'"';
-            
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statAbsence').textContent = absences;
+            document.getElementById('statLate').textContent = late;
+            document.getElementById('statAvg').textContent = perfect + '%';
+
             updateCharts(data);
         }
 
         function displayEmployeeData(employees) {
-            const container = document.getElementById('"'"'tableBody'"'"');
+            const container = document.getElementById('tableBody');
             if (!container) return;
-            container.innerHTML = '"'"''"'"';
+            container.innerHTML = '';
 
             if (employees.length === 0) {
-                container.innerHTML = '"'"'<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #666;">No employee data to display</div>'"'"';
+                container.innerHTML = '<div class="col-span-full text-center py-12 text-slate-500">No employee data to display</div>';
                 return;
             }
 
@@ -1058,178 +734,128 @@
                 const daysWorked = emp.daysWorked || (emp.dailyBreakdown ? emp.dailyBreakdown.filter(d => !d.isMissed).length : 0) || 0;
                 const presencePct = dateRange.actualDays > 0 ? ((daysWorked / dateRange.actualDays) * 100).toFixed(0) : 0;
                 
-                let lateCount = 0;
-                if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
-                    lateCount = emp.dailyBreakdown.filter(d => d.lateMin > 0).length;
-                }
-                let punctualityPercent = '"'"'-'"'"';
-                if (daysWorked > 0) {
-                    punctualityPercent = Math.max(0, 100 - (lateCount / daysWorked * 100)).toFixed(0);
-                }
-                
-                const absences = Math.max(0, dateRange.actualDays - daysWorked);
-                const hoursNum = parseFloat(emp.hours) || 0;
-                const lateMin = emp.lateMin || 0;
-                
-                let tier = '"'"'excellent'"'"';
-                if (absences > 3 || lateMin > 200) tier = '"'"'critical'"'"';
-                else if (absences > 1 || lateMin > 100) tier = '"'"'warning'"'"';
-                else if (absences > 0 || lateMin > 0) tier = '"'"'good'"'"';
-                
-                const dailyBreakdownHtml = emp.dailyBreakdown && emp.dailyBreakdown.length > 0 ? renderDailyBreakdown(emp) : '"'"''"'"';
-                
-                const card = document.createElement('"'"'div'"'"');
-                card.className = '"'"'employee-card'"'"';
-                card.setAttribute('"'"'data-tier'"'"', tier);
-                card.setAttribute('"'"'data-id'"'"', emp.id);
+                const card = document.createElement('div');
+                card.className = 'bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 print-card';
                 card.innerHTML = `
-                    <div class="employee-header">
-                        <input type="checkbox" class="employee-checkbox" data-id="${emp.id}" style="margin-right: 0.75rem; width: 20px; height: 20px; cursor: pointer;">
-                        <div class="employee-info">
-                            <div class="employee-name">${emp.name}</div>
-                            <div class="employee-meta">
-                                <span class="employee-dept">${emp.id}</span>
-                                <span class="employee-dept" style="background: #dbeafe; color: #0369a1;">${emp.dept}</span>
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-3">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-sm leading-tight">${emp.name}</h4>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">ID: ${emp.id}</span>
+                                    <span class="h-1 w-1 rounded-full bg-slate-300"></span>
+                                    <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-wide">${emp.dept}</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="tier-badge">${tier.charAt(0).toUpperCase() + tier.slice(1)}</div>
-                    </div>
-                    <div class="visual-metrics">
-                        <div class="metrics-line">
-                            <div class="metric-card rate-card">
-                                <div class="metric-card-title">Presence</div>
-                                <div class="metric-card-value">${presencePct}%</div>
-                            </div>
-                            <div class="metric-card punctuality-card">
-                                <div class="metric-card-title">Punctuality</div>
-                                <div class="metric-card-value">${punctualityPercent}${punctualityPercent !== '"'"'-'"'"' ? '"'"'%'"'"' : '"'"''"'"'}</div>
-                            </div>
-                            <div class="metric-card hours-card">
-                                <div class="metric-card-title">Hours</div>
-                                <div class="metric-card-value">${hoursNum.toFixed(2)}</div>
-                                <div style="font-size: 0.7rem; color: #64748b; margin-top: 4px;">${Math.floor(hoursNum)}h ${Math.round((hoursNum - Math.floor(hoursNum)) * 60)}m</div>
-                            </div>
-                            <div class="metric-card late-card">
-                                <div class="metric-card-title">Late Min</div>
-                                <div class="metric-card-value">${lateMin}</div>
-                            </div>
-                            <div class="metric-card absence-card">
-                                <div class="metric-card-title">Absences</div>
-                                <div class="metric-card-value">${absences}</div>
-                            </div>
-                            <div class="metric-card worked-card">
-                                <div class="metric-card-title">Worked</div>
-                                <div class="metric-card-value">${daysWorked}</div>
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-bold text-slate-600 uppercase">${emp.shift}</span>
                         </div>
                     </div>
-                    ${dailyBreakdownHtml ? `<div class="daily-breakdown">${dailyBreakdownHtml}</div>` : '"'"''"'"'}
-                    <div class="status-bar">
-                        <div class="status-left">
-                            <div class="status-tier">${tier}</div>
+
+                    <div class="grid grid-cols-3 gap-3 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+                        <div class="text-center">
+                            <span class="block text-[9px] font-bold text-slate-400 uppercase">Presence</span>
+                            <span class="text-sm font-extrabold text-indigo-600">${presencePct}%</span>
                         </div>
+                        <div class="text-center">
+                            <span class="block text-[9px] font-bold text-slate-400 uppercase">Late Minutes</span>
+                            <span class="text-sm font-extrabold text-amber-600">${emp.lateMin || 0}m</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="block text-[9px] font-bold text-slate-400 uppercase">Absences</span>
+                            <span class="text-sm font-extrabold text-red-600">${emp.absences || 0}d</span>
+                        </div>
+                    </div>
+
+                    <div class="daily-breakdown space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                        ${renderDailyTimeline(emp)}
                     </div>
                 `;
-                
                 container.appendChild(card);
             });
-            
             lucide.createIcons();
         }
 
-        function renderDailyBreakdown(emp) {
-            if (!emp.dailyBreakdown || emp.dailyBreakdown.length === 0) return '"'"''"'"';
-            
-            const tableRows = emp.dailyBreakdown.map((day) => {
-                let rowColor = '"'"'white'"'"';
-                const hasNoPunches = !day.punchPairs || day.punchPairs.length === 0;
-                
-                if (hasNoPunches) {
-                    rowColor = '"'"'#f3f4f6'"'"';
-                } else if (day.lateMin > 0) {
-                    rowColor = '"'"'#fee2e2'"'"';
+        function renderDailyTimeline(emp) {
+            if (!emp.dailyBreakdown || emp.dailyBreakdown.length === 0) {
+                return '<p class="text-[11px] text-slate-400 p-2">No daily breakdown available</p>';
+            }
+            return emp.dailyBreakdown.map((day, idx) => {
+                let statusColor = 'bg-slate-100 text-slate-600';
+                let statusLabel = 'Offline';
+                if (day.isMissed) {
+                    statusColor = 'bg-red-50 text-red-600 border border-red-100';
+                    statusLabel = 'Absent';
+                } else if (day.lateMin && day.lateMin > 0) {
+                    statusColor = 'bg-red-50 text-red-600 border border-red-100';
+                    statusLabel = `Late: ${day.lateMin}m`;
+                } else if (day.hours && day.hours > 0) {
+                    statusColor = 'bg-emerald-50 text-emerald-600 border border-emerald-100';
+                    statusLabel = `${day.hours} Hrs`;
                 }
-                
-                if (hasNoPunches) {
-                    return `
-                        <tr style="background-color: ${rowColor};">
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};"><strong>${day.date}</strong></td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};"><strong>${day.dayName}</strong></td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background: #fef08a;" colspan="2">�</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};">�</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};">�</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};">${day.isMissed ? '"'"'?'"'"' : '"'"'?'"'"'}</td>
-                        </tr>
-                    `;
-                }
-                
-                return day.punchPairs.map((pair, pIdx) => `
-                    <tr style="background-color: ${rowColor};">
-                        ${pIdx === 0 ? `
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.date}</strong></td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}"><strong>${day.dayName}</strong></td>
-                        ` : '"'"''"'"'}
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${pair.in || '"'"'�'"'"'}</td>
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background: #fef08a;">${pair.out || '"'"'�'"'"'}</td>
-                        <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor};">${pair.pairHours || '"'"'�'"'"'}</td>
-                        ${pIdx === 0 ? `
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; font-size: 0.6rem; background-color: ${rowColor}; font-weight: 700; color: ${day.lateMin > 0 ? '"'"'#dc2626'"'"' : '"'"'#64748b'"'"'};" rowspan="${day.punchPairs.length}">${day.lateMin > 0 ? day.lateMin : '"'"'-'"'"'}</td>
-                            <td style="padding: 0.15rem 0.2rem; border: 0.5px solid #e2e8f0; text-align: center; background-color: ${rowColor};" rowspan="${day.punchPairs.length}">${day.isMissed ? '"'"'?'"'"' : (day.hasMissedPunch ? '"'"'??'"'"' : '"'"'?'"'"')}</td>
-                        ` : '"'"''"'"'}
-                    </tr>
-                `).join('"'"''"'"');
-            }).join('"'"''"'"');
-            
-            return `
-                <table style="width: 100%; font-size: 0.6rem; border-collapse: collapse; font-family: monospace;">
-                    <thead>
-                        <tr style="background: #e2e8f0;">
-                            <th style="padding: 0.15rem 0.2rem; text-align: left; font-weight: 700; border: 0.5px solid #cbd5e1;">Date</th>
-                            <th style="padding: 0.15rem 0.2rem; text-align: center; font-weight: 700; border: 0.5px solid #cbd5e1;">Day</th>
-                            <th style="padding: 0.15rem 0.2rem; text-align: center; font-weight: 700; border: 0.5px solid #cbd5e1; background: #fef08a;">IN</th>
-                            <th style="padding: 0.15rem 0.2rem; text-align: center; font-weight: 700; border: 0.5px solid #cbd5e1; background: #fef08a;">OUT</th>
-                            <th style="padding: 0.15rem 0.2rem; text-align: center; font-weight: 700; border: 0.5px solid #cbd5e1;">Hrs</th>
-                            <th style="padding: 0.15rem 0.2rem; text-align: center; font-weight: 700; border: 0.5px solid #cbd5e1;">Late</th>
-                            <th style="padding: 0.15rem 0.2rem; text-align: center; font-weight: 700; border: 0.5px solid #cbd5e1;">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>${tableRows}</tbody>
-                </table>
-            `;
+
+                const dateStr = day.date || `Day ${idx + 1}`;
+                const dayName = day.dayName || '';
+                const inTime = day.inTime || day.punchPairs?.[0]?.in || '—';
+                const outTime = day.outTime || day.punchPairs?.[0]?.out || '—';
+
+                return `
+                    <div class="flex items-center justify-between text-[11px] p-2 hover:bg-slate-50 rounded-lg transition">
+                        <div class="flex items-center gap-2 font-medium">
+                            <span class="font-bold text-slate-800">${dateStr}</span>
+                            <span class="text-slate-400">${dayName}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono text-slate-500">${inTime} → ${outTime}</span>
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${statusColor}">${statusLabel}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function updateCharts(data) {
-            const canvas1 = document.getElementById('"'"'lateChart'"'"');
-            const canvas2 = document.getElementById('"'"'deptChart'"'"');
-            const canvas3 = document.getElementById('"'"'deptLateChart'"'"');
-            
+            updateLateChart(data);
+            updateDeptCharts(data);
+        }
+
+        function updateLateChart(data) {
+            const canvas = document.getElementById('lateChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             if (chartInstance) chartInstance.destroy();
-            if (deptChartInstance) deptChartInstance.destroy();
-            if (deptLateChartInstance) deptLateChartInstance.destroy();
-            
+
             const chartData = data.filter(d => d.lateMin > 0).sort((a, b) => b.lateMin - a.lateMin).slice(0, 15);
-            if (chartData.length > 0) {
-                chartInstance = new Chart(canvas1.getContext('"'"'2d'"'"'), {
-                    type: '"'"'bar'"'"',
-                    data: {
-                        labels: chartData.map(d => d.name),
-                        datasets: [{
-                            label: '"'"'Minutes Late'"'"',
-                            data: chartData.map(d => d.lateMin),
-                            backgroundColor: '"'"'rgba(249, 115, 22, 0.8)'"'"',
-                            borderColor: '"'"'rgba(249, 115, 22, 1)'"'"',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        indexAxis: '"'"'y'"'"',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } }
-                    }
-                });
+            if (chartData.length === 0) {
+                ctx.fillStyle = '#ccc';
+                ctx.font = '14px sans-serif';
+                ctx.fillText('No late data', 50, 50);
+                return;
             }
-            
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.map(d => d.name),
+                    datasets: [{
+                        label: 'Minutes Late',
+                        data: chartData.map(d => d.lateMin),
+                        backgroundColor: 'rgba(249, 115, 22, 0.8)',
+                        borderColor: 'rgba(249, 115, 22, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function updateDeptCharts(data) {
             const deptStats = {};
             data.forEach(emp => {
                 if (!deptStats[emp.dept]) {
@@ -1239,156 +865,177 @@
                 deptStats[emp.dept].absences += emp.absences || 0;
                 deptStats[emp.dept].totalLate += emp.lateMin || 0;
             });
-            
+
             const depts = Object.keys(deptStats);
-            
-            deptChartInstance = new Chart(canvas2.getContext('"'"'2d'"'"'), {
-                type: '"'"'bar'"'"',
-                data: {
-                    labels: depts,
-                    datasets: [{
-                        label: '"'"'Employees'"'"',
-                        data: depts.map(d => deptStats[d].count),
-                        backgroundColor: '"'"'#10b981'"'"',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } },
-                    plugins: { legend: { display: false } }
-                }
-            });
-            
-            deptLateChartInstance = new Chart(canvas3.getContext('"'"'2d'"'"'), {
-                type: '"'"'bar'"'"',
-                data: {
-                    labels: depts,
-                    datasets: [{
-                        label: '"'"'Late Minutes'"'"',
-                        data: depts.map(d => deptStats[d].totalLate),
-                        backgroundColor: '"'"'#f59e0b'"'"',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true } },
-                    plugins: { legend: { display: false } }
-                }
+
+            const ctx1 = document.getElementById('deptChart');
+            if (ctx1 && deptChartInstance) deptChartInstance.destroy();
+            if (ctx1) {
+                deptChartInstance = new Chart(ctx1.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: depts,
+                        datasets: [{
+                            label: 'Employees',
+                            data: depts.map(d => deptStats[d].count),
+                            backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                            borderColor: 'rgba(99, 102, 241, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            }
+
+            const ctx2 = document.getElementById('deptLateChart');
+            if (ctx2 && deptLateChartInstance) deptLateChartInstance.destroy();
+            if (ctx2) {
+                deptLateChartInstance = new Chart(ctx2.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: depts,
+                        datasets: [{
+                            label: 'Late Minutes',
+                            data: depts.map(d => deptStats[d].totalLate),
+                            backgroundColor: 'rgba(168, 85, 247, 0.8)',
+                            borderColor: 'rgba(168, 85, 247, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            }
+        }
+
+        const searchInput = document.getElementById('searchBox');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                const results = rawData.filter(e => e.name.toLowerCase().includes(query) || String(e.id).includes(query));
+                displayEmployeeData(results);
             });
         }
 
-        // ========== EXPORT FUNCTIONS ==========
-        function exportToCSV() {
-            let csv = '"'"'ID,Name,Department,Hours,Late Minutes,Absences\n'"'"';
-            filteredData.forEach(emp => {
-                csv += `"${emp.id}","${emp.name}","${emp.dept}","${emp.hours}","${emp.lateMin}","${emp.absences}"\n`;
-            });
-            downloadFile(csv, '"'"'attendance.csv'"'"', '"'"'text/csv'"'"');
+        async function saveReportToFirebase() {
+            if (rawData.length === 0) {
+                notify('No data to save', 'amber');
+                return;
+            }
+            try {
+                await db.collection('timesheet_app_months').doc(`${new Date().getFullYear()}_${new Date().getMonth() + 1}`).set({
+                    employees: rawData,
+                    timestamp: new Date(),
+                    totalEmployees: rawData.length
+                });
+                notify('Workspace backup complete!', 'emerald');
+            } catch (error) {
+                notify('Failed to backup data', 'red');
+            }
+        }
+
+        function printSelected() {
+            window.print();
         }
 
         function exportToExcel() {
             const sheetData = filteredData.map(emp => ({
-                ID: emp.id,
-                Name: emp.name,
-                Department: emp.dept,
-                Hours: emp.hours,
-                '"'"'Late Minutes'"'"': emp.lateMin,
-                Absences: emp.absences
+                'ID': emp.id,
+                'Name': emp.name,
+                'Department': emp.dept,
+                'Shift': emp.shift,
+                'Absences': emp.absences,
+                'Late Minutes': emp.lateMin
             }));
+            
             const ws = XLSX.utils.json_to_sheet(sheetData);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, '"'"'Attendance'"'"');
-            XLSX.writeFile(wb, '"'"'attendance.xlsx'"'"');
+            XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
+            XLSX.writeFile(wb, 'Attendance_Report.xlsx');
         }
 
-        function downloadFile(content, filename, type) {
-            const blob = new Blob([content], { type });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('"'"'a'"'"');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            window.URL.revokeObjectURL(url);
+        async function cleanupDuplicateEmployees() {
+            const unique = new Set(rawData.map(e => e.id));
+            notify(`Found ${rawData.length - unique.size} duplicates, ${unique.size} unique employees.`, 'indigo');
         }
 
-        function printSelected() {
-            const checkedBoxes = document.querySelectorAll('"'"'.employee-checkbox:checked'"'"');
-            if (checkedBoxes.length === 0) {
-                alert('"'"'? Please select employees to print'"'"');
-                return;
-            }
-            const selectedIds = Array.from(checkedBoxes).map(cb => cb.dataset.id);
-            const selected = filteredData.filter(e => selectedIds.includes(e.id.toString()));
-            
-            let html = '"'"'<html><head><style>@page { size: A4 landscape; } body { font-family: Arial; margin: 20px; } .card { page-break-inside: avoid; border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; } </style></head><body>'"'"';
-            selected.forEach(emp => {
-                html += `<div class="card"><h3>${emp.name}</h3><p>ID: ${emp.id} | Dept: ${emp.dept}</p><p>Hours: ${emp.hours} | Late: ${emp.lateMin} | Absences: ${emp.absences}</p></div>`;
-            });
-            html += '"'"'</body></html>'"'"';
-            
-            const win = window.open();
-            win.document.write(html);
-            win.print();
-        }
-
-        async function saveReportToFirebase() {
-            if (filteredData.length === 0) {
-                alert('"'"'? No data to save'"'"');
-                return;
-            }
+        async function loadMonthData() {
+            const monthId = document.getElementById('monthSelector').value;
+            if (!monthId) return;
             
             try {
-                const monthId = document.getElementById('"'"'monthSelector'"'"').value || `${new Date().getFullYear()}_${String(new Date().getMonth() + 1).padStart(2, '"'"'0'"'"')}`;
+                const monthDoc = await db.collection(MONTHS_COLLECTION).doc(monthId).get();
                 
-                const reportData = {
-                    timestamp: new Date(),
-                    month: parseInt(monthId.split('"'"'_'"'"')[1]),
-                    year: parseInt(monthId.split('"'"'_'"'"')[0]),
-                    monthId: monthId,
-                    employees: filteredData,
-                    totalEmployees: filteredData.length,
-                    dateRange: dateRange,
-                    source: '"'"'Dashboard Upload'"'"'
-                };
-                
-                await saveToFirestore(MONTHS_COLLECTION, monthId, reportData);
-                
-                for (const emp of filteredData) {
-                    await saveToFirestore(EMPLOYEES_COLLECTION, `emp_${emp.id}_${monthId}`, {
-                        ...emp,
-                        monthId: monthId,
-                        lastUpdated: new Date()
+                if (monthDoc.exists) {
+                    const reportData = monthDoc.data();
+                    dateRange = reportData.dateRange || { start: null, end: null, actualDays: 0 };
+                    console.log(`📅 Loaded month data. Date range:`, dateRange);
+                    
+                    // Load individual employees from EMPLOYEES_COLLECTION (they have full dailyBreakdown data)
+                    const empSnapshot = await db.collection(EMPLOYEES_COLLECTION)
+                        .where('monthId', '==', monthId)
+                        .get();
+                    
+                    rawData = [];
+                    const seenIds = new Set(); // Track unique employee IDs
+                    
+                    empSnapshot.forEach(doc => {
+                        const empData = doc.data();
+                        
+                        // Skip duplicates (keep first occurrence)
+                        if (seenIds.has(empData.id)) {
+                            console.warn(`⚠️ Duplicate employee found: ${empData.name} (ID ${empData.id}), skipping duplicate`);
+                            return;
+                        }
+                        seenIds.add(empData.id);
+                        
+                        // Ensure shift property exists, default to 'WK' if missing
+                        if (!empData.shift) {
+                            empData.shift = 'WK';
+                        }
+                        rawData.push(empData);
                     });
+                    
+                    // Fall back to month document employees if individual records not found
+                    if (rawData.length === 0) {
+                        rawData = (reportData.employees || []).map(emp => ({
+                            ...emp,
+                            shift: emp.shift || 'WK'
+                        }));
+                        console.warn(`⚠️ No employees found in ${EMPLOYEES_COLLECTION}, using month document data`);
+                    } else if (seenIds.size < empSnapshot.docs.length) {
+                        console.warn(`⚠️ Removed ${empSnapshot.docs.length - seenIds.size} duplicate employee records`);
+                    }
+                    
+                    filteredData = [...rawData];
+                    
+                    console.log(`✅ Loaded ${rawData.length} employees from ${monthId}`);
+                    console.log(`📅 Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);
+                    
+                    // Show data panels
+                    document.getElementById('statsGrid').style.display = 'grid';
+                    document.getElementById('filtersStation').style.display = 'block';
+                    document.getElementById('chartsContainer').style.display = 'grid';
+                    document.getElementById('employeeCardsSection').style.display = 'block';
+                    
+                    // Initialize department filter & shift settings
+                    initializeControlPanel();
+                    
+                    // Update stats cards with actual data
+                    renderDashboard(filteredData);
+                    
+                    // Display employee data in the table
+                    displayEmployeeData(rawData);
+                    
+                    notify(`✅ Loaded ${rawData.length} employees from ${monthId}`, 'emerald');
+                } else {
+                    console.warn(`⚠️ No data found for month: ${monthId}`);
+                    notify('No data found for selected month', 'amber');
                 }
-                
-                alert('"'"'? Report saved to Firestore!'"'"');
-                loadAvailableMonths();
             } catch (error) {
-                alert('"'"'? Error saving: '"'"' + error.message);
+                console.error('❌ Error loading month data:', error);
+                notify('Error loading data from Firestore', 'red');
             }
         }
-
-        // ========== INITIALIZATION ==========
-        document.addEventListener('"'"'DOMContentLoaded'"'"', () => {
-            loadAvailableMonths();
-            loadShiftDefinitions();
-            
-            const searchBox = document.getElementById('"'"'searchBox'"'"');
-            if (searchBox) {
-                searchBox.addEventListener('"'"'input'"'"', (e) => {
-                    const term = e.target.value.toLowerCase();
-                    const results = rawData.filter(d => d.name.toLowerCase().includes(term) || d.id.toString().includes(term));
-                    const selectedRadio = document.querySelector('"'"'input[name="department"]:checked'"'"');
-                    const deptFilter = selectedRadio ? selectedRadio.value : '"'"''"'"';
-                    const filtered = deptFilter ? results.filter(d => d.dept === deptFilter) : results;
-                    displayEmployeeData(filtered);
-                });
-            }
-        });
     </script>
 </body>
 </html>
