@@ -3528,6 +3528,11 @@ Authentication: Include X-API-Key header with your API key
                     // Display employee data in the table
                     displayEmployeeData(rawData);
                     
+                    // Also render charts if charts view is active
+                    if (document.getElementById('view-charts') && !document.getElementById('view-charts').classList.contains('hidden')) {
+                        setTimeout(renderAllCharts, 100);
+                    }
+                    
                     notify(`✅ Loaded ${rawData.length} employees from ${monthId}`, 'emerald');
                 } else {
                     console.warn(`⚠️ No data found for month: ${monthId}`);
