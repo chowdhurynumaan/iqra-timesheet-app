@@ -2813,31 +2813,31 @@ Authentication: Include X-API-Key header with your API key
                         </button>
                     </div>
 
-                    <!-- ROW 2: 6 Colored Metric Cards (50% SMALLER) -->
-                    <div class="px-1 py-0.5 bg-slate-50/50 flex gap-0.25 overflow-x-auto">
-                        <div class="bg-gradient-to-br from-green-400 to-green-600 rounded px-0.5 py-0.25 text-center text-white shadow-sm flex-shrink-0 min-w-fit">
-                            <div class="text-2px font-semibold opacity-90 uppercase tracking-wide leading-tight">Present</div>
-                            <div class="text-2px font-black leading-tight">${attendancePercent.toFixed(0)}%</div>
+                    <!-- ROW 2: 6 Colored Metric Cards (ACTUAL TINY TEXT) -->
+                    <div class="px-2 py-1 bg-slate-50/50 flex gap-0.5 overflow-x-auto">
+                        <div class="bg-gradient-to-br from-green-400 to-green-600 rounded px-1 py-0.5 text-center text-white shadow-sm flex-shrink-0 min-w-fit">
+                            <div class="font-semibold opacity-90 uppercase tracking-wide leading-tight" style="font-size: 4px;">Present</div>
+                            <div class="font-black leading-tight" style="font-size: 4px;">${attendancePercent.toFixed(0)}%</div>
                         </div>
-                        <div class="bg-gradient-to-br from-blue-400 to-blue-600 rounded px-0.5 py-0.25 text-center text-white shadow-sm flex-shrink-0 min-w-fit">
-                            <div class="text-2px font-semibold opacity-90 uppercase tracking-wide leading-tight">Timely</div>
-                            <div class="text-2px font-black leading-tight">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
+                        <div class="bg-gradient-to-br from-blue-400 to-blue-600 rounded px-1 py-0.5 text-center text-white shadow-sm flex-shrink-0 min-w-fit">
+                            <div class="font-semibold opacity-90 uppercase tracking-wide leading-tight" style="font-size: 4px;">Timely</div>
+                            <div class="font-black leading-tight" style="font-size: 4px;">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
                         </div>
-                        <div class="bg-gradient-to-br from-purple-400 to-purple-600 rounded px-0.5 py-0.25 text-center text-white shadow-sm flex-shrink-0 min-w-fit">
-                            <div class="text-2px font-semibold opacity-90 uppercase tracking-wide leading-tight">Hours</div>
-                            <div class="text-2px font-black leading-tight">${hoursNum.toFixed(1)}</div>
+                        <div class="bg-gradient-to-br from-purple-400 to-purple-600 rounded px-1 py-0.5 text-center text-white shadow-sm flex-shrink-0 min-w-fit">
+                            <div class="font-semibold opacity-90 uppercase tracking-wide leading-tight" style="font-size: 4px;">Hours</div>
+                            <div class="font-black leading-tight" style="font-size: 4px;">${hoursNum.toFixed(1)}</div>
                         </div>
-                        <div class="bg-gradient-to-br from-orange-400 to-orange-600 rounded px-0.5 py-0.25 text-center text-white shadow-sm flex-shrink-0 min-w-fit">
-                            <div class="text-2px font-semibold opacity-90 uppercase tracking-wide leading-tight">Late</div>
-                            <div class="text-2px font-black leading-tight">${lateMin}</div>
+                        <div class="bg-gradient-to-br from-orange-400 to-orange-600 rounded px-1 py-0.5 text-center text-white shadow-sm flex-shrink-0 min-w-fit">
+                            <div class="font-semibold opacity-90 uppercase tracking-wide leading-tight" style="font-size: 4px;">Late</div>
+                            <div class="font-black leading-tight" style="font-size: 4px;">${lateMin}</div>
                         </div>
-                        <div class="bg-gradient-to-br from-red-400 to-red-600 rounded px-0.5 py-0.25 text-center text-white shadow-sm flex-shrink-0 min-w-fit">
-                            <div class="text-2px font-semibold opacity-90 uppercase tracking-wide leading-tight">Absent</div>
-                            <div class="text-2px font-black leading-tight">${absences}</div>
+                        <div class="bg-gradient-to-br from-red-400 to-red-600 rounded px-1 py-0.5 text-center text-white shadow-sm flex-shrink-0 min-w-fit">
+                            <div class="font-semibold opacity-90 uppercase tracking-wide leading-tight" style="font-size: 4px;">Absent</div>
+                            <div class="font-black leading-tight" style="font-size: 4px;">${absences}</div>
                         </div>
-                        <div class="bg-gradient-to-br from-teal-400 to-teal-600 rounded px-0.5 py-0.25 text-center text-white shadow-sm flex-shrink-0 min-w-fit">
-                            <div class="text-2px font-semibold opacity-90 uppercase tracking-wide leading-tight">Worked</div>
-                            <div class="text-2px font-black leading-tight">${daysWorked}</div>
+                        <div class="bg-gradient-to-br from-teal-400 to-teal-600 rounded px-1 py-0.5 text-center text-white shadow-sm flex-shrink-0 min-w-fit">
+                            <div class="font-semibold opacity-90 uppercase tracking-wide leading-tight" style="font-size: 4px;">Worked</div>
+                            <div class="font-black leading-tight" style="font-size: 4px;">${daysWorked}</div>
                         </div>
                     </div>
 
