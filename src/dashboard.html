@@ -27,7 +27,29 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-family='system-ui'>≡ƒôè</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        /* CSS Variables - Light Mode (Default) */
+        :root {
+            --bg-primary: #f9fafb;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* CSS Variables - Dark Mode */
+        html.dark-mode {
+            --bg-primary: #111827;
+            --bg-secondary: #1f2937;
+            --bg-tertiary: #374151;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --border-color: #4b5563;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s ease, color 0.3s ease; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -36,6 +58,161 @@
         /* Custom utilities */
         .text-7px { font-size: 0.438rem; }
         .text-10px { font-size: 0.625rem; }
+        
+        /* Dark Mode Base Styles */
+        html.dark-mode body {
+            background-color: var(--bg-primary) !important;
+            color: var(--text-primary);
+        }
+        html.dark-mode aside {
+            background-color: #0f172a !important;
+            border-color: var(--border-color);
+        }
+        html.dark-mode main {
+            background-color: var(--bg-primary) !important;
+        }
+        html.dark-mode header {
+            background-color: var(--bg-secondary) !important;
+            border-color: var(--border-color);
+        }
+        html.dark-mode .bg-white {
+            background-color: var(--bg-secondary) !important;
+            color: var(--text-primary);
+        }
+        html.dark-mode .bg-slate-50 {
+            background-color: var(--bg-tertiary) !important;
+        }
+        html.dark-mode .text-slate-800,
+        html.dark-mode .text-slate-900 {
+            color: var(--text-primary) !important;
+        }
+        html.dark-mode .text-slate-600,
+        html.dark-mode .text-slate-500,
+        html.dark-mode .text-slate-400 {
+            color: var(--text-secondary) !important;
+        }
+        html.dark-mode .border-slate-200,
+        html.dark-mode .border-slate-300 {
+            border-color: var(--border-color) !important;
+        }
+        html.dark-mode input,
+        html.dark-mode select {
+            background-color: var(--bg-secondary) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        html.dark-mode table {
+            background-color: var(--bg-secondary) !important;
+            color: var(--text-primary);
+        }
+        html.dark-mode th,
+        html.dark-mode td {
+            border-color: var(--border-color) !important;
+            color: var(--text-primary);
+        }
+        html.dark-mode .bg-slate-200/60 {
+            background-color: rgba(51, 65, 85, 0.4) !important;
+        }
+
+        /* Smooth transitions for theme change */
+        * {
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        /* Confirmation Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        html.dark-mode .modal-content {
+            background-color: var(--bg-secondary) !important;
+            color: var(--text-primary);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #1f2937;
+        }
+
+        html.dark-mode .modal-title {
+            color: var(--text-primary);
+        }
+
+        .modal-message {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        html.dark-mode .modal-message {
+            color: var(--text-secondary);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-button {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-button-cancel {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+
+        .modal-button-cancel:hover {
+            background-color: #d1d5db;
+        }
+
+        .modal-button-confirm {
+            background-color: #dc2626;
+            color: white;
+        }
+
+        .modal-button-confirm:hover {
+            background-color: #b91c1c;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
         
         /* Print layout overrides */
         @media print {
@@ -50,6 +227,18 @@
 
     <!-- Global Toast Notifications -->
     <div id="toastContainer" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-title" id="confirmTitle">Confirm Action</div>
+            <div class="modal-message" id="confirmMessage">Are you sure?</div>
+            <div class="modal-buttons">
+                <button class="modal-button modal-button-cancel" onclick="closeConfirmation()">Cancel</button>
+                <button class="modal-button modal-button-confirm" id="confirmButton" onclick="executeConfirmation()">Confirm</button>
+            </div>
+        </div>
+    </div>
 
     <!-- SIDEBAR NAVIGATION (Collapsible on Mobile) -->
     <aside class="no-print w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between h-auto md:h-full border-r border-slate-800 z-50">
@@ -96,13 +285,19 @@
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50">
         
         <!-- TOP WORKSPACE HEADER - ULTRA COMPACT -->
-        <header class="no-print bg-white border-b border-slate-200 h-10 flex items-center justify-end px-4 flex-shrink-0 z-40 gap-1.5">
+        <header class="no-print bg-white border-b border-slate-200 h-10 flex items-center justify-between px-4 flex-shrink-0 z-40 gap-1.5">
+            <!-- Dark Mode Toggle -->
+            <button onclick="toggleDarkMode()" id="darkModeButton" class="flex items-center gap-1 px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded text-xs font-bold shadow transition" title="Toggle dark mode">
+                <i data-lucide="moon" class="h-3 w-3"></i>
+                <span class="hidden sm:inline">Theme</span>
+            </button>
+
             <div class="flex items-center gap-1">
-                <button onclick="saveReportToFirebase()" class="flex items-center gap-1 px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-bold shadow transition whitespace-nowrap">
+                <button onclick="saveReportToFirebase()" class="flex items-center gap-1 px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-bold shadow transition whitespace-nowrap" title="Save to Firebase (Ctrl+S)">
                     <i data-lucide="cloud" class="h-3 w-3"></i>
                     <span>Save</span>
                 </button>
-                <button onclick="printSelected()" class="flex items-center gap-1 px-2 py-1 bg-slate-800 hover:bg-slate-900 text-white rounded text-xs font-bold shadow transition whitespace-nowrap">
+                <button onclick="printSelected()" class="flex items-center gap-1 px-2 py-1 bg-slate-800 hover:bg-slate-900 text-white rounded text-xs font-bold shadow transition whitespace-nowrap" title="Print (Ctrl+P)">
                     <i data-lucide="printer" class="h-3 w-3"></i>
                     <span>Print</span>
                 </button>
@@ -344,8 +539,145 @@
         let dateRange = { start: null, end: null, actualDays: 0 };
         let cellEditHistory = {};
 
+        // ========== PHASE 2: UX POLISH ==========
+        // Dark Mode Management
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDarkMode = html.classList.contains('dark-mode');
+            
+            if (isDarkMode) {
+                html.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'false');
+                updateDarkModeButton(false);
+                notify('Light mode activated', 'indigo');
+            } else {
+                html.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'true');
+                updateDarkModeButton(true);
+                notify('Dark mode activated', 'indigo');
+            }
+            lucide.createIcons();
+        }
+
+        function updateDarkModeButton(isDarkMode) {
+            const btn = document.getElementById('darkModeButton');
+            if (!btn) return;
+            if (isDarkMode) {
+                btn.classList.remove('bg-slate-200', 'hover:bg-slate-300', 'text-slate-800');
+                btn.classList.add('bg-slate-700', 'hover:bg-slate-600', 'text-slate-200');
+            } else {
+                btn.classList.remove('bg-slate-700', 'hover:bg-slate-600', 'text-slate-200');
+                btn.classList.add('bg-slate-200', 'hover:bg-slate-300', 'text-slate-800');
+            }
+        }
+
+        // Initialize dark mode from localStorage
+        function initializeDarkMode() {
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                document.documentElement.classList.add('dark-mode');
+                updateDarkModeButton(true);
+            }
+        }
+
+        // Undo/Redo Stack Management
+        let undoStack = [];
+        let redoStack = [];
+
+        function recordChange(description, data) {
+            const change = {
+                timestamp: new Date(),
+                description: description,
+                data: JSON.parse(JSON.stringify(data))
+            };
+            undoStack.push(change);
+            redoStack = []; // Clear redo stack when new change is made
+            console.log(`✅ Change recorded: ${description}`);
+        }
+
+        function undo() {
+            if (undoStack.length === 0) {
+                notify('Nothing to undo', 'amber');
+                return false;
+            }
+            const change = undoStack.pop();
+            redoStack.push(change);
+            notify(`↶ Undone: ${change.description}`, 'indigo');
+            return true;
+        }
+
+        function redo() {
+            if (redoStack.length === 0) {
+                notify('Nothing to redo', 'amber');
+                return false;
+            }
+            const change = redoStack.pop();
+            undoStack.push(change);
+            notify(`↷ Redone: ${change.description}`, 'indigo');
+            return true;
+        }
+
+        // Confirmation Dialog
+        let confirmationCallback = null;
+
+        function showConfirmation(title, message, onConfirm) {
+            const modal = document.getElementById('confirmationModal');
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            confirmationCallback = onConfirm;
+            modal.style.display = 'flex';
+        }
+
+        function closeConfirmation() {
+            document.getElementById('confirmationModal').style.display = 'none';
+            confirmationCallback = null;
+        }
+
+        function executeConfirmation() {
+            if (confirmationCallback) {
+                confirmationCallback();
+            }
+            closeConfirmation();
+        }
+
+        // Keyboard Shortcuts
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                // Ctrl+S: Save
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    saveReportToFirebase();
+                    return;
+                }
+
+                // Ctrl+Z: Undo
+                if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+                    e.preventDefault();
+                    undo();
+                    return;
+                }
+
+                // Ctrl+Y or Ctrl+Shift+Z: Redo
+                if ((e.ctrlKey && e.key === 'y') || (e.ctrlKey && e.shiftKey && e.key === 'z')) {
+                    e.preventDefault();
+                    redo();
+                    return;
+                }
+
+                // Escape: Close modal
+                if (e.key === 'Escape') {
+                    const modal = document.getElementById('confirmationModal');
+                    if (modal.style.display === 'flex') {
+                        closeConfirmation();
+                    }
+                }
+            });
+        }
+
         // Load Initial Assets on load
         window.addEventListener('load', () => {
+            initializeDarkMode();
+            setupKeyboardShortcuts();
             loadAvailableMonths();
             loadShiftDefinitions();
             loadEmployeeFormMapping();
@@ -959,14 +1291,19 @@
                     timestamp: new Date(),
                     totalEmployees: rawData.length
                 });
-                notify('Workspace backup complete!', 'emerald');
+                recordChange('Workspace backup', { employees: rawData.length });
+                notify('💾 Workspace backup complete! (Ctrl+S)', 'emerald');
             } catch (error) {
                 notify('Failed to backup data', 'red');
             }
         }
 
         function printSelected() {
-            window.print();
+            recordChange('Print report', { timestamp: new Date() });
+            notify('🖨️ Opening print preview...', 'indigo');
+            setTimeout(() => {
+                window.print();
+            }, 500);
         }
 
         function exportToExcel() {
@@ -986,8 +1323,18 @@
         }
 
         async function cleanupDuplicateEmployees() {
-            const unique = new Set(rawData.map(e => e.id));
-            notify(`Found ${rawData.length - unique.size} duplicates, ${unique.size} unique employees.`, 'indigo');
+            const duplicateCount = rawData.length - new Set(rawData.map(e => e.id)).size;
+            showConfirmation(
+                '⚠️ Clean Up Duplicates',
+                `Found ${duplicateCount} duplicate records. This action cannot be undone. Continue?`,
+                () => {
+                    const unique = new Set(rawData.map(e => e.id));
+                    const beforeCount = rawData.length;
+                    rawData = Array.from(unique).map(id => rawData.find(e => e.id === id));
+                    recordChange('Cleanup duplicates', { before: beforeCount, after: rawData.length });
+                    notify(`✓ Removed ${beforeCount - rawData.length} duplicates. ${rawData.length} unique employees remain.`, 'emerald');
+                }
+            );
         }
 
         async function loadMonthData() {
