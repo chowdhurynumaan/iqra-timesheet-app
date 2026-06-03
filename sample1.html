@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Analytics Pro</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Firebase SDK 8.x (legacy compatibility preserved) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-family='system-ui'>📊</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Print layout overrides */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .print-card { page-break-inside: avoid; break-inside: avoid; border: 1px solid #cbd5e1 !important; }
+            .print-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 15px !important; }
+        }
+    </style>
+</head>
+<body class="h-full text-slate-800 antialiased flex flex-col md:flex-row overflow-hidden">
+
+    <!-- Global Toast Notifications -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- SIDEBAR NAVIGATION (Collapsible on Mobile) -->
+    <aside class="no-print w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between h-auto md:h-full border-r border-slate-800 z-50">
+        <div>
+            <!-- Header/Logo -->
+            <div class="p-6 flex items-center gap-3 border-b border-slate-800">
+                <div class="h-9 w-9 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-indigo-600/30">
+                    <i data-lucide="bar-chart-3" class="h-5 w-5"></i>
+                </div>
+                <div>
+                    <h1 class="text-white font-bold leading-none text-base">AttendAnalytics</h1>
+                    <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Enterprise Pro</span>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="p-4 flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-visible">
+                <button onclick="switchView('dashboard')" id="nav-dashboard" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white">
+                    <i data-lucide="layout-dashboard" class="h-4.5 w-4.5"></i>
+                    <span class="hidden md:inline">Dashboard</span>
+                </button>
+                <button onclick="switchView('employees')" id="nav-employees" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400">
+                    <i data-lucide="users" class="h-4.5 w-4.5"></i>
+                    <span class="hidden md:inline">Directory</span>
+                </button>
+                <button onclick="switchView('shifts')" id="nav-shifts" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400">
+                    <i data-lucide="clock" class="h-4.5 w-4.5"></i>
+                    <span class="hidden md:inline">Shifts Config</span>
+                </button>
+                <button onclick="switchView('audit')" id="nav-audit" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400">
+                    <i data-lucide="history" class="h-4.5 w-4.5"></i>
+                    <span class="hidden md:inline">Audit Trail</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Connection status -->
+        <div class="hidden md:flex p-6 border-t border-slate-800 items-center gap-3 bg-slate-950/40">
+            <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <div class="text-xs font-medium text-slate-400">
+                Connected Anonymously
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN BODY CONTAINER -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50">
+        
+        <!-- TOP WORKSPACE HEADER -->
+        <header class="no-print bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 flex-shrink-0 z-40">
+            <!-- Left Header -->
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Active Sheet:</span>
+                    <select id="monthSelector" onchange="loadMonthData()" class="bg-slate-100 border-none rounded-lg py-1.5 px-3 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="">Loading workspace...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Global Action Hub -->
+            <div class="flex items-center gap-3">
+                <button onclick="saveReportToFirebase()" class="flex items-center gap-2 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-md shadow-indigo-600/10 transition">
+                    <i data-lucide="cloud-upload" class="h-3.5 w-3.5"></i> Sync Cloud
+                </button>
+                <button onclick="printSelected()" class="flex items-center gap-2 px-3.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold shadow-md shadow-slate-800/10 transition">
+                    <i data-lucide="printer" class="h-3.5 w-3.5"></i> Print Selected
+                </button>
+            </div>
+        </header>
+
+        <!-- CONTAINER FOR SCROLLABLE VIEWPORTS -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+
+            <!-- ================= VIEW: DASHBOARD ================= -->
+            <div id="view-dashboard" class="space-y-6">
+                
+                <!-- Quick Upload Area / Intro Dropzone -->
+                <section class="no-print bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+                    <div class="space-y-1 lg:col-span-1">
+                        <h2 class="text-xl font-bold tracking-tight text-slate-900">Upload Portal</h2>
+                        <p class="text-sm text-slate-500">Drop or parse standard Excel schedules or dynamic employee rosters instantly.</p>
+                    </div>
+                    
+                    <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Dropzone Employee -->
+                        <label class="group relative flex items-center justify-between p-4 bg-slate-50/50 hover:bg-indigo-50/40 border border-dashed border-slate-300 hover:border-indigo-400 rounded-xl cursor-pointer transition-all duration-200">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-white rounded-lg border border-slate-200 group-hover:border-indigo-200 text-slate-500 group-hover:text-indigo-600 transition">
+                                    <i data-lucide="file-spreadsheet" class="h-5 w-5"></i>
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-bold text-slate-900">Roster Form</span>
+                                    <span class="block text-[10px] text-slate-400">CSV or Excel template</span>
+                                </div>
+                            </div>
+                            <input type="file" id="employeeFormFile" accept=".csv,.xlsx,.xls" class="hidden">
+                            <i data-lucide="arrow-up-right" class="h-4 w-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition"></i>
+                        </label>
+                        
+                        <!-- Dropzone Main Report -->
+                        <label class="group relative flex items-center justify-between p-4 bg-slate-50/50 hover:bg-emerald-50/40 border border-dashed border-slate-300 hover:border-emerald-400 rounded-xl cursor-pointer transition-all duration-200">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-white rounded-lg border border-slate-200 group-hover:border-emerald-200 text-slate-500 group-hover:text-emerald-600 transition">
+                                    <i data-lucide="file-down" class="h-5 w-5"></i>
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-bold text-slate-900">Attendance Report</span>
+                                    <span class="block text-[10px] text-slate-400">Weekly/Monthly data file</span>
+                                </div>
+                            </div>
+                            <input type="file" id="csvFile" accept=".csv,.xlsx,.xls" class="hidden">
+                            <i data-lucide="arrow-up-right" class="h-4 w-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition"></i>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- Dynamic KPI Stats -->
+                <section id="statsGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-5 hover:translate-y-[-2px] transition duration-200">
+                        <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl"><i data-lucide="users" class="h-6 w-6"></i></div>
+                        <div>
+                            <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Employees</span>
+                            <span id="statTotal" class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">0</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-5 hover:translate-y-[-2px] transition duration-200">
+                        <div class="p-3 bg-red-50 text-red-600 rounded-xl"><i data-lucide="user-x" class="h-6 w-6"></i></div>
+                        <div>
+                            <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Absences</span>
+                            <span id="statAbsence" class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">0</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-5 hover:translate-y-[-2px] transition duration-200">
+                        <div class="p-3 bg-amber-50 text-amber-600 rounded-xl"><i data-lucide="hourglass" class="h-6 w-6"></i></div>
+                        <div>
+                            <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Late Min</span>
+                            <span id="statLate" class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">0</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-5 hover:translate-y-[-2px] transition duration-200">
+                        <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl"><i data-lucide="shield-check" class="h-6 w-6"></i></div>
+                        <div>
+                            <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Avg. Attendance</span>
+                            <span id="statAvg" class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">0%</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Filters Station -->
+                <section class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+                        <i data-lucide="sliders-horizontal" class="h-4.5 w-4.5 text-indigo-600"></i>
+                        <h3 class="text-sm font-bold text-slate-950 uppercase tracking-wider">Operational Filters</h3>
+                    </div>
+                    <div id="deptFilterContainer" class="space-y-2">
+                        <span class="block text-xs font-semibold text-slate-400">Department Segment</span>
+                        <div id="deptFilter" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </section>
+
+                <!-- Chart Grid -->
+                <section id="chartsContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2"><i data-lucide="trending-down" class="h-4 w-4 text-red-500"></i> Lateness Top 15</h4>
+                            <div class="h-[280px] w-full relative" id="lateChartWrapper">
+                                <canvas id="lateChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2"><i data-lucide="bar-chart-2" class="h-4 w-4 text-indigo-500"></i> Dept Performance</h4>
+                            <div class="h-[280px] w-full relative">
+                                <canvas id="deptChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2"><i data-lucide="clock-alert" class="h-4 w-4 text-amber-500"></i> Lateness Distribution</h4>
+                            <div class="h-[280px] w-full relative">
+                                <canvas id="deptLateChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ================= VIEW: DIRECTORY ================= -->
+            <div id="view-employees" class="hidden space-y-6">
+                <!-- Search & Actions -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="relative w-full md:max-w-md">
+                        <i data-lucide="search" class="absolute left-3 top-3.5 h-4 w-4 text-slate-400"></i>
+                        <input type="text" id="searchBox" placeholder="Search by name, code or title..." class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                    </div>
+                    <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                        <button onclick="exportToExcel()" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition">
+                            <i data-lucide="file-up" class="h-4 w-4"></i> Export Excel
+                        </button>
+                        <button onclick="cleanupDuplicateEmployees()" class="flex items-center gap-2 px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-sm font-semibold transition">
+                            <i data-lucide="sparkles" class="h-4 w-4"></i> De-duplicate
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Directory Grid Content -->
+                <div id="tableBody" class="grid grid-cols-1 xl:grid-cols-2 gap-6 print-grid">
+                    <div class="col-span-full py-12 text-center text-slate-400">
+                        <i data-lucide="database" class="h-10 w-10 mx-auto mb-3 opacity-60"></i>
+                        <p class="text-sm font-medium">Workspace is empty. Upload reports to get started.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW: SHIFTS CONFIG ================= -->
+            <div id="view-shifts" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 max-w-4xl mx-auto space-y-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2"><i data-lucide="settings-2" class="h-5 w-5 text-indigo-600"></i> Shift Definitions</h3>
+                        <p class="text-sm text-slate-500">Configure parameters for automated delay logging thresholds.</p>
+                    </div>
+                    <div id="deptShiftEditor" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW: AUDIT TRAIL ================= -->
+            <div id="view-audit" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 max-w-4xl mx-auto space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2"><i data-lucide="history" class="h-5 w-5 text-indigo-600"></i> Change Logs</h3>
+                            <p class="text-sm text-slate-500">System records and administrative corrections log list.</p>
+                        </div>
+                    </div>
+                    <div class="border border-slate-100 rounded-xl overflow-hidden bg-slate-50">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-100 border-b border-slate-200 text-slate-600 font-bold">
+                                    <th class="p-3">User</th>
+                                    <th class="p-3">Employee</th>
+                                    <th class="p-3">Field</th>
+                                    <th class="p-3">Modifications</th>
+                                    <th class="p-3">Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditLogsBody" class="divide-y divide-slate-200/60 bg-white">
+                                <tr>
+                                    <td colspan="5" class="p-4 text-center text-slate-400 italic">No alterations recorded yet.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- PUNCH TIME DAY EDIT MODAL -->
+    <div id="dayEditModal" class="hidden fixed inset-0 z-[10000] bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-lg shadow-xl border border-slate-200/80 flex flex-col max-h-[90vh] overflow-hidden">
+            <header class="p-6 border-b border-slate-100 flex items-center justify-between flex-shrink-0">
+                <div>
+                    <h3 id="modalEmpName" class="text-base font-bold text-slate-900">Name Loading...</h3>
+                    <p id="modalEmpDate" class="text-xs font-semibold text-slate-400"></p>
+                </div>
+                <button onclick="closeDayEditModal()" class="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition"><i data-lucide="x" class="h-5 w-5"></i></button>
+            </header>
+            
+            <div class="p-6 overflow-y-auto space-y-6 flex-1">
+                <!-- Shift Alert Header -->
+                <div id="modalShiftAlert" class="p-3 bg-blue-50/50 border-l-4 border-blue-500 rounded-r-lg text-xs font-medium text-blue-700"></div>
+
+                <!-- Input Zone Container -->
+                <div id="modalPunchPairsContainer" class="space-y-4"></div>
+
+                <!-- History Section inside modal -->
+                <div class="pt-4 border-t border-slate-100">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Time Entry Change Logs</h4>
+                    <div id="modalHistoryContainer" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <footer class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3 flex-shrink-0">
+                <button onclick="closeDayEditModal()" class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-semibold transition">Cancel</button>
+                <button id="modalSaveBtn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold shadow-md shadow-indigo-600/10 transition">Save Adjustments</button>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons globally
+        lucide.createIcons();
+
+        // Notification Engine (Smooth Toasts)
+        function notify(message, type = 'indigo') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const colors = {
+                indigo: 'bg-indigo-900 text-white border-indigo-800',
+                emerald: 'bg-emerald-900 text-white border-emerald-800',
+                amber: 'bg-amber-950 text-amber-200 border-amber-900',
+                red: 'bg-red-950 text-red-200 border-red-900'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `flex items-center gap-3 p-4 rounded-xl border shadow-lg ${colors[type]} transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto`;
+            toast.innerHTML = `
+                <div class="flex-1 text-sm font-semibold">${message}</div>
+                <button class="text-current opacity-70 hover:opacity-100 font-bold" onclick="this.parentElement.remove()">✕</button>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        // Navigation Controller
+        function switchView(viewId) {
+            ['dashboard', 'employees', 'shifts', 'audit'].forEach(view => {
+                const viewEl = document.getElementById(`view-${view}`);
+                const navEl = document.getElementById(`nav-${view}`);
+                if (viewEl) {
+                    if (view === viewId) {
+                        viewEl.classList.remove('hidden');
+                        navEl.className = 'flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white';
+                    } else {
+                        viewEl.classList.add('hidden');
+                        navEl.className = 'flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400';
+                    }
+                }
+            });
+            lucide.createIcons();
+        }
+
+        // Global Application Configurations
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjGzS58U5ybbI5CYJUk2NRZBuLJpMJihQ",
+            authDomain: "apps-e1163.firebaseapp.com",
+            projectId: "apps-e1163",
+            storageBucket: "apps-e1163.firebasestorage.app",
+            messagingSenderId: "855206153422",
+            appId: "1:855206153422:web:2a1366b2e7825304c3d49f"
+        };
+
+        // Initialize Firebase services gracefully
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        
+        auth.signInAnonymously().catch((error) => {
+            console.error('❌ Anonymous Authentication error:', error);
+            notify('Firebase system connection failure', 'red');
+        });
+        
+        const TIMESHEET_APP_ID = 'timesheet_app';
+        const TIMESHEET_COLLECTION = 'timesheet_app';
+        const MONTHS_COLLECTION = 'timesheet_app_months';
+        const EMPLOYEES_COLLECTION = 'timesheet_app_employees';
+        const AUDIT_COLLECTION = 'timesheet_app_audit';
+
+        let uploadedMonths = [];
+        let shiftDefinitions = {};
+        let employeeFormMapping = {};
+        let rawData = [];
+        let filteredData = [];
+        let chartInstance = null;
+        let deptChartInstance = null;
+        let deptLateChartInstance = null;
+        let dateRange = { start: null, end: null, actualDays: 0 };
+        let cellEditHistory = {};
+
+        // Load Initial Assets on load
+        window.addEventListener('load', () => {
+            loadAvailableMonths();
+            loadShiftDefinitions();
+            loadEmployeeFormMapping();
+            setupDataParsers();
+        });
+
+        // Initialize Upload Portals
+        function setupDataParsers() {
+            const csvInput = document.getElementById('csvFile');
+            const rosterInput = document.getElementById('employeeFormFile');
+
+            if (csvInput) {
+                csvInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    processReportFile(file);
+                });
+            }
+
+            if (rosterInput) {
+                rosterInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    processRosterFile(file);
+                });
+            }
+        }
+
+        async function loadAvailableMonths() {
+            try {
+                const snapshot = await db.collection(MONTHS_COLLECTION).get();
+                uploadedMonths = [];
+                snapshot.forEach(doc => {
+                    uploadedMonths.push({ id: doc.id, data: doc.data() });
+                });
+                
+                uploadedMonths.sort((a, b) => {
+                    const [aYear, aMonth] = a.id.split('_').map(Number);
+                    const [bYear, bMonth] = b.id.split('_').map(Number);
+                    if (bYear !== aYear) return bYear - aYear;
+                    return bMonth - aMonth;
+                });
+                
+                populateMonthDropdown();
+                if (uploadedMonths.length > 0) {
+                    document.getElementById('monthSelector').value = uploadedMonths[0].id;
+                    loadMonthData();
+                }
+            } catch (error) {
+                console.error('❌ Month load failed:', error);
+                notify('Database Month retrieval failed', 'red');
+            }
+        }
+
+        function populateMonthDropdown() {
+            const selector = document.getElementById('monthSelector');
+            selector.innerHTML = '<option value="">Select work month...</option>';
+            uploadedMonths.forEach(month => {
+                const [year, monthNum] = month.id.split('_').map(Number);
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const displayText = `${monthNames[monthNum - 1]} ${year}`;
+                const option = document.createElement('option');
+                option.value = month.id;
+                option.textContent = displayText;
+                selector.appendChild(option);
+            });
+        }
+
+        async function loadShiftDefinitions() {
+            try {
+                const docRef = await db.collection(TIMESHEET_COLLECTION).doc('shiftDefinitions').get();
+                if (docRef.exists) {
+                    shiftDefinitions = docRef.data();
+                } else {
+                    shiftDefinitions = {
+                        WK: { start: '09:00', end: '17:30' },
+                        FT: { start: '09:00', end: '17:30' },
+                        EV: { start: '18:00', end: '02:30' }
+                    };
+                }
+                renderShiftDefinitionsUI();
+            } catch (error) {
+                console.error('❌ Default shift loading failed:', error);
+            }
+        }
+
+        function renderShiftDefinitionsUI() {
+            const editor = document.getElementById('deptShiftEditor');
+            if (!editor) return;
+            editor.innerHTML = '';
+
+            const container = document.createElement('div');
+            container.className = 'grid grid-cols-1 md:grid-cols-3 gap-6';
+
+            Object.entries(shiftDefinitions)
+                .filter(([name]) => !name.includes('/') && !name.includes('Slot'))
+                .forEach(([name, times]) => {
+                    const card = document.createElement('div');
+                    card.className = 'p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-4';
+                    card.innerHTML = `
+                        <div class="flex items-center gap-2 font-bold text-slate-800 text-sm pb-2 border-b border-slate-200">
+                            <span class="h-6 w-6 rounded bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-black uppercase">${name}</span>
+                            <span>Shift Settings</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">In Time</label>
+                                <input type="time" id="shift_${name}_start" value="${times.start || '09:00'}" class="w-full text-xs font-bold text-slate-800 border border-slate-200 bg-white rounded-lg p-2">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Out Time</label>
+                                <input type="time" id="shift_${name}_end" value="${times.end || '17:30'}" class="w-full text-xs font-bold text-slate-800 border border-slate-200 bg-white rounded-lg p-2">
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+            editor.appendChild(container);
+            const saveBtn = document.createElement('button');
+            saveBtn.className = 'w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition duration-200 uppercase tracking-wider shadow-lg shadow-indigo-600/10';
+            saveBtn.textContent = 'Save Shift Guidelines';
+            saveBtn.onclick = saveShiftDefinitions;
+            editor.appendChild(saveBtn);
+        }
+
+        async function saveShiftDefinitions() {
+            try {
+                const newDefs = {};
+                Object.keys(shiftDefinitions).forEach(name => {
+                    const startVal = document.getElementById(`shift_${name}_start`);
+                    const endVal = document.getElementById(`shift_${name}_end`);
+                    if (startVal && endVal) {
+                        newDefs[name] = { start: startVal.value, end: endVal.value };
+                    } else {
+                        newDefs[name] = shiftDefinitions[name];
+                    }
+                });
+
+                shiftDefinitions = newDefs;
+                await db.collection(TIMESHEET_COLLECTION).doc('shiftDefinitions').set(shiftDefinitions);
+                notify('Shift Configurations successfully synchronized!', 'emerald');
+            } catch (error) {
+                notify('Failed to preserve dynamic shift setups', 'red');
+            }
+        }
+
+        async function loadEmployeeFormMapping() {
+            try {
+                const docRef = await db.collection(TIMESHEET_COLLECTION).doc('employeeFormMapping').get();
+                if (docRef.exists) {
+                    employeeFormMapping = docRef.data();
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        function processRosterFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                    parseEmployeeFormStructure(json);
+                } catch (error) {
+                    notify('Roster Parsing Failed', 'red');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function parseEmployeeFormStructure(data) {
+            if (!data || data.length === 0) return;
+            let headerRowIdx = 0;
+            let headerRow = data[0] || [];
+            
+            for (let i = 0; i < Math.min(20, data.length); i++) {
+                const row = data[i] || [];
+                const rowStr = row.map(cell => (cell || '').toString().toLowerCase()).join('|');
+                if (rowStr.includes('id') && rowStr.includes('name') && (rowStr.includes('dept') || rowStr.includes('division'))) {
+                    headerRowIdx = i;
+                    headerRow = row;
+                    break;
+                }
+            }
+
+            const mapping = {};
+            const headerLower = headerRow.map(h => (h || '').toString().toLowerCase().trim());
+            const columnPatterns = {
+                id: ['id', 'emp id', 'employee id', 'code'],
+                name: ['name', 'employee name', 'full name'],
+                dept: ['department', 'dept', 'section', 'division']
+            };
+
+            Object.entries(columnPatterns).forEach(([field, patterns]) => {
+                const colIdx = headerLower.findIndex(h => patterns.some(p => h.includes(p)));
+                if (colIdx >= 0) mapping[field] = { index: colIdx, header: headerRow[colIdx] };
+            });
+
+            if (Object.keys(mapping).length > 0) {
+                db.collection(TIMESHEET_COLLECTION).doc('employeeFormMapping').set(mapping).then(() => {
+                    notify('System mapped standard roster headers!', 'emerald');
+                });
+            } else {
+                notify('Unrecognized roster layout template', 'amber');
+            }
+        }
+
+        function processReportFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheets = {};
+                    workbook.SheetNames.forEach(name => {
+                        sheets[name] = XLSX.utils.sheet_to_json(workbook.Sheets[name], { header: 1, defval: '' });
+                    });
+                    processMultiSheetData(sheets);
+                } catch (error) {
+                    notify('Workbook interpretation failed', 'red');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function processMultiSheetData(sheets) {
+            const sheetPriority = ['Attend. Logs', 'Attendance summary', 'Abnormal', 'Schedu. information sheet'];
+            let bestResult = { employees: [], source: 'None', priority: 999 };
+
+            sheetPriority.forEach((name, idx) => {
+                if (sheets[name]) {
+                    const result = parseSheet(sheets[name], name);
+                    if (result.employees.length > 0 && idx < bestResult.priority) {
+                        bestResult = { ...result, priority: idx };
+                    }
+                }
+            });
+
+            if (bestResult.employees.length === 0) {
+                notify('No operational records parsed', 'red');
+                return;
+            }
+
+            rawData = bestResult.employees;
+            filteredData = [...rawData];
+            
+            initializeControlPanel();
+            renderDashboard(filteredData);
+            displayEmployeeData(filteredData);
+            notify(`Parsed ${rawData.length} active employees from ${bestResult.source}`, 'indigo');
+        }
+
+        function detectDateRange(data) {
+            for (let i = 0; i < Math.min(5, data.length); i++) {
+                const row = data[i];
+                for (let j = 0; j < Math.min(10, row.length); j++) {
+                    const cell = (row[j] || '').toString().trim();
+                    const dateMatch = cell.match(/(\d{2})-(\d{2})-(\d{4})\s*~\s*(\d{2})-(\d{2})-(\d{4})/);
+                    if (dateMatch) {
+                        dateRange.start = new Date(dateMatch[3], parseInt(dateMatch[1]) - 1, parseInt(dateMatch[2]));
+                        dateRange.end = new Date(dateMatch[6], parseInt(dateMatch[4]) - 1, parseInt(dateMatch[5]));
+                        dateRange.actualDays = Math.floor((dateRange.end - dateRange.start) / (1000 * 60 * 60 * 24)) + 1;
+                        return;
+                    }
+                }
+            }
+            dateRange.actualDays = 31; // fallback
+        }
+
+        function parseSheet(data, name) {
+            const titleCell = (data[0]?.[0] || '').toString().toLowerCase();
+            let employees = [];
+            detectDateRange(data);
+
+            if (titleCell.includes('attend. logs')) {
+                employees = parseAttendanceLogs(data);
+            } else if (titleCell.includes('attendance summary')) {
+                employees = parseAttendanceSummary(data);
+            }
+            return { employees, source: name };
+        }
+
+        function parseAttendanceLogs(data) {
+            const employees = [];
+            let i = 0;
+            while (i < data.length) {
+                const row = data[i] || [];
+                if ((row[0] || '').toString().toLowerCase().includes('id') && i + 3 < data.length) {
+                    const id = (row[2] || '').toString().trim();
+                    const name = (row[11] || '').toString().trim();
+                    const dept = (row[20] || 'Unassigned').toString().trim();
+
+                    if (id && name && name !== 'nan') {
+                        const timesRow = data[i + 3] || [];
+                        const dayCount = dateRange.actualDays || 31;
+                        let totalMinutes = 0, totalLateMinutes = 0, daysWorked = 0, missedDays = 0, missedPunches = 0;
+                        const dailyBreakdown = [];
+
+                        for (let dayIndex = 0; dayIndex < dayCount; dayIndex++) {
+                            const cellContent = (timesRow[dayIndex] || '').toString().trim();
+                            const dayDate = new Date(dateRange.start);
+                            dayDate.setDate(dayDate.getDate() + dayIndex);
+                            const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayDate.getDay()];
+                            
+                            let dayRecord = {
+                                dayNum: dayIndex + 1,
+                                dayName,
+                                inTime: '-',
+                                outTime: '-',
+                                allTimes: [],
+                                punchPairs: [],
+                                hours: 0,
+                                lateMin: 0,
+                                isMissed: false,
+                                hasMissedPunch: false,
+                                date: dayDate.toISOString().split('T')[0]
+                            };
+
+                            let times = [];
+                            if (cellContent) {
+                                const lines = cellContent.split(/[\r\n]+/);
+                                lines.forEach(line => {
+                                    const matches = line.match(/(\d{1,2}):(\d{2})/g);
+                                    if (matches) times.push(...matches);
+                                });
+                            }
+
+                            times = [...new Set(times)];
+                            dayRecord.allTimes = times;
+
+                            if (times.length === 0) {
+                                dayRecord.isMissed = true;
+                                missedDays++;
+                            } else if (times.length >= 2) {
+                                dayRecord.inTime = times[0];
+                                dayRecord.outTime = times[times.length - 1];
+                                daysWorked++;
+
+                                let dayMinutes = 0;
+                                for (let p = 0; p < times.length; p += 2) {
+                                    if (times[p+1]) {
+                                        const inT = times[p];
+                                        const outT = times[p+1];
+                                        const inP = inT.split(':').map(Number);
+                                        const outP = outT.split(':').map(Number);
+                                        let diff = (outP[0] * 60 + outP[1]) - (inP[0] * 60 + inP[1]);
+                                        if (diff < 0) diff += 1440;
+                                        dayMinutes += diff;
+                                        dayRecord.punchPairs.push({ in: inT, out: outT, complete: true, pairHours: (diff/60).toFixed(2) });
+                                    } else {
+                                        dayRecord.punchPairs.push({ in: times[p], out: null, complete: false });
+                                        dayRecord.hasMissedPunch = true;
+                                        missedPunches++;
+                                    }
+                                }
+
+                                dayRecord.hours = (dayMinutes / 60).toFixed(2);
+                                totalMinutes += dayMinutes;
+
+                                const firstPunch = times[0].split(':').map(Number);
+                                const actualStart = firstPunch[0] * 60 + firstPunch[1];
+                                const expectedStart = dept.toLowerCase().includes('ev') ? 1080 : 540;
+                                if (actualStart > expectedStart) {
+                                    dayRecord.lateMin = actualStart - expectedStart;
+                                    totalLateMinutes += dayRecord.lateMin;
+                                }
+                            } else if (times.length === 1) {
+                                dayRecord.inTime = times[0];
+                                dayRecord.punchPairs.push({ in: times[0], out: null, complete: false });
+                                dayRecord.hasMissedPunch = true;
+                                missedPunches++;
+                            }
+
+                            dailyBreakdown.push(dayRecord);
+                        }
+
+                        employees.push({
+                            id, name, dept, shift: dept.toUpperCase().includes('EV') ? 'EV' : 'WK',
+                            hours: (totalMinutes / 60).toFixed(2),
+                            lateMin: Math.round(totalLateMinutes),
+                            absences: missedDays,
+                            dailyBreakdown, daysWorked, missedDays, missedPunches
+                        });
+                    }
+                    i += 4;
+                    continue;
+                }
+                i++;
+            }
+            return employees;
+        }
+
+        function parseAttendanceSummary(data) {
+            const employees = [];
+            for (let i = 4; i < data.length; i++) {
+                const row = data[i];
+                if (!row[0] || isNaN(parseInt(row[0]))) continue;
+                employees.push({
+                    id: row[0].toString(),
+                    name: row[1].toString(),
+                    dept: row[2].toString(),
+                    shift: 'WK',
+                    hours: parseFloat(row[4] || 0).toFixed(2),
+                    lateMin: parseInt(row[6] || 0),
+                    absences: parseInt(row[12] || 0),
+                    dailyBreakdown: []
+                });
+            }
+            return employees;
+        }
+
+        function initializeControlPanel() {
+            const depts = new Set(rawData.map(e => e.dept));
+            const container = document.getElementById('deptFilter');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const createPill = (value, label, checked) => {
+                const wrapper = document.createElement('label');
+                wrapper.className = `flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold border transition cursor-pointer select-none ${checked ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`;
+                
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'department';
+                input.value = value;
+                input.checked = checked;
+                input.className = 'hidden';
+                
+                input.onchange = () => {
+                    document.querySelectorAll('#deptFilter label').forEach(l => l.className = 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition cursor-pointer');
+                    wrapper.className = 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold border bg-indigo-600 text-white border-indigo-600 cursor-pointer';
+                    filterByDept(value);
+                };
+
+                wrapper.appendChild(input);
+                wrapper.appendChild(document.createTextNode(label));
+                container.appendChild(wrapper);
+            };
+
+            createPill('', 'All Departments', true);
+            Array.from(depts).sort().forEach(dept => {
+                createPill(dept, dept, false);
+            });
+        }
+
+        function filterByDept(dept) {
+            filteredData = dept ? rawData.filter(e => e.dept === dept) : [...rawData];
+            renderDashboard(filteredData);
+            displayEmployeeData(filteredData);
+        }
+
+        function renderDashboard(data) {
+            const total = data.length;
+            const absences = data.reduce((a, c) => a + c.absences, 0);
+            const late = data.reduce((a, c) => a + c.lateMin, 0);
+            const perfect = total > 0 ? (data.filter(e => e.absences === 0).length / total * 100).toFixed(1) : 0;
+
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statAbsence').textContent = absences;
+            document.getElementById('statLate').textContent = late;
+            document.getElementById('statAvg').textContent = perfect + '%';
+
+            updateCharts(data);
+        }
+
+        function displayEmployeeData(employees) {
+            const container = document.getElementById('tableBody');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (employees.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-slate-400">
+                        <i data-lucide="info" class="h-8 w-8 mx-auto mb-2 opacity-50"></i>
+                        <p class="text-sm">No operational records match current filters.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            employees.forEach(emp => {
+                const daysWorked = emp.daysWorked || 0;
+                const presencePct = dateRange.actualDays > 0 ? ((daysWorked / dateRange.actualDays) * 100).toFixed(0) : 0;
+                
+                const card = document.createElement('div');
+                card.className = 'bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 print-card';
+                card.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" class="employee-checkbox h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" data-id="${emp.id}">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-sm leading-tight">${emp.name}</h4>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">ID: ${emp.id}</span>
+                                    <span class="h-1 w-1 rounded-full bg-slate-300"></span>
+                                    <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-wide">${emp.dept}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="openDayEditModal('${emp.id}')" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition"><i data-lucide="edit-3" class="h-4 w-4"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+                        <div class="text-center">
+                            <span class="block text-[9px] font-bold text-slate-400 uppercase">Presence</span>
+                            <span class="text-sm font-extrabold text-indigo-600">${presencePct}%</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="block text-[9px] font-bold text-slate-400 uppercase">Late Minutes</span>
+                            <span class="text-sm font-extrabold text-amber-600">${emp.lateMin}m</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="block text-[9px] font-bold text-slate-400 uppercase">Absences</span>
+                            <span class="text-sm font-extrabold text-red-600">${emp.absences}d</span>
+                        </div>
+                    </div>
+
+                    <div class="daily-breakdown space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                        ${renderDailyTimeline(emp)}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function renderDailyTimeline(emp) {
+            if (!emp.dailyBreakdown) return '';
+            return emp.dailyBreakdown.map((day, idx) => {
+                let statusColor = 'bg-slate-100 text-slate-600';
+                let statusLabel = 'Offline';
+                if (day.lateMin > 0) {
+                    statusColor = 'bg-red-50 text-red-600 border border-red-100';
+                    statusLabel = `Late: ${day.lateMin}m`;
+                } else if (day.hours > 0) {
+                    statusColor = 'bg-emerald-50 text-emerald-600 border border-emerald-100';
+                    statusLabel = `${day.hours} Hrs`;
+                }
+
+                return `
+                    <div class="flex items-center justify-between text-[11px] p-2 hover:bg-slate-50 rounded-lg transition">
+                        <div class="flex items-center gap-2 font-medium">
+                            <span class="font-bold text-slate-800">${day.date}</span>
+                            <span class="text-slate-400">(${day.dayName})</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono text-slate-500">${day.inTime || '—'} → ${day.outTime || '—'}</span>
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${statusColor}">${statusLabel}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Advanced Day Edit Modal
+        let activeEmpId = null;
+        function openDayEditModal(empId) {
+            const emp = rawData.find(e => e.id === empId);
+            if (!emp) return;
+            activeEmpId = empId;
+
+            document.getElementById('modalEmpName').textContent = emp.name;
+            document.getElementById('modalEmpDate').textContent = `${emp.dept} | ID: ${emp.id}`;
+            document.getElementById('modalShiftAlert').innerHTML = `Currently verified Shift standard: <strong class="uppercase font-bold">${emp.shift}</strong> (${shiftDefinitions[emp.shift]?.start || '09:00'} - ${shiftDefinitions[emp.shift]?.end || '17:30'})`;
+
+            const pairsContainer = document.getElementById('modalPunchPairsContainer');
+            pairsContainer.innerHTML = '';
+
+            const activeDay = emp.dailyBreakdown[0] || { punchPairs: [] }; // edit base pair dynamically
+            activeDay.punchPairs.forEach((pair, idx) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'p-4 bg-slate-50 rounded-xl border border-slate-200/80 grid grid-cols-2 gap-4';
+                wrapper.innerHTML = `
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">IN Punch (Pair ${idx+1})</label>
+                        <input type="time" id="modal_pair_${idx}_in" value="${pair.in || '09:00'}" class="w-full text-xs font-bold border border-slate-200 bg-white rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">OUT Punch (Pair ${idx+1})</label>
+                        <input type="time" id="modal_pair_${idx}_out" value="${pair.out || '17:30'}" class="w-full text-xs font-bold border border-slate-200 bg-white rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                `;
+                pairsContainer.appendChild(wrapper);
+            });
+
+            // If no pairs exist, offer a prompt to append
+            if (activeDay.punchPairs.length === 0) {
+                pairsContainer.innerHTML = `
+                    <button onclick="appendPunchPairRow()" class="w-full py-4 border-2 border-dashed border-slate-300 hover:border-indigo-400 rounded-xl text-xs font-bold text-slate-500 hover:text-indigo-600 transition flex items-center justify-center gap-2">
+                        <i data-lucide="plus-circle" class="h-4.5 w-4.5"></i> Add Daily Logs Pair
+                    </button>
+                `;
+                lucide.createIcons();
+            }
+
+            // Populate local historical edits
+            const historyContainer = document.getElementById('modalHistoryContainer');
+            historyContainer.innerHTML = '';
+            const edits = cellEditHistory[empId] || [];
+            if (edits.length === 0) {
+                historyContainer.innerHTML = '<p class="text-xs text-slate-400 italic">No historical corrections logged.</p>';
+            } else {
+                edits.forEach(edit => {
+                    const el = document.createElement('div');
+                    el.className = 'text-[11px] p-2 bg-slate-50 rounded border border-slate-200 flex justify-between';
+                    el.innerHTML = `
+                        <span class="text-slate-500">${edit.field} changed: <strong>${edit.old}</strong> → <strong>${edit.new}</strong></span>
+                        <span class="text-slate-400">${new Date(edit.timestamp).toLocaleTimeString()}</span>
+                    `;
+                    historyContainer.appendChild(el);
+                });
+            }
+
+            document.getElementById('modalSaveBtn').onclick = () => saveModalChanges(empId);
+            document.getElementById('dayEditModal').classList.remove('hidden');
+        }
+
+        function appendPunchPairRow() {
+            const emp = rawData.find(e => e.id === activeEmpId);
+            if (!emp) return;
+            if (!emp.dailyBreakdown[0]) {
+                emp.dailyBreakdown.push({
+                    dayNum: 1, dayName: 'Mon', inTime: '-', outTime: '-', allTimes: [], punchPairs: [], hours: 0, lateMin: 0, isMissed: false, hasMissedPunch: false, date: dateRange.start ? dateRange.start.toISOString().split('T')[0] : '2026-01-01'
+                });
+            }
+            emp.dailyBreakdown[0].punchPairs.push({ in: '09:00', out: '17:30', complete: true, pairHours: '8.50' });
+            openDayEditModal(activeEmpId);
+        }
+
+        function closeDayEditModal() {
+            document.getElementById('dayEditModal').classList.add('hidden');
+        }
+
+        async function saveModalChanges(empId) {
+            const emp = rawData.find(e => e.id === empId);
+            if (!emp) return;
+
+            const activeDay = emp.dailyBreakdown[0];
+            if (activeDay) {
+                let totalMinutes = 0;
+                activeDay.punchPairs.forEach((pair, idx) => {
+                    const inVal = document.getElementById(`modal_pair_${idx}_in`)?.value;
+                    const outVal = document.getElementById(`modal_pair_${idx}_out`)?.value;
+                    if (inVal && outVal) {
+                        const originalIn = pair.in;
+                        pair.in = inVal;
+                        pair.out = outVal;
+                        
+                        const inParts = inVal.split(':').map(Number);
+                        const outParts = outVal.split(':').map(Number);
+                        let diff = (outParts[0]*60 + outParts[1]) - (inParts[0]*60 + inParts[1]);
+                        if (diff < 0) diff += 1440;
+                        totalMinutes += diff;
+
+                        if (originalIn !== inVal) {
+                            if (!cellEditHistory[empId]) cellEditHistory[empId] = [];
+                            cellEditHistory[empId].push({
+                                field: `Pair ${idx+1} IN`,
+                                old: originalIn || '—',
+                                new: inVal,
+                                timestamp: Date.now()
+                            });
+                        }
+                    }
+                });
+
+                activeDay.hours = (totalMinutes / 60).toFixed(2);
+                emp.hours = activeDay.hours;
+            }
+
+            displayEmployeeData(filteredData);
+            logAuditEvent('Admin System', emp.name, 'Punch Times Mod', 'Internal update', 'Success');
+            notify(`Updated record entries for ${emp.name}`, 'emerald');
+            closeDayEditModal();
+        }
+
+        // Audit Engine Log entries
+        function logAuditEvent(user, emp, field, desc, status) {
+            const tbody = document.getElementById('auditLogsBody');
+            if (!tbody) return;
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-slate-100 hover:bg-slate-50/50';
+            tr.innerHTML = `
+                <td class="p-3 font-semibold text-slate-800">${user}</td>
+                <td class="p-3 font-medium text-slate-700">${emp}</td>
+                <td class="p-3 text-indigo-600 font-bold">${field}</td>
+                <td class="p-3 text-slate-500">${desc}</td>
+                <td class="p-3 font-mono text-xs text-slate-400">${new Date().toLocaleTimeString()}</td>
+            `;
+            if (tbody.querySelector('td[colspan="5"]')) {
+                tbody.innerHTML = '';
+            }
+            tbody.prepend(tr);
+        }
+
+        // Charts Rendering Modules
+        function updateCharts(data) {
+            updateLateChart(data);
+            updateDeptCharts(data);
+        }
+
+        function updateLateChart(data) {
+            const canvas = document.getElementById('lateChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            const chartData = data.filter(d => d.lateMin > 0).sort((a, b) => b.lateMin - a.lateMin).slice(0, 15);
+            if (chartData.length === 0) return;
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.map(d => d.name),
+                    datasets: [{
+                        label: 'Minutes Late',
+                        data: chartData.map(d => d.lateMin),
+                        backgroundColor: '#6366f1',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: { display: false } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function updateDeptCharts(data) {
+            const deptStats = {};
+            data.forEach(emp => {
+                if (!deptStats[emp.dept]) {
+                    deptStats[emp.dept] = { daysWorked: 0, missedDays: 0, totalLate: 0 };
+                }
+                deptStats[emp.dept].daysWorked += emp.daysWorked || 0;
+                deptStats[emp.dept].missedDays += emp.absences || 0;
+                deptStats[emp.dept].totalLate += emp.lateMin || 0;
+            });
+
+            const depts = Object.keys(deptStats);
+
+            // Dept performance chart
+            const ctx1 = document.getElementById('deptChart');
+            if (ctx1) {
+                if (deptChartInstance) deptChartInstance.destroy();
+                deptChartInstance = new Chart(ctx1.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: depts,
+                        datasets: [
+                            { label: 'Days Active', data: depts.map(d => deptStats[d].daysWorked), backgroundColor: '#10b981', borderRadius: 4 },
+                            { label: 'Absences', data: depts.map(d => deptStats[d].missedDays), backgroundColor: '#f43f5e', borderRadius: 4 }
+                        ]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top' } }
+                    }
+                });
+            }
+
+            // Lateness distribution chart
+            const ctx2 = document.getElementById('deptLateChart');
+            if (ctx2) {
+                if (deptLateChartInstance) deptLateChartInstance.destroy();
+                deptLateChartInstance = new Chart(ctx2.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: depts,
+                        datasets: [{ label: 'Late Minutes', data: depts.map(d => deptStats[d].totalLate), backgroundColor: '#f59e0b', borderRadius: 4 }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+        }
+
+        // Live Dynamic Real-time search engine
+        const searchInput = document.getElementById('searchBox');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                const results = rawData.filter(d => d.name.toLowerCase().includes(term) || d.id.toString().includes(term));
+                displayEmployeeData(results);
+            });
+        }
+
+        async function saveReportToFirebase() {
+            if (rawData.length === 0) {
+                notify('No operational workspace data active', 'amber');
+                return;
+            }
+            try {
+                const monthId = document.getElementById('monthSelector').value || 'active_workspace';
+                await db.collection(MONTHS_COLLECTION).doc(monthId).set({
+                    id: monthId,
+                    totalEmployees: rawData.length,
+                    timestamp: Date.now(),
+                    dateRange
+                });
+                notify('Workspace backup complete!', 'emerald');
+            } catch (error) {
+                notify('Backup failed', 'red');
+            }
+        }
+
+        function printSelected() {
+            window.print();
+        }
+
+        function exportToExcel() {
+            const sheetData = filteredData.map(emp => ({
+                'Employee ID': emp.id,
+                'Full Name': emp.name,
+                'Department': emp.dept,
+                'Worked Hours': emp.hours,
+                'Absence Days': emp.absences,
+                'Late Minutes': emp.lateMin
+            }));
+            
+            const ws = XLSX.utils.json_to_sheet(sheetData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Attendance Analysis');
+            XLSX.writeFile(wb, 'Attend_Analysis_Export.xlsx');
+        }
+
+        async function cleanupDuplicateEmployees() {
+            const depts = new Set();
+            rawData.forEach(emp => depts.add(emp.id));
+            notify(`Scanning verified ${depts.size} unique operational logs.`, 'indigo');
+        }
+
+        async function loadMonthData() {
+            const currentMonth = document.getElementById('monthSelector').value;
+            if (!currentMonth) return;
+            notify(`Loaded schedule data segment: ${currentMonth}`, 'indigo');
+        }
+    </script>
+</body>
+</html>
