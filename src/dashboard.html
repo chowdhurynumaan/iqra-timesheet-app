@@ -3604,27 +3604,121 @@ Authentication: Include X-API-Key header with your API key
 
         // Chart Modal Functions
         let currentChartModal = null;
+        let modalChartInstances = {};
+
+        function renderChartInModal(chartId, canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            if (modalChartInstances[chartId]) {
+                modalChartInstances[chartId].destroy();
+            }
+
+            // Render based on chart type
+            if (chartId === 'lateChart') {
+                const chartData = filteredData.filter(d => d.lateMin > 0).sort((a, b) => b.lateMin - a.lateMin).slice(0, 15);
+                if (chartData.length > 0) {
+                    modalChartInstances[chartId] = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: chartData.map(d => d.name),
+                            datasets: [{ label: 'Minutes Late', data: chartData.map(d => d.lateMin), backgroundColor: 'rgba(249, 115, 22, 0.8)', borderColor: 'rgba(249, 115, 22, 1)', borderWidth: 1 }]
+                        },
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                    });
+                }
+            } else if (chartId === 'deptChart') {
+                const deptStats = {};
+                filteredData.forEach(emp => {
+                    if (!deptStats[emp.dept]) deptStats[emp.dept] = { total: 0, attended: 0 };
+                    deptStats[emp.dept].total++;
+                    if (emp.status === 'P') deptStats[emp.dept].attended++;
+                });
+                const labels = Object.keys(deptStats);
+                const attendanceData = labels.map(dept => Math.round((deptStats[dept].attended / deptStats[dept].total) * 100));
+                if (labels.length > 0) {
+                    modalChartInstances[chartId] = new Chart(ctx, {
+                        type: 'bar',
+                        data: { labels, datasets: [{ label: 'Attendance %', data: attendanceData, backgroundColor: 'rgba(59, 130, 246, 0.8)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 1 }] },
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                    });
+                }
+            } else if (chartId === 'deptLateChart') {
+                const deptLate = {};
+                filteredData.forEach(emp => {
+                    if (!deptLate[emp.dept]) deptLate[emp.dept] = 0;
+                    deptLate[emp.dept] += emp.lateMin || 0;
+                });
+                const labels = Object.keys(deptLate);
+                const lateData = labels.map(dept => deptLate[dept]);
+                if (labels.length > 0) {
+                    modalChartInstances[chartId] = new Chart(ctx, {
+                        type: 'bar',
+                        data: { labels, datasets: [{ label: 'Total Late Minutes', data: lateData, backgroundColor: 'rgba(239, 68, 68, 0.8)', borderColor: 'rgba(239, 68, 68, 1)', borderWidth: 1 }] },
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                    });
+                }
+            } else if (chartId === 'attendanceTrendChart') {
+                const trendData = {};
+                filteredData.forEach(emp => {
+                    const day = emp.date ? emp.date.substring(0, 10) : 'Unknown';
+                    if (!trendData[day]) trendData[day] = { total: 0, present: 0 };
+                    trendData[day].total++;
+                    if (emp.status === 'P') trendData[day].present++;
+                });
+                const sortedDays = Object.keys(trendData).sort();
+                const percentages = sortedDays.map(day => Math.round((trendData[day].present / trendData[day].total) * 100));
+                if (sortedDays.length > 0) {
+                    modalChartInstances[chartId] = new Chart(ctx, {
+                        type: 'line',
+                        data: { labels: sortedDays, datasets: [{ label: 'Attendance %', data: percentages, borderColor: 'rgba(34, 197, 94, 1)', backgroundColor: 'rgba(34, 197, 94, 0.1)', fill: true, tension: 0.4 }] },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true } } }
+                    });
+                }
+            } else if (chartId === 'lateTrendChart') {
+                const lateData = {};
+                filteredData.forEach(emp => {
+                    const day = emp.date ? emp.date.substring(0, 10) : 'Unknown';
+                    if (!lateData[day]) lateData[day] = 0;
+                    if (emp.lateMin > 0) lateData[day]++;
+                });
+                const sortedDays = Object.keys(lateData).sort();
+                const counts = sortedDays.map(day => lateData[day]);
+                if (sortedDays.length > 0) {
+                    modalChartInstances[chartId] = new Chart(ctx, {
+                        type: 'line',
+                        data: { labels: sortedDays, datasets: [{ label: 'Late Arrivals', data: counts, borderColor: 'rgba(251, 146, 60, 1)', backgroundColor: 'rgba(251, 146, 60, 0.1)', fill: true, tension: 0.4 }] },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true } } }
+                    });
+                }
+            } else if (chartId === 'distributionChart') {
+                const ranges = { '90-100%': 0, '80-90%': 0, '70-80%': 0, 'Below 70%': 0 };
+                filteredData.forEach(emp => {
+                    const pct = emp.attendancePercent || 0;
+                    if (pct >= 90) ranges['90-100%']++;
+                    else if (pct >= 80) ranges['80-90%']++;
+                    else if (pct >= 70) ranges['70-80%']++;
+                    else ranges['Below 70%']++;
+                });
+                const colors = ['rgba(34, 197, 94, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(251, 146, 60, 0.8)', 'rgba(239, 68, 68, 0.8)'];
+                modalChartInstances[chartId] = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: { labels: Object.keys(ranges), datasets: [{ data: Object.values(ranges), backgroundColor: colors }] },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+        }
 
         function openChartModal(chartId, title, description) {
             closePageMenu();
             document.getElementById('chartModalTitle').textContent = title;
             
-            const canvas = document.getElementById(chartId);
-            if (!canvas) {
-                document.getElementById('chartModalContent').innerHTML = `<p class="text-slate-600">Chart not available</p>`;
-            } else {
-                // Clone canvas or recreate chart in modal
-                document.getElementById('chartModalContent').innerHTML = `<canvas id="${chartId}Modal"></canvas>`;
-                setTimeout(() => {
-                    const newCanvas = document.getElementById(chartId + 'Modal');
-                    if (newCanvas && canvas.parentElement) {
-                        // Copy chart context if possible
-                        newCanvas.style.display = 'block';
-                        newCanvas.width = canvas.width;
-                        newCanvas.height = canvas.height;
-                    }
-                }, 100);
-            }
+            document.getElementById('chartModalContent').innerHTML = `<canvas id="${chartId}Modal" style="position: relative; width: 100%; height: 100%;"></canvas>`;
+            
+            setTimeout(() => {
+                renderChartInModal(chartId, chartId + 'Modal');
+            }, 50);
 
             currentChartModal = chartId;
             document.getElementById('chartModal').style.display = 'flex';
