@@ -300,6 +300,12 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes chartsSlideUp { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* Charts modal dark mode */
+        html.dark-mode .charts-modal-panel { background: var(--bg-secondary) !important; border-color: var(--border-color) !important; }
+        html.dark-mode .charts-modal-panel .chart-tile { background: var(--bg-surface) !important; border-color: var(--border-color) !important; }
+        html.dark-mode .charts-modal-panel canvas { filter: invert(0.88) hue-rotate(180deg); }
 
         /* ===== TOAST ===== */
         .toast-item {
@@ -754,53 +760,79 @@
 
             <!-- ================= VIEW: CHARTS ================= -->
             <!-- Charts Modal -->
-            <div id="chartsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-                <div class="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] flex flex-col">
+            <div id="chartsModal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center" style="background: rgba(0,0,0,0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);">
+                <div class="charts-modal-panel bg-white w-full sm:max-w-5xl sm:w-[95%] max-h-[92vh] sm:max-h-[85vh] flex flex-col sm:rounded-2xl rounded-t-2xl border border-slate-200/60" style="box-shadow: 0 24px 48px -12px rgba(0,0,0,0.25); animation: chartsSlideUp 0.25s ease;">
                     <!-- Modal Header -->
-                    <div class="flex items-center justify-between p-4 border-b border-slate-200 flex-shrink-0">
-                        <h2 class="text-xl font-bold text-slate-900">All Charts</h2>
-                        <button onclick="closeChartsModal()" class="text-slate-500 hover:text-slate-700 text-2xl" title="Close">×</button>
+                    <div class="flex items-center justify-between px-5 py-3.5 border-b flex-shrink-0" style="border-color: var(--border-color); background: var(--bg-tertiary);">
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-lg" style="background: var(--accent-subtle);">
+                                <i data-lucide="bar-chart-3" class="h-4 w-4" style="color: var(--accent);"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-base font-bold tracking-tight" style="color: var(--text-primary);">Analytics</h2>
+                                <p class="text-[10px] font-medium" style="color: var(--text-tertiary);">Performance overview</p>
+                            </div>
+                        </div>
+                        <button onclick="closeChartsModal()" class="flex items-center justify-center w-8 h-8 rounded-lg transition" style="background: var(--bg-secondary); border: 1px solid var(--border-color);" title="Close" onmouseover="this.style.background='#fef2f2'; this.style.borderColor='#fecaca'" onmouseout="this.style.background='var(--bg-secondary)'; this.style.borderColor='var(--border-color)'">
+                            <i data-lucide="x" class="h-4 w-4 text-slate-400"></i>
+                        </button>
                     </div>
                     <!-- Scrollable Content -->
-                    <div class="overflow-y-auto flex-1 p-4">
-                        <div class="space-y-2">
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <!-- Late Arrivals -->
-                                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                                    <h3 class="font-bold text-slate-900 mb-1">Late Arrivals</h3>
-                                    <p class="text-xs text-slate-600 mb-3">Top employees by lateness</p>
-                                    <canvas id="chartLateArrivals" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
+                    <div class="overflow-y-auto flex-1 p-4 sm:p-5" style="background: var(--bg-primary);">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <!-- Late Arrivals -->
+                            <div class="chart-tile rounded-xl p-4 border" style="background: var(--bg-secondary); border-color: var(--border-color); box-shadow: var(--shadow-sm);">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-amber-400"></span>
+                                    <h3 class="text-sm font-bold" style="color: var(--text-primary);">Late Arrivals</h3>
                                 </div>
-                                <!-- Department Stats -->
-                                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                                    <h3 class="font-bold text-slate-900 mb-1">Department Stats</h3>
-                                    <p class="text-xs text-slate-600 mb-3">Attendance by department</p>
-                                    <canvas id="chartDeptStats" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
+                                <p class="text-[10px] font-medium mb-3" style="color: var(--text-tertiary);">Top employees by lateness</p>
+                                <canvas id="chartLateArrivals" width="300" height="220" style="max-width: 100%; display: block;"></canvas>
+                            </div>
+                            <!-- Department Stats -->
+                            <div class="chart-tile rounded-xl p-4 border" style="background: var(--bg-secondary); border-color: var(--border-color); box-shadow: var(--shadow-sm);">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-blue-400"></span>
+                                    <h3 class="text-sm font-bold" style="color: var(--text-primary);">Department Stats</h3>
                                 </div>
-                                <!-- Late Minutes -->
-                                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                                    <h3 class="font-bold text-slate-900 mb-1">Late Minutes</h3>
-                                    <p class="text-xs text-slate-600 mb-3">Department lateness comparison</p>
-                                    <canvas id="chartLateMinutes" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
+                                <p class="text-[10px] font-medium mb-3" style="color: var(--text-tertiary);">Attendance by department</p>
+                                <canvas id="chartDeptStats" width="300" height="220" style="max-width: 100%; display: block;"></canvas>
+                            </div>
+                            <!-- Late Minutes -->
+                            <div class="chart-tile rounded-xl p-4 border" style="background: var(--bg-secondary); border-color: var(--border-color); box-shadow: var(--shadow-sm);">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-red-400"></span>
+                                    <h3 class="text-sm font-bold" style="color: var(--text-primary);">Late Minutes</h3>
                                 </div>
-                                <!-- Trends -->
-                                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                                    <h3 class="font-bold text-slate-900 mb-1">Trends</h3>
-                                    <p class="text-xs text-slate-600 mb-3">Attendance trend analysis</p>
-                                    <canvas id="chartTrends" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
+                                <p class="text-[10px] font-medium mb-3" style="color: var(--text-tertiary);">Department lateness comparison</p>
+                                <canvas id="chartLateMinutes" width="300" height="220" style="max-width: 100%; display: block;"></canvas>
+                            </div>
+                            <!-- Trends -->
+                            <div class="chart-tile rounded-xl p-4 border" style="background: var(--bg-secondary); border-color: var(--border-color); box-shadow: var(--shadow-sm);">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+                                    <h3 class="text-sm font-bold" style="color: var(--text-primary);">Trends</h3>
                                 </div>
-                                <!-- Late Trend -->
-                                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                                    <h3 class="font-bold text-slate-900 mb-1">Late Trend</h3>
-                                    <p class="text-xs text-slate-600 mb-3">Late arrivals trend</p>
-                                    <canvas id="chartLateTrend" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
+                                <p class="text-[10px] font-medium mb-3" style="color: var(--text-tertiary);">Attendance trend analysis</p>
+                                <canvas id="chartTrends" width="300" height="220" style="max-width: 100%; display: block;"></canvas>
+                            </div>
+                            <!-- Late Trend -->
+                            <div class="chart-tile rounded-xl p-4 border" style="background: var(--bg-secondary); border-color: var(--border-color); box-shadow: var(--shadow-sm);">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-orange-400"></span>
+                                    <h3 class="text-sm font-bold" style="color: var(--text-primary);">Late Trend</h3>
                                 </div>
-                                <!-- Distribution -->
-                                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                                    <h3 class="font-bold text-slate-900 mb-1">Distribution</h3>
-                                    <p class="text-xs text-slate-600 mb-3">Attendance distribution chart</p>
-                                    <canvas id="chartDistribution" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
+                                <p class="text-[10px] font-medium mb-3" style="color: var(--text-tertiary);">Late arrivals trend</p>
+                                <canvas id="chartLateTrend" width="300" height="220" style="max-width: 100%; display: block;"></canvas>
+                            </div>
+                            <!-- Distribution -->
+                            <div class="chart-tile rounded-xl p-4 border" style="background: var(--bg-secondary); border-color: var(--border-color); box-shadow: var(--shadow-sm);">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-purple-400"></span>
+                                    <h3 class="text-sm font-bold" style="color: var(--text-primary);">Distribution</h3>
                                 </div>
+                                <p class="text-[10px] font-medium mb-3" style="color: var(--text-tertiary);">Attendance distribution chart</p>
+                                <canvas id="chartDistribution" width="300" height="220" style="max-width: 100%; display: block;"></canvas>
                             </div>
                         </div>
                     </div>
@@ -4070,6 +4102,7 @@ Authentication: Include X-API-Key header with your API key
             const modal = document.getElementById('chartsModal');
             if (modal) {
                 modal.classList.remove('hidden');
+                if (window.lucide) lucide.createIcons({nodes: [modal]});
                 setTimeout(renderAllCharts, 100);
             }
         }
