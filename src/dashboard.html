@@ -722,31 +722,88 @@
             }
 
             employees.forEach(emp => {
+                const daysWorked = emp.daysWorked || (emp.dailyBreakdown ? emp.dailyBreakdown.filter(d => !d.isMissed).length : 0) || 0;
+                const presencePct = dateRange.actualDays > 0 ? ((daysWorked / dateRange.actualDays) * 100).toFixed(0) : 0;
+                
                 const card = document.createElement('div');
-                card.className = 'bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition';
+                card.className = 'bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 print-card';
                 card.innerHTML = `
-                    <div class="bg-gradient-to-r from-indigo-50 to-slate-50 p-4 border-b border-slate-200">
-                        <h3 class="font-bold text-slate-900">${emp.name}</h3>
-                        <p class="text-xs text-slate-600">${emp.dept} | ID: ${emp.id}</p>
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-3">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-sm leading-tight">${emp.name}</h4>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">ID: ${emp.id}</span>
+                                    <span class="h-1 w-1 rounded-full bg-slate-300"></span>
+                                    <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-wide">${emp.dept}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-bold text-slate-600 uppercase">${emp.shift}</span>
+                        </div>
                     </div>
-                    <div class="p-4 space-y-2">
-                        <div class="flex justify-between">
-                            <span class="text-sm text-slate-600">Absences:</span>
-                            <span class="font-bold text-red-600">${emp.absences}</span>
+
+                    <div class="grid grid-cols-3 gap-3 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+                        <div class="text-center">
+                            <span class="block text-[9px] font-bold text-slate-400 uppercase">Presence</span>
+                            <span class="text-sm font-extrabold text-indigo-600">${presencePct}%</span>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-sm text-slate-600">Late (min):</span>
-                            <span class="font-bold text-amber-600">${emp.lateMin}</span>
+                        <div class="text-center">
+                            <span class="block text-[9px] font-bold text-slate-400 uppercase">Late Minutes</span>
+                            <span class="text-sm font-extrabold text-amber-600">${emp.lateMin || 0}m</span>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-sm text-slate-600">Shift:</span>
-                            <span class="font-bold text-indigo-600">${emp.shift}</span>
+                        <div class="text-center">
+                            <span class="block text-[9px] font-bold text-slate-400 uppercase">Absences</span>
+                            <span class="text-sm font-extrabold text-red-600">${emp.absences || 0}d</span>
                         </div>
+                    </div>
+
+                    <div class="daily-breakdown space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                        ${renderDailyTimeline(emp)}
                     </div>
                 `;
                 container.appendChild(card);
             });
             lucide.createIcons();
+        }
+
+        function renderDailyTimeline(emp) {
+            if (!emp.dailyBreakdown || emp.dailyBreakdown.length === 0) {
+                return '<p class="text-[11px] text-slate-400 p-2">No daily breakdown available</p>';
+            }
+            return emp.dailyBreakdown.map((day, idx) => {
+                let statusColor = 'bg-slate-100 text-slate-600';
+                let statusLabel = 'Offline';
+                if (day.isMissed) {
+                    statusColor = 'bg-red-50 text-red-600 border border-red-100';
+                    statusLabel = 'Absent';
+                } else if (day.lateMin && day.lateMin > 0) {
+                    statusColor = 'bg-red-50 text-red-600 border border-red-100';
+                    statusLabel = `Late: ${day.lateMin}m`;
+                } else if (day.hours && day.hours > 0) {
+                    statusColor = 'bg-emerald-50 text-emerald-600 border border-emerald-100';
+                    statusLabel = `${day.hours} Hrs`;
+                }
+
+                const dateStr = day.date || `Day ${idx + 1}`;
+                const dayName = day.dayName || '';
+                const inTime = day.inTime || day.punchPairs?.[0]?.in || '—';
+                const outTime = day.outTime || day.punchPairs?.[0]?.out || '—';
+
+                return `
+                    <div class="flex items-center justify-between text-[11px] p-2 hover:bg-slate-50 rounded-lg transition">
+                        <div class="flex items-center gap-2 font-medium">
+                            <span class="font-bold text-slate-800">${dateStr}</span>
+                            <span class="text-slate-400">${dayName}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono text-slate-500">${inTime} → ${outTime}</span>
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${statusColor}">${statusLabel}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function updateCharts(data) {
