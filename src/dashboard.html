@@ -2799,16 +2799,16 @@ Authentication: Include X-API-Key header with your API key
                 card.className = 'bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition print-card';
                 card.setAttribute('data-card-id', emp.id);
                 card.innerHTML = `
-                    <!-- ROW 1: Single-line Header (COMPACT) -->
-                    <div class="flex items-center justify-between bg-slate-50 border-b border-slate-200 px-2 py-1 cursor-pointer hover:bg-slate-100 transition" onclick="toggleCard('${emp.id}')">
-                        <div class="flex-1 flex items-center gap-1 min-w-0">
-                            <span data-expand-icon class="text-xs font-bold flex-shrink-0">▶️</span>
-                            <h4 class="font-bold text-slate-900 text-xs truncate">${emp.name}</h4>
-                            <span class="text-5px font-semibold text-slate-600 flex-shrink-0">${emp.id}</span>
-                            <span class="px-1 py-0.5 bg-indigo-100 text-indigo-700 rounded text-5px font-bold flex-shrink-0">${emp.dept}</span>
-                            <span class="bg-gradient-to-r ${tier.color} text-white px-1 py-0.5 rounded text-5px font-bold flex-shrink-0">${tier.label}</span>
+                    <!-- ROW 1: Single-line Header (50% SMALLER) -->
+                    <div class="flex items-center justify-between bg-slate-50 border-b border-slate-200 px-1 py-0.5 cursor-pointer hover:bg-slate-100 transition" onclick="toggleCard('${emp.id}')">
+                        <div class="flex-1 flex items-center gap-0.5 min-w-0">
+                            <span data-expand-icon class="text-4px font-bold flex-shrink-0">▶️</span>
+                            <h4 class="font-bold text-slate-900 text-4px truncate">${emp.name}</h4>
+                            <span class="text-4px font-semibold text-slate-600 flex-shrink-0">${emp.id}</span>
+                            <span class="px-0.5 py-0.25 bg-indigo-100 text-indigo-700 rounded text-4px font-bold flex-shrink-0">${emp.dept}</span>
+                            <span class="bg-gradient-to-r ${tier.color} text-white px-0.5 py-0.25 rounded text-4px font-bold flex-shrink-0">${tier.label}</span>
                         </div>
-                        <button onclick="event.stopPropagation(); showPunchEditModal(rawData.find(e => e.id === '${emp.id}'))" class="ml-1 px-1.5 py-0.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded text-5px font-bold transition flex-shrink-0">
+                        <button onclick="event.stopPropagation(); showPunchEditModal(rawData.find(e => e.id === '${emp.id}'))" class="ml-0.5 px-1 py-0.25 bg-indigo-500 hover:bg-indigo-600 text-white rounded text-4px font-bold transition flex-shrink-0">
                             ✏️
                         </button>
                     </div>
