@@ -3615,40 +3615,43 @@ Authentication: Include X-API-Key header with your API key
                 modalChartInstances[chartId].destroy();
             }
 
+            // Use rawData for all charts
+            const data = rawData || [];
+
             // Render based on chart type
             if (chartId === 'lateChart') {
-                const chartData = filteredData.filter(d => d.lateMin > 0).sort((a, b) => b.lateMin - a.lateMin).slice(0, 15);
+                const chartData = data.filter(d => (d.lateMin || d.minutesLate || 0) > 0).sort((a, b) => (b.lateMin || b.minutesLate || 0) - (a.lateMin || a.minutesLate || 0)).slice(0, 15);
                 if (chartData.length > 0) {
                     modalChartInstances[chartId] = new Chart(ctx, {
                         type: 'bar',
                         data: {
                             labels: chartData.map(d => d.name),
-                            datasets: [{ label: 'Minutes Late', data: chartData.map(d => d.lateMin), backgroundColor: 'rgba(249, 115, 22, 0.8)', borderColor: 'rgba(249, 115, 22, 1)', borderWidth: 1 }]
+                            datasets: [{ label: 'Minutes Late', data: chartData.map(d => d.lateMin || d.minutesLate || 0), backgroundColor: 'rgba(249, 115, 22, 0.8)', borderColor: 'rgba(249, 115, 22, 1)', borderWidth: 1 }]
                         },
                         options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
                     });
                 }
             } else if (chartId === 'deptChart') {
                 const deptStats = {};
-                filteredData.forEach(emp => {
-                    if (!deptStats[emp.dept]) deptStats[emp.dept] = { total: 0, attended: 0 };
+                data.forEach(emp => {
+                    if (!deptStats[emp.dept]) deptStats[emp.dept] = { total: 0, worked: 0 };
                     deptStats[emp.dept].total++;
-                    if (emp.status === 'P') deptStats[emp.dept].attended++;
+                    deptStats[emp.dept].worked += (emp.daysWorked || 0);
                 });
                 const labels = Object.keys(deptStats);
-                const attendanceData = labels.map(dept => Math.round((deptStats[dept].attended / deptStats[dept].total) * 100));
+                const attendanceData = labels.map(dept => Math.round((deptStats[dept].worked / (deptStats[dept].total * (dateRange.actualDays || 1))) * 100 * 100) / 100);
                 if (labels.length > 0) {
                     modalChartInstances[chartId] = new Chart(ctx, {
                         type: 'bar',
                         data: { labels, datasets: [{ label: 'Attendance %', data: attendanceData, backgroundColor: 'rgba(59, 130, 246, 0.8)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 1 }] },
-                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { max: 100 } } }
                     });
                 }
             } else if (chartId === 'deptLateChart') {
                 const deptLate = {};
-                filteredData.forEach(emp => {
+                data.forEach(emp => {
                     if (!deptLate[emp.dept]) deptLate[emp.dept] = 0;
-                    deptLate[emp.dept] += emp.lateMin || 0;
+                    deptLate[emp.dept] += emp.lateMin || emp.minutesLate || 0;
                 });
                 const labels = Object.keys(deptLate);
                 const lateData = labels.map(dept => deptLate[dept]);
@@ -3660,42 +3663,32 @@ Authentication: Include X-API-Key header with your API key
                     });
                 }
             } else if (chartId === 'attendanceTrendChart') {
-                const trendData = {};
-                filteredData.forEach(emp => {
-                    const day = emp.date ? emp.date.substring(0, 10) : 'Unknown';
-                    if (!trendData[day]) trendData[day] = { total: 0, present: 0 };
-                    trendData[day].total++;
-                    if (emp.status === 'P') trendData[day].present++;
-                });
-                const sortedDays = Object.keys(trendData).sort();
-                const percentages = sortedDays.map(day => Math.round((trendData[day].present / trendData[day].total) * 100));
-                if (sortedDays.length > 0) {
+                // For summary data, show attendance percentage per employee
+                const empData = data.slice(0, 10).map(emp => ({
+                    name: emp.name,
+                    attendance: Math.round((emp.daysWorked / (dateRange.actualDays || 1)) * 100)
+                }));
+                if (empData.length > 0) {
                     modalChartInstances[chartId] = new Chart(ctx, {
-                        type: 'line',
-                        data: { labels: sortedDays, datasets: [{ label: 'Attendance %', data: percentages, borderColor: 'rgba(34, 197, 94, 1)', backgroundColor: 'rgba(34, 197, 94, 0.1)', fill: true, tension: 0.4 }] },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true } } }
+                        type: 'bar',
+                        data: { labels: empData.map(d => d.name), datasets: [{ label: 'Attendance %', data: empData.map(d => d.attendance), backgroundColor: 'rgba(34, 197, 94, 0.8)', borderColor: 'rgba(34, 197, 94, 1)', borderWidth: 1 }] },
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { max: 100 } } }
                     });
                 }
             } else if (chartId === 'lateTrendChart') {
-                const lateData = {};
-                filteredData.forEach(emp => {
-                    const day = emp.date ? emp.date.substring(0, 10) : 'Unknown';
-                    if (!lateData[day]) lateData[day] = 0;
-                    if (emp.lateMin > 0) lateData[day]++;
-                });
-                const sortedDays = Object.keys(lateData).sort();
-                const counts = sortedDays.map(day => lateData[day]);
-                if (sortedDays.length > 0) {
+                // Show top 10 with late minutes
+                const lateEmps = data.filter(e => (e.lateMin || e.minutesLate || 0) > 0).sort((a, b) => (b.lateMin || b.minutesLate || 0) - (a.lateMin || a.minutesLate || 0)).slice(0, 10);
+                if (lateEmps.length > 0) {
                     modalChartInstances[chartId] = new Chart(ctx, {
-                        type: 'line',
-                        data: { labels: sortedDays, datasets: [{ label: 'Late Arrivals', data: counts, borderColor: 'rgba(251, 146, 60, 1)', backgroundColor: 'rgba(251, 146, 60, 0.1)', fill: true, tension: 0.4 }] },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true } } }
+                        type: 'bar',
+                        data: { labels: lateEmps.map(e => e.name), datasets: [{ label: 'Late Minutes', data: lateEmps.map(e => e.lateMin || e.minutesLate || 0), backgroundColor: 'rgba(251, 146, 60, 0.8)', borderColor: 'rgba(251, 146, 60, 1)', borderWidth: 1 }] },
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
                     });
                 }
             } else if (chartId === 'distributionChart') {
                 const ranges = { '90-100%': 0, '80-90%': 0, '70-80%': 0, 'Below 70%': 0 };
-                filteredData.forEach(emp => {
-                    const pct = emp.attendancePercent || 0;
+                data.forEach(emp => {
+                    const pct = Math.round((emp.daysWorked / (dateRange.actualDays || 1)) * 100);
                     if (pct >= 90) ranges['90-100%']++;
                     else if (pct >= 80) ranges['80-90%']++;
                     else if (pct >= 70) ranges['70-80%']++;
