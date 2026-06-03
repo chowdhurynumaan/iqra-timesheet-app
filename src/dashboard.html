@@ -66,21 +66,21 @@
             
             <!-- Navigation -->
             <nav class="p-2 flex flex-row md:flex-col gap-0.5 overflow-x-auto md:overflow-visible">
-                <button onclick="switchView('dashboard')" id="nav-dashboard" class="flex items-center justify-center md:justify-start gap-2 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white">
-                    <i data-lucide="home" class="h-4 w-4"></i>
-                    <span class="hidden md:inline">Dashboard</span>
+                <button onclick="switchView('dashboard')" id="nav-dashboard" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 bg-indigo-600 text-white whitespace-nowrap">
+                    <i data-lucide="home" class="h-3.5 w-3.5 flex-shrink-0"></i>
+                    <span>Dashboard</span>
                 </button>
-                <button onclick="switchView('employees')" id="nav-employees" class="flex items-center justify-center md:justify-start gap-2 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400">
-                    <i data-lucide="users" class="h-4 w-4"></i>
-                    <span class="hidden md:inline">Employees</span>
+                <button onclick="switchView('employees')" id="nav-employees" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
+                    <i data-lucide="users" class="h-3.5 w-3.5 flex-shrink-0"></i>
+                    <span>Employees</span>
                 </button>
-                <button onclick="switchView('shifts')" id="nav-shifts" class="flex items-center justify-center md:justify-start gap-2 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400">
-                    <i data-lucide="clock" class="h-4 w-4"></i>
-                    <span class="hidden md:inline">Shifts</span>
+                <button onclick="switchView('shifts')" id="nav-shifts" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
+                    <i data-lucide="clock" class="h-3.5 w-3.5 flex-shrink-0"></i>
+                    <span>Shifts</span>
                 </button>
-                <button onclick="switchView('audit')" id="nav-audit" class="flex items-center justify-center md:justify-start gap-2 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400">
-                    <i data-lucide="shield-check" class="h-4 w-4"></i>
-                    <span class="hidden md:inline">Audit</span>
+                <button onclick="switchView('audit')" id="nav-audit" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
+                    <i data-lucide="shield-check" class="h-3.5 w-3.5 flex-shrink-0"></i>
+                    <span>Audit</span>
                 </button>
             </nav>
         </div>
@@ -96,15 +96,15 @@
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50">
         
         <!-- TOP WORKSPACE HEADER - ULTRA COMPACT -->
-        <header class="no-print bg-white border-b border-slate-200 h-10 flex items-center justify-end px-4 flex-shrink-0 z-40 gap-2">
-            <div class="flex items-center gap-1.5">
-                <button onclick="saveReportToFirebase()" class="flex items-center gap-1 px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-10px font-bold shadow transition">
+        <header class="no-print bg-white border-b border-slate-200 h-10 flex items-center justify-end px-4 flex-shrink-0 z-40 gap-1.5">
+            <div class="flex items-center gap-1">
+                <button onclick="saveReportToFirebase()" class="flex items-center gap-1 px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-bold shadow transition whitespace-nowrap">
                     <i data-lucide="cloud" class="h-3 w-3"></i>
-                    <span class="hidden sm:inline">Save</span>
+                    <span>Save</span>
                 </button>
-                <button onclick="printSelected()" class="flex items-center gap-1 px-2.5 py-1 bg-slate-800 hover:bg-slate-900 text-white rounded text-10px font-bold shadow transition">
+                <button onclick="printSelected()" class="flex items-center gap-1 px-2 py-1 bg-slate-800 hover:bg-slate-900 text-white rounded text-xs font-bold shadow transition whitespace-nowrap">
                     <i data-lucide="printer" class="h-3 w-3"></i>
-                    <span class="hidden sm:inline">Print</span>
+                    <span>Print</span>
                 </button>
             </div>
         </header>
