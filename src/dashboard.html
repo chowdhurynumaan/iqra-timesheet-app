@@ -772,31 +772,31 @@
                     </div>
 
                     <div class="p-2.5 bg-slate-50/40 space-y-2.5">
-                        <!-- 6 Metrics Grid - Uniform 3x2 Layout -->
-                        <div class="grid grid-cols-3 gap-0.5">
-                            <div class="bg-green-500 rounded p-1 text-center text-white shadow">
-                                <div style="font-size: 6px;" class="font-semibold leading-tight opacity-80 whitespace-nowrap">Present</div>
-                                <div style="font-size: 11px;" class="font-black">${attendancePercent.toFixed(0)}%</div>
+                        <!-- 6 Metrics Grid - Modern Design -->
+                        <div class="grid grid-cols-3 gap-1">
+                            <div class="bg-gradient-to-br from-green-400 to-green-600 rounded-lg p-2 text-center text-white shadow-md hover:shadow-lg transition-shadow cursor-default">
+                                <div style="font-size: 6px;" class="font-semibold leading-tight opacity-90 whitespace-nowrap uppercase tracking-wider">Present</div>
+                                <div style="font-size: 16px;" class="font-black mt-0.5">${attendancePercent.toFixed(0)}%</div>
                             </div>
-                            <div class="bg-blue-500 rounded p-1 text-center text-white shadow">
-                                <div style="font-size: 6px;" class="font-semibold leading-tight opacity-80 whitespace-nowrap">Timely</div>
-                                <div style="font-size: 11px;" class="font-black">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
+                            <div class="bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg p-2 text-center text-white shadow-md hover:shadow-lg transition-shadow cursor-default">
+                                <div style="font-size: 6px;" class="font-semibold leading-tight opacity-90 whitespace-nowrap uppercase tracking-wider">Timely</div>
+                                <div style="font-size: 16px;" class="font-black mt-0.5">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
                             </div>
-                            <div class="bg-indigo-500 rounded p-1 text-center text-white shadow">
-                                <div style="font-size: 6px;" class="font-semibold leading-tight opacity-80 whitespace-nowrap">Hours</div>
-                                <div style="font-size: 11px;" class="font-black">${hoursNum.toFixed(1)}</div>
+                            <div class="bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg p-2 text-center text-white shadow-md hover:shadow-lg transition-shadow cursor-default">
+                                <div style="font-size: 6px;" class="font-semibold leading-tight opacity-90 whitespace-nowrap uppercase tracking-wider">Hours</div>
+                                <div style="font-size: 16px;" class="font-black mt-0.5">${hoursNum.toFixed(1)}</div>
                             </div>
-                            <div class="bg-amber-500 rounded p-1 text-center text-white shadow">
-                                <div style="font-size: 6px;" class="font-semibold leading-tight opacity-80 whitespace-nowrap">Late</div>
-                                <div style="font-size: 11px;" class="font-black">${lateMin}</div>
+                            <div class="bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg p-2 text-center text-white shadow-md hover:shadow-lg transition-shadow cursor-default">
+                                <div style="font-size: 6px;" class="font-semibold leading-tight opacity-90 whitespace-nowrap uppercase tracking-wider">Late</div>
+                                <div style="font-size: 16px;" class="font-black mt-0.5">${lateMin}</div>
                             </div>
-                            <div class="bg-red-500 rounded p-1 text-center text-white shadow">
-                                <div style="font-size: 6px;" class="font-semibold leading-tight opacity-80 whitespace-nowrap">Absent</div>
-                                <div style="font-size: 11px;" class="font-black">${absences}</div>
+                            <div class="bg-gradient-to-br from-red-400 to-red-600 rounded-lg p-2 text-center text-white shadow-md hover:shadow-lg transition-shadow cursor-default">
+                                <div style="font-size: 6px;" class="font-semibold leading-tight opacity-90 whitespace-nowrap uppercase tracking-wider">Absent</div>
+                                <div style="font-size: 16px;" class="font-black mt-0.5">${absences}</div>
                             </div>
-                            <div class="bg-teal-500 rounded p-1 text-center text-white shadow">
-                                <div style="font-size: 6px;" class="font-semibold leading-tight opacity-80 whitespace-nowrap">Worked</div>
-                                <div style="font-size: 11px;" class="font-black">${daysWorked}</div>
+                            <div class="bg-gradient-to-br from-teal-400 to-teal-600 rounded-lg p-2 text-center text-white shadow-md hover:shadow-lg transition-shadow cursor-default">
+                                <div style="font-size: 6px;" class="font-semibold leading-tight opacity-90 whitespace-nowrap uppercase tracking-wider">Worked</div>
+                                <div style="font-size: 16px;" class="font-black mt-0.5">${daysWorked}</div>
                             </div>
                         </div>
 
