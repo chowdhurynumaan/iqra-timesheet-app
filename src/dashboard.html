@@ -251,6 +251,65 @@
         </div>
     </div>
 
+    <!-- Day-Specific Edit Modal -->
+    <div id="dayEditModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-title" id="dayEditTitle">Edit Day: 2026-04-01</div>
+            <div id="dayEditContent" style="margin: 16px 0; padding: 0 4px;"></div>
+            <div class="modal-buttons" style="display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid #e5e7eb; padding-top: 12px; margin-top: 12px;">
+                <button class="modal-button modal-button-cancel" onclick="closeDayEditModal()" style="flex: 0 1 auto; padding: 8px 16px;">Cancel</button>
+                <button class="modal-button modal-button-confirm" onclick="saveDayEdit()" style="flex: 0 1 auto; padding: 8px 16px;">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day-Specific Modal (View/Edit) -->
+    <div id="dayModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-title" id="dayModalTitle">Monday, April 1</div>
+            <div id="dayModalContent" style="margin: 16px 0; padding: 0 4px;"></div>
+            <div class="modal-buttons" style="display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid #e5e7eb; padding-top: 12px; margin-top: 12px;">
+                <button class="modal-button modal-button-cancel" onclick="closeDayModal()" style="flex: 0 1 auto; padding: 8px 16px;">Close</button>
+                <button class="modal-button modal-button-confirm" onclick="openDayEditFromModal()" id="dayModalEditBtn" style="flex: 0 1 auto; padding: 8px 16px;">✏️ Edit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audit Log Item Modal (View Details) -->
+    <div id="auditItemModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-title">Audit Event Details</div>
+            <div id="auditItemContent" style="margin: 16px 0; space: 3; font-size: 14px;"></div>
+            <div class="modal-buttons" style="display: flex; gap: 8px; justify-content: flex-end;">
+                <button class="modal-button modal-button-cancel" onclick="closeAuditItemModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Webhook Item Modal (View/Edit) -->
+    <div id="webhookItemModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-title">Webhook Details</div>
+            <div id="webhookItemContent" style="margin: 16px 0; space: 3;"></div>
+            <div class="modal-buttons" style="display: flex; gap: 8px; justify-content: flex-end;">
+                <button class="modal-button modal-button-cancel" onclick="closeWebhookItemModal()">Close</button>
+                <button class="modal-button modal-button-confirm" onclick="editWebhookItem()">Edit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Role Assignment Item Modal (View/Edit) -->
+    <div id="roleItemModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-title">Role Assignment Details</div>
+            <div id="roleItemContent" style="margin: 16px 0; space: 3;"></div>
+            <div class="modal-buttons" style="display: flex; gap: 8px; justify-content: flex-end;">
+                <button class="modal-button modal-button-cancel" onclick="closeRoleItemModal()">Close</button>
+                <button class="modal-button modal-button-confirm" onclick="editRoleItem()">Edit Permissions</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Punch Edit Modal -->
     <div id="punchEditModal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 700px; max-height: 85vh;">
@@ -2745,7 +2804,7 @@ Authentication: Include X-API-Key header with your API key
                 const hours = day.hours || (day.punchPairs?.[0]?.pairHours || '—');
 
                 return `
-                    <tr class="${rowBg} border-b border-slate-100 hover:bg-slate-50 transition">
+                    <tr class="${rowBg} border-b border-slate-100 hover:bg-slate-100 transition cursor-pointer" onclick="openDayModal('${emp.id}', ${idx})">
                         <td class="px-1.5 py-1 font-bold text-slate-800">${day.date || day.dayNum}</td>
                         <td class="px-1 py-1 text-center font-semibold text-slate-600">${day.dayName}</td>
                         <td class="px-1 py-1 text-center font-mono text-slate-700 bg-yellow-50">${inTime}</td>
@@ -2756,6 +2815,300 @@ Authentication: Include X-API-Key header with your API key
                     </tr>
                 `;
             }).join('');
+        }
+
+        // ===== DISTRIBUTED CONTROL PATTERN: Day-Specific Modals =====
+        let currentDayEditContext = null;
+
+        function openDayModal(empId, dayIdx) {
+            const emp = rawData.find(e => e.id === empId);
+            if (!emp || !emp.dailyBreakdown || !emp.dailyBreakdown[dayIdx]) {
+                notify('⚠️ Day data not found', 'amber');
+                return;
+            }
+
+            const day = emp.dailyBreakdown[dayIdx];
+            const dayName = day.dayName || 'Unknown Day';
+            const dateStr = day.date || day.dayNum || 'N/A';
+
+            // Store context for later editing
+            currentDayEditContext = { empId, dayIdx, emp, day };
+
+            // Build modal content - Day-specific data only
+            const inTime = day.punchPairs?.[0]?.in || day.inTime || '—';
+            const outTime = day.punchPairs?.[0]?.out || day.outTime || '—';
+            const hours = day.hours || (day.punchPairs?.[0]?.pairHours || '—');
+
+            document.getElementById('dayModalTitle').textContent = `📅 ${dayName}, ${dateStr}`;
+            document.getElementById('dayModalContent').innerHTML = `
+                <div class="space-y-4">
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Employee</p>
+                                <p class="text-lg font-bold text-slate-900">${emp.name}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Department</p>
+                                <p class="text-lg font-bold text-slate-900">${emp.dept || 'N/A'}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <p class="text-xs font-semibold text-yellow-700 uppercase mb-1">IN Time</p>
+                            <p class="text-2xl font-mono font-bold text-yellow-900">${inTime}</p>
+                        </div>
+                        <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <p class="text-xs font-semibold text-yellow-700 uppercase mb-1">OUT Time</p>
+                            <p class="text-2xl font-mono font-bold text-yellow-900">${outTime}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p class="text-xs font-semibold text-blue-700 uppercase mb-1">Hours</p>
+                            <p class="text-2xl font-bold text-blue-900">${typeof hours === 'number' ? hours.toFixed(2) : hours}</p>
+                        </div>
+                        <div class="p-3 ${day.lateMin > 0 ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-slate-200'} border rounded-lg">
+                            <p class="text-xs font-semibold ${day.lateMin > 0 ? 'text-red-700' : 'text-slate-600'} uppercase mb-1">Late (Min)</p>
+                            <p class="text-2xl font-bold ${day.lateMin > 0 ? 'text-red-900' : 'text-slate-900'}">${day.lateMin > 0 ? day.lateMin : '0'}</p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                        <p class="text-xs font-semibold text-slate-600 uppercase mb-2">Status</p>
+                        <p class="text-lg font-bold text-slate-900">
+                            ${day.isMissed ? '❌ Absent' : (day.lateMin > 0 ? '⚠️ Late Arrival' : '✅ Present')}
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('dayModal').style.display = 'flex';
+        }
+
+        function closeDayModal() {
+            document.getElementById('dayModal').style.display = 'none';
+            currentDayEditContext = null;
+        }
+
+        function openDayEditFromModal() {
+            if (!currentDayEditContext) return;
+            document.getElementById('dayModal').style.display = 'none';
+            openDayEdit(currentDayEditContext.empId, currentDayEditContext.dayIdx);
+        }
+
+        function openDayEdit(empId, dayIdx) {
+            const emp = rawData.find(e => e.id === empId);
+            if (!emp || !emp.dailyBreakdown || !emp.dailyBreakdown[dayIdx]) {
+                notify('⚠️ Day data not found', 'amber');
+                return;
+            }
+
+            const day = emp.dailyBreakdown[dayIdx];
+            currentDayEditContext = { empId, dayIdx, emp, day };
+
+            const dateStr = day.date || day.dayNum || 'N/A';
+            document.getElementById('dayEditTitle').textContent = `✏️ Edit ${dateStr} - ${emp.name}`;
+
+            const inTime = day.punchPairs?.[0]?.in || day.inTime || '';
+            const outTime = day.punchPairs?.[0]?.out || day.outTime || '';
+
+            document.getElementById('dayEditContent').innerHTML = `
+                <div class="space-y-4">
+                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <p class="text-xs font-semibold text-slate-600 uppercase mb-2">Employee Context</p>
+                        <p class="font-bold text-slate-900">${emp.name}</p>
+                        <p class="text-sm text-slate-600">${emp.dept || 'N/A'} | ${dateStr}</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-900 mb-2">IN Time (HH:MM)</label>
+                        <input type="time" id="dayEditInTime" value="${inTime}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-900 mb-2">OUT Time (HH:MM)</label>
+                        <input type="time" id="dayEditOutTime" value="${outTime}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono">
+                    </div>
+
+                    <div>
+                        <label class="flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:bg-slate-50">
+                            <input type="checkbox" id="dayEditMissed" ${day.isMissed ? 'checked' : ''} class="w-4 h-4 rounded">
+                            <div>
+                                <p class="font-semibold text-slate-900">Mark as Absent</p>
+                                <p class="text-xs text-slate-600">Check if employee was absent this day</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('dayEditModal').style.display = 'flex';
+        }
+
+        function closeDayEditModal() {
+            document.getElementById('dayEditModal').style.display = 'none';
+        }
+
+        function saveDayEdit() {
+            if (!currentDayEditContext) return;
+
+            const { empId, dayIdx } = currentDayEditContext;
+            const emp = rawData.find(e => e.id === empId);
+            
+            if (!emp || !emp.dailyBreakdown || !emp.dailyBreakdown[dayIdx]) {
+                notify('⚠️ Day data not found', 'amber');
+                return;
+            }
+
+            const day = emp.dailyBreakdown[dayIdx];
+            const newInTime = document.getElementById('dayEditInTime').value;
+            const newOutTime = document.getElementById('dayEditOutTime').value;
+            const isMissed = document.getElementById('dayEditMissed').checked;
+
+            // Update day data - localized to this day only
+            day.inTime = newInTime;
+            day.outTime = newOutTime;
+            day.isMissed = isMissed;
+
+            // Recalculate hours if times provided
+            if (newInTime && newOutTime && !isMissed) {
+                const [inH, inM] = newInTime.split(':').map(Number);
+                const [outH, outM] = newOutTime.split(':').map(Number);
+                const inMin = inH * 60 + inM;
+                const outMin = outH * 60 + outM;
+                day.hours = Math.max(0, (outMin - inMin) / 60);
+            } else {
+                day.hours = 0;
+            }
+
+            // Log audit event
+            logAuditEvent('punch.update', 'Current User', `Updated ${emp.name} on ${day.date}`, 'success');
+
+            closeDayEditModal();
+            notify('✅ Day data updated successfully!', 'emerald');
+            console.log('💾 Day edited:', { empId, dayIdx, day });
+            
+            // Refresh display
+            renderEmployeeCards();
+        }
+
+        // ===== PATTERN APPLICATION: Audit Log Items =====
+        function openAuditItemModal(logId) {
+            const log = auditLogs.find(l => l.id === logId);
+            if (!log) return;
+
+            document.getElementById('auditItemContent').innerHTML = `
+                <div class="space-y-3">
+                    <div class="p-3 bg-slate-50 rounded-lg">
+                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Event Type</p>
+                        <p class="font-bold text-slate-900">${log.type}</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-lg">
+                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">User</p>
+                        <p class="font-bold text-slate-900">${log.user}</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-lg">
+                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Details</p>
+                        <p class="font-bold text-slate-900">${log.details}</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-lg">
+                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Timestamp</p>
+                        <p class="font-mono text-slate-900">${log.timestamp}</p>
+                    </div>
+                    <div class="p-3 ${log.status === 'success' ? 'bg-green-50' : 'bg-red-50'} rounded-lg">
+                        <p class="text-xs font-semibold uppercase mb-1">Status</p>
+                        <p class="font-bold">${log.status === 'success' ? '✅ Success' : '❌ Failed'}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('auditItemModal').style.display = 'flex';
+        }
+
+        function closeAuditItemModal() {
+            document.getElementById('auditItemModal').style.display = 'none';
+        }
+
+        // ===== PATTERN APPLICATION: Webhook Items =====
+        function openWebhookItemModal(whId) {
+            const wh = webhooks.find(w => w.id === whId);
+            if (!wh) return;
+
+            document.getElementById('webhookItemContent').innerHTML = `
+                <div class="space-y-3">
+                    <div class="p-3 bg-slate-50 rounded-lg">
+                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">URL</p>
+                        <p class="font-mono text-slate-900 truncate">${wh.url}</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-lg">
+                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Event Trigger</p>
+                        <p class="font-bold text-slate-900">${wh.event}</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-lg">
+                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Created</p>
+                        <p class="font-mono text-slate-900">${wh.created}</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-lg">
+                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Attempts</p>
+                        <p class="font-bold text-slate-900">${wh.attempts}</p>
+                    </div>
+                    <div class="p-3 ${wh.active ? 'bg-green-50' : 'bg-slate-50'} rounded-lg">
+                        <p class="text-xs font-semibold uppercase mb-1">Status</p>
+                        <p class="font-bold">${wh.active ? '🟢 Active' : '🔴 Inactive'}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('webhookItemModal').style.display = 'flex';
+        }
+
+        function closeWebhookItemModal() {
+            document.getElementById('webhookItemModal').style.display = 'none';
+        }
+
+        function editWebhookItem() {
+            // Implementation would go here
+            notify('✏️ Webhook editing (future enhancement)', 'indigo');
+        }
+
+        // ===== PATTERN APPLICATION: Role Items =====
+        function openRoleItemModal(roleId) {
+            const role = roles[roleId];
+            if (!role) return;
+
+            document.getElementById('roleItemContent').innerHTML = `
+                <div class="space-y-3">
+                    <div class="p-3 bg-slate-50 rounded-lg">
+                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Role Name</p>
+                        <p class="font-bold text-lg text-slate-900">${role.name}</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-lg">
+                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Description</p>
+                        <p class="text-slate-900">${role.description || 'No description'}</p>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-lg">
+                        <p class="text-xs font-semibold text-slate-600 uppercase mb-2">Permissions</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${role.permissions.map(p => `<span class="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs font-mono">${p}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-lg">
+                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Users</p>
+                        <p class="font-bold text-lg text-slate-900">${role.users}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('roleItemModal').style.display = 'flex';
+        }
+
+        function closeRoleItemModal() {
+            document.getElementById('roleItemModal').style.display = 'none';
+        }
+
+        function editRoleItem() {
+            notify('✏️ Permission editing (future enhancement)', 'indigo');
         }
 
         function updateCharts(data) {
