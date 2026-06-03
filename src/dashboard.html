@@ -251,26 +251,15 @@
         </div>
     </div>
 
-    <!-- Day-Specific Edit Modal -->
-    <div id="dayEditModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-title" id="dayEditTitle">Edit Day: 2026-04-01</div>
-            <div id="dayEditContent" style="margin: 16px 0; padding: 0 4px;"></div>
-            <div class="modal-buttons" style="display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid #e5e7eb; padding-top: 12px; margin-top: 12px;">
-                <button class="modal-button modal-button-cancel" onclick="closeDayEditModal()" style="flex: 0 1 auto; padding: 8px 16px;">Cancel</button>
-                <button class="modal-button modal-button-confirm" onclick="saveDayEdit()" style="flex: 0 1 auto; padding: 8px 16px;">Save Changes</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Day-Specific Modal (View/Edit) -->
+    <!-- Day Modal (VIEW + EDIT Togglable) -->
     <div id="dayModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content" style="max-width: 600px;">
             <div class="modal-title" id="dayModalTitle">Monday, April 1</div>
             <div id="dayModalContent" style="margin: 16px 0; padding: 0 4px;"></div>
             <div class="modal-buttons" style="display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid #e5e7eb; padding-top: 12px; margin-top: 12px;">
-                <button class="modal-button modal-button-cancel" onclick="closeDayModal()" style="flex: 0 1 auto; padding: 8px 16px;">Close</button>
-                <button class="modal-button modal-button-confirm" onclick="openDayEditFromModal()" id="dayModalEditBtn" style="flex: 0 1 auto; padding: 8px 16px;">✏️ Edit</button>
+                <button class="modal-button modal-button-cancel" onclick="closeDayModal()" style="flex: 0 1 auto; padding: 8px 16px;" id="dayModalCancelBtn">Close</button>
+                <button class="modal-button modal-button-confirm" onclick="toggleDayEditMode()" id="dayModalEditBtn" style="flex: 0 1 auto; padding: 8px 16px;">✏️ Edit</button>
+                <button class="modal-button modal-button-confirm" onclick="saveDayEdit()" id="dayModalSaveBtn" style="flex: 0 1 auto; padding: 8px 16px; display: none; background-color: #10b981;">💾 Save</button>
             </div>
         </div>
     </div>
@@ -286,26 +275,28 @@
         </div>
     </div>
 
-    <!-- Webhook Item Modal (View/Edit) -->
+    <!-- Webhook Item Modal (VIEW + EDIT Togglable) -->
     <div id="webhookItemModal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-title">Webhook Details</div>
+            <div class="modal-title" id="webhookModalTitle">Webhook Details</div>
             <div id="webhookItemContent" style="margin: 16px 0; space: 3;"></div>
             <div class="modal-buttons" style="display: flex; gap: 8px; justify-content: flex-end;">
-                <button class="modal-button modal-button-cancel" onclick="closeWebhookItemModal()">Close</button>
-                <button class="modal-button modal-button-confirm" onclick="editWebhookItem()">Edit</button>
+                <button class="modal-button modal-button-cancel" onclick="closeWebhookItemModal()" id="webhookModalCancelBtn">Close</button>
+                <button class="modal-button modal-button-confirm" onclick="toggleWebhookEditMode()" id="webhookModalEditBtn">✏️ Edit</button>
+                <button class="modal-button modal-button-confirm" onclick="saveWebhookEdit()" id="webhookModalSaveBtn" style="display: none; background-color: #10b981;">💾 Save</button>
             </div>
         </div>
     </div>
 
-    <!-- Role Assignment Item Modal (View/Edit) -->
+    <!-- Role Item Modal (VIEW + EDIT Togglable) -->
     <div id="roleItemModal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-title">Role Assignment Details</div>
+            <div class="modal-title" id="roleModalTitle">Role Details</div>
             <div id="roleItemContent" style="margin: 16px 0; space: 3;"></div>
             <div class="modal-buttons" style="display: flex; gap: 8px; justify-content: flex-end;">
-                <button class="modal-button modal-button-cancel" onclick="closeRoleItemModal()">Close</button>
-                <button class="modal-button modal-button-confirm" onclick="editRoleItem()">Edit Permissions</button>
+                <button class="modal-button modal-button-cancel" onclick="closeRoleItemModal()" id="roleModalCancelBtn">Close</button>
+                <button class="modal-button modal-button-confirm" onclick="toggleRoleEditMode()" id="roleModalEditBtn">✏️ Edit</button>
+                <button class="modal-button modal-button-confirm" onclick="saveRoleEdit()" id="roleModalSaveBtn" style="display: none; background-color: #10b981;">💾 Save</button>
             </div>
         </div>
     </div>
@@ -2819,6 +2810,7 @@ Authentication: Include X-API-Key header with your API key
 
         // ===== DISTRIBUTED CONTROL PATTERN: Day-Specific Modals =====
         let currentDayEditContext = null;
+        let dayModalEditMode = false;
 
         function openDayModal(empId, dayIdx) {
             const emp = rawData.find(e => e.id === empId);
@@ -2828,129 +2820,124 @@ Authentication: Include X-API-Key header with your API key
             }
 
             const day = emp.dailyBreakdown[dayIdx];
-            const dayName = day.dayName || 'Unknown Day';
-            const dateStr = day.date || day.dayNum || 'N/A';
-
-            // Store context for later editing
             currentDayEditContext = { empId, dayIdx, emp, day };
+            dayModalEditMode = false;
 
-            // Build modal content - Day-specific data only
-            const inTime = day.punchPairs?.[0]?.in || day.inTime || '—';
-            const outTime = day.punchPairs?.[0]?.out || day.outTime || '—';
-            const hours = day.hours || (day.punchPairs?.[0]?.pairHours || '—');
-
-            document.getElementById('dayModalTitle').textContent = `📅 ${dayName}, ${dateStr}`;
-            document.getElementById('dayModalContent').innerHTML = `
-                <div class="space-y-4">
-                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Employee</p>
-                                <p class="text-lg font-bold text-slate-900">${emp.name}</p>
-                            </div>
-                            <div>
-                                <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Department</p>
-                                <p class="text-lg font-bold text-slate-900">${emp.dept || 'N/A'}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                            <p class="text-xs font-semibold text-yellow-700 uppercase mb-1">IN Time</p>
-                            <p class="text-2xl font-mono font-bold text-yellow-900">${inTime}</p>
-                        </div>
-                        <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                            <p class="text-xs font-semibold text-yellow-700 uppercase mb-1">OUT Time</p>
-                            <p class="text-2xl font-mono font-bold text-yellow-900">${outTime}</p>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p class="text-xs font-semibold text-blue-700 uppercase mb-1">Hours</p>
-                            <p class="text-2xl font-bold text-blue-900">${typeof hours === 'number' ? hours.toFixed(2) : hours}</p>
-                        </div>
-                        <div class="p-3 ${day.lateMin > 0 ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-slate-200'} border rounded-lg">
-                            <p class="text-xs font-semibold ${day.lateMin > 0 ? 'text-red-700' : 'text-slate-600'} uppercase mb-1">Late (Min)</p>
-                            <p class="text-2xl font-bold ${day.lateMin > 0 ? 'text-red-900' : 'text-slate-900'}">${day.lateMin > 0 ? day.lateMin : '0'}</p>
-                        </div>
-                    </div>
-
-                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-                        <p class="text-xs font-semibold text-slate-600 uppercase mb-2">Status</p>
-                        <p class="text-lg font-bold text-slate-900">
-                            ${day.isMissed ? '❌ Absent' : (day.lateMin > 0 ? '⚠️ Late Arrival' : '✅ Present')}
-                        </p>
-                    </div>
-                </div>
-            `;
-
+            renderDayModalContent(false);
             document.getElementById('dayModal').style.display = 'flex';
+        }
+
+        function renderDayModalContent(isEditMode) {
+            const { emp, day } = currentDayEditContext;
+            const dateStr = day.date || day.dayNum || 'N/A';
+            const dayName = day.dayName || 'Unknown Day';
+
+            const inTime = day.punchPairs?.[0]?.in || day.inTime || '';
+            const outTime = day.punchPairs?.[0]?.out || day.outTime || '';
+            const hours = day.hours || (day.punchPairs?.[0]?.pairHours || 0);
+
+            if (isEditMode) {
+                // EDIT MODE: Show editable fields
+                document.getElementById('dayModalTitle').textContent = `✏️ Edit ${dayName}, ${dateStr}`;
+                document.getElementById('dayModalContent').innerHTML = `
+                    <div class="space-y-4">
+                        <div class="p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                            <p class="text-xs font-semibold text-indigo-600 uppercase mb-2">Editing</p>
+                            <p class="font-bold text-slate-900">${emp.name}</p>
+                            <p class="text-sm text-slate-600">${emp.dept || 'N/A'} | ${dateStr}</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-900 mb-2">IN Time (HH:MM)</label>
+                            <input type="time" id="dayEditInTime" value="${inTime}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-900 mb-2">OUT Time (HH:MM)</label>
+                            <input type="time" id="dayEditOutTime" value="${outTime}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+
+                        <div>
+                            <label class="flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:bg-slate-50">
+                                <input type="checkbox" id="dayEditMissed" ${day.isMissed ? 'checked' : ''} class="w-4 h-4 rounded">
+                                <div>
+                                    <p class="font-semibold text-slate-900">Mark as Absent</p>
+                                    <p class="text-xs text-slate-600">Check if employee was absent this day</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                `;
+
+                // Show save button, hide edit button
+                document.getElementById('dayModalEditBtn').style.display = 'none';
+                document.getElementById('dayModalSaveBtn').style.display = 'block';
+                document.getElementById('dayModalCancelBtn').textContent = 'Cancel';
+            } else {
+                // VIEW MODE: Show read-only data
+                document.getElementById('dayModalTitle').textContent = `📅 ${dayName}, ${dateStr}`;
+                document.getElementById('dayModalContent').innerHTML = `
+                    <div class="space-y-4">
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Employee</p>
+                                    <p class="text-lg font-bold text-slate-900">${emp.name}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Department</p>
+                                    <p class="text-lg font-bold text-slate-900">${emp.dept || 'N/A'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <p class="text-xs font-semibold text-yellow-700 uppercase mb-1">IN Time</p>
+                                <p class="text-2xl font-mono font-bold text-yellow-900">${inTime || '—'}</p>
+                            </div>
+                            <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <p class="text-xs font-semibold text-yellow-700 uppercase mb-1">OUT Time</p>
+                                <p class="text-2xl font-mono font-bold text-yellow-900">${outTime || '—'}</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <p class="text-xs font-semibold text-blue-700 uppercase mb-1">Hours</p>
+                                <p class="text-2xl font-bold text-blue-900">${typeof hours === 'number' ? hours.toFixed(2) : hours}</p>
+                            </div>
+                            <div class="p-3 ${day.lateMin > 0 ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-slate-200'} border rounded-lg">
+                                <p class="text-xs font-semibold ${day.lateMin > 0 ? 'text-red-700' : 'text-slate-600'} uppercase mb-1">Late (Min)</p>
+                                <p class="text-2xl font-bold ${day.lateMin > 0 ? 'text-red-900' : 'text-slate-900'}">${day.lateMin > 0 ? day.lateMin : '0'}</p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                            <p class="text-xs font-semibold text-slate-600 uppercase mb-2">Status</p>
+                            <p class="text-lg font-bold text-slate-900">
+                                ${day.isMissed ? '❌ Absent' : (day.lateMin > 0 ? '⚠️ Late Arrival' : '✅ Present')}
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                // Show edit button, hide save button
+                document.getElementById('dayModalEditBtn').style.display = 'block';
+                document.getElementById('dayModalSaveBtn').style.display = 'none';
+                document.getElementById('dayModalCancelBtn').textContent = 'Close';
+            }
+        }
+
+        function toggleDayEditMode() {
+            dayModalEditMode = !dayModalEditMode;
+            renderDayModalContent(dayModalEditMode);
         }
 
         function closeDayModal() {
             document.getElementById('dayModal').style.display = 'none';
+            dayModalEditMode = false;
             currentDayEditContext = null;
-        }
-
-        function openDayEditFromModal() {
-            if (!currentDayEditContext) return;
-            document.getElementById('dayModal').style.display = 'none';
-            openDayEdit(currentDayEditContext.empId, currentDayEditContext.dayIdx);
-        }
-
-        function openDayEdit(empId, dayIdx) {
-            const emp = rawData.find(e => e.id === empId);
-            if (!emp || !emp.dailyBreakdown || !emp.dailyBreakdown[dayIdx]) {
-                notify('⚠️ Day data not found', 'amber');
-                return;
-            }
-
-            const day = emp.dailyBreakdown[dayIdx];
-            currentDayEditContext = { empId, dayIdx, emp, day };
-
-            const dateStr = day.date || day.dayNum || 'N/A';
-            document.getElementById('dayEditTitle').textContent = `✏️ Edit ${dateStr} - ${emp.name}`;
-
-            const inTime = day.punchPairs?.[0]?.in || day.inTime || '';
-            const outTime = day.punchPairs?.[0]?.out || day.outTime || '';
-
-            document.getElementById('dayEditContent').innerHTML = `
-                <div class="space-y-4">
-                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                        <p class="text-xs font-semibold text-slate-600 uppercase mb-2">Employee Context</p>
-                        <p class="font-bold text-slate-900">${emp.name}</p>
-                        <p class="text-sm text-slate-600">${emp.dept || 'N/A'} | ${dateStr}</p>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-900 mb-2">IN Time (HH:MM)</label>
-                        <input type="time" id="dayEditInTime" value="${inTime}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-900 mb-2">OUT Time (HH:MM)</label>
-                        <input type="time" id="dayEditOutTime" value="${outTime}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono">
-                    </div>
-
-                    <div>
-                        <label class="flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:bg-slate-50">
-                            <input type="checkbox" id="dayEditMissed" ${day.isMissed ? 'checked' : ''} class="w-4 h-4 rounded">
-                            <div>
-                                <p class="font-semibold text-slate-900">Mark as Absent</p>
-                                <p class="text-xs text-slate-600">Check if employee was absent this day</p>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('dayEditModal').style.display = 'flex';
-        }
-
-        function closeDayEditModal() {
-            document.getElementById('dayEditModal').style.display = 'none';
         }
 
         function saveDayEdit() {
@@ -2988,127 +2975,236 @@ Authentication: Include X-API-Key header with your API key
             // Log audit event
             logAuditEvent('punch.update', 'Current User', `Updated ${emp.name} on ${day.date}`, 'success');
 
-            closeDayEditModal();
-            notify('✅ Day data updated successfully!', 'emerald');
+            notify('✅ Changes saved!', 'emerald');
             console.log('💾 Day edited:', { empId, dayIdx, day });
             
-            // Refresh display
+            // Close modal and refresh display
+            dayModalEditMode = false;
+            closeDayModal();
             renderEmployeeCards();
         }
 
-        // ===== PATTERN APPLICATION: Audit Log Items =====
-        function openAuditItemModal(logId) {
-            const log = auditLogs.find(l => l.id === logId);
-            if (!log) return;
+        // ===== PATTERN APPLICATION: Webhook Items (Single Modal Toggle) =====
+        let webhookModalEditMode = false;
+        let currentWebhookId = null;
 
-            document.getElementById('auditItemContent').innerHTML = `
-                <div class="space-y-3">
-                    <div class="p-3 bg-slate-50 rounded-lg">
-                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Event Type</p>
-                        <p class="font-bold text-slate-900">${log.type}</p>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded-lg">
-                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">User</p>
-                        <p class="font-bold text-slate-900">${log.user}</p>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded-lg">
-                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Details</p>
-                        <p class="font-bold text-slate-900">${log.details}</p>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded-lg">
-                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Timestamp</p>
-                        <p class="font-mono text-slate-900">${log.timestamp}</p>
-                    </div>
-                    <div class="p-3 ${log.status === 'success' ? 'bg-green-50' : 'bg-red-50'} rounded-lg">
-                        <p class="text-xs font-semibold uppercase mb-1">Status</p>
-                        <p class="font-bold">${log.status === 'success' ? '✅ Success' : '❌ Failed'}</p>
-                    </div>
-                </div>
-            `;
-            document.getElementById('auditItemModal').style.display = 'flex';
-        }
-
-        function closeAuditItemModal() {
-            document.getElementById('auditItemModal').style.display = 'none';
-        }
-
-        // ===== PATTERN APPLICATION: Webhook Items =====
         function openWebhookItemModal(whId) {
             const wh = webhooks.find(w => w.id === whId);
             if (!wh) return;
 
-            document.getElementById('webhookItemContent').innerHTML = `
-                <div class="space-y-3">
-                    <div class="p-3 bg-slate-50 rounded-lg">
-                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">URL</p>
-                        <p class="font-mono text-slate-900 truncate">${wh.url}</p>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded-lg">
-                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Event Trigger</p>
-                        <p class="font-bold text-slate-900">${wh.event}</p>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded-lg">
-                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Created</p>
-                        <p class="font-mono text-slate-900">${wh.created}</p>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded-lg">
-                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Attempts</p>
-                        <p class="font-bold text-slate-900">${wh.attempts}</p>
-                    </div>
-                    <div class="p-3 ${wh.active ? 'bg-green-50' : 'bg-slate-50'} rounded-lg">
-                        <p class="text-xs font-semibold uppercase mb-1">Status</p>
-                        <p class="font-bold">${wh.active ? '🟢 Active' : '🔴 Inactive'}</p>
-                    </div>
-                </div>
-            `;
+            currentWebhookId = whId;
+            webhookModalEditMode = false;
+            renderWebhookModalContent(false);
             document.getElementById('webhookItemModal').style.display = 'flex';
+        }
+
+        function renderWebhookModalContent(isEditMode) {
+            const wh = webhooks.find(w => w.id === currentWebhookId);
+            if (!wh) return;
+
+            document.getElementById('webhookModalTitle').textContent = isEditMode ? `✏️ Edit Webhook` : `🔗 Webhook Details`;
+
+            if (isEditMode) {
+                // EDIT MODE
+                document.getElementById('webhookItemContent').innerHTML = `
+                    <div class="space-y-4">
+                        <div class="p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                            <p class="text-xs font-semibold text-indigo-600 uppercase mb-2">Editing</p>
+                            <p class="font-mono text-slate-900">${wh.id}</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-900 mb-2">URL</label>
+                            <input type="text" id="webhookEditUrl" value="${wh.url}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-900 mb-2">Event Trigger</label>
+                            <select id="webhookEditEvent" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="punch.create" ${wh.event === 'punch.create' ? 'selected' : ''}>punch.create</option>
+                                <option value="punch.update" ${wh.event === 'punch.update' ? 'selected' : ''}>punch.update</option>
+                                <option value="attendance.changed" ${wh.event === 'attendance.changed' ? 'selected' : ''}>attendance.changed</option>
+                                <option value="user.login" ${wh.event === 'user.login' ? 'selected' : ''}>user.login</option>
+                            </select>
+                        </div>
+
+                        <label class="flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:bg-slate-50">
+                            <input type="checkbox" id="webhookEditActive" ${wh.active ? 'checked' : ''} class="w-4 h-4 rounded">
+                            <div>
+                                <p class="font-semibold text-slate-900">Active</p>
+                                <p class="text-xs text-slate-600">Enable this webhook</p>
+                            </div>
+                        </label>
+                    </div>
+                `;
+
+                document.getElementById('webhookModalEditBtn').style.display = 'none';
+                document.getElementById('webhookModalSaveBtn').style.display = 'block';
+            } else {
+                // VIEW MODE
+                document.getElementById('webhookItemContent').innerHTML = `
+                    <div class="space-y-3">
+                        <div class="p-3 bg-slate-50 rounded-lg">
+                            <p class="text-xs font-semibold text-slate-600 uppercase mb-1">URL</p>
+                            <p class="font-mono text-slate-900 break-all">${wh.url}</p>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-lg">
+                            <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Event Trigger</p>
+                            <p class="font-bold text-slate-900">${wh.event}</p>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-lg">
+                            <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Created</p>
+                            <p class="font-mono text-slate-900">${wh.created}</p>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-lg">
+                            <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Attempts</p>
+                            <p class="font-bold text-slate-900">${wh.attempts}</p>
+                        </div>
+                        <div class="p-3 ${wh.active ? 'bg-green-50' : 'bg-slate-50'} rounded-lg">
+                            <p class="text-xs font-semibold uppercase mb-1">Status</p>
+                            <p class="font-bold">${wh.active ? '🟢 Active' : '🔴 Inactive'}</p>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('webhookModalEditBtn').style.display = 'block';
+                document.getElementById('webhookModalSaveBtn').style.display = 'none';
+                document.getElementById('webhookModalCancelBtn').textContent = 'Close';
+            }
+        }
+
+        function toggleWebhookEditMode() {
+            webhookModalEditMode = !webhookModalEditMode;
+            renderWebhookModalContent(webhookModalEditMode);
         }
 
         function closeWebhookItemModal() {
             document.getElementById('webhookItemModal').style.display = 'none';
+            webhookModalEditMode = false;
+            currentWebhookId = null;
         }
 
-        function editWebhookItem() {
-            // Implementation would go here
-            notify('✏️ Webhook editing (future enhancement)', 'indigo');
+        function saveWebhookEdit() {
+            const wh = webhooks.find(w => w.id === currentWebhookId);
+            if (!wh) return;
+
+            wh.url = document.getElementById('webhookEditUrl').value;
+            wh.event = document.getElementById('webhookEditEvent').value;
+            wh.active = document.getElementById('webhookEditActive').checked;
+
+            localStorage.setItem('webhooks', JSON.stringify(webhooks));
+            notify('✅ Webhook updated!', 'emerald');
+
+            webhookModalEditMode = false;
+            renderWebhookModalContent(false);
+            console.log('💾 Webhook saved:', wh);
         }
 
-        // ===== PATTERN APPLICATION: Role Items =====
+        // ===== PATTERN APPLICATION: Role Items (Single Modal Toggle) =====
+        let roleModalEditMode = false;
+        let currentRoleId = null;
+
         function openRoleItemModal(roleId) {
             const role = roles[roleId];
             if (!role) return;
 
-            document.getElementById('roleItemContent').innerHTML = `
-                <div class="space-y-3">
-                    <div class="p-3 bg-slate-50 rounded-lg">
-                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Role Name</p>
-                        <p class="font-bold text-lg text-slate-900">${role.name}</p>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded-lg">
-                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Description</p>
-                        <p class="text-slate-900">${role.description || 'No description'}</p>
-                    </div>
-                    <div class="p-3 bg-slate-50 rounded-lg">
-                        <p class="text-xs font-semibold text-slate-600 uppercase mb-2">Permissions</p>
-                        <div class="flex flex-wrap gap-2">
-                            ${role.permissions.map(p => `<span class="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs font-mono">${p}</span>`).join('')}
+            currentRoleId = roleId;
+            roleModalEditMode = false;
+            renderRoleModalContent(false);
+            document.getElementById('roleItemModal').style.display = 'flex';
+        }
+
+        function renderRoleModalContent(isEditMode) {
+            const role = roles[currentRoleId];
+            if (!role) return;
+
+            document.getElementById('roleModalTitle').textContent = isEditMode ? `✏️ Edit Role` : `👥 Role Details`;
+
+            if (isEditMode) {
+                // EDIT MODE
+                document.getElementById('roleItemContent').innerHTML = `
+                    <div class="space-y-4">
+                        <div class="p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                            <p class="text-xs font-semibold text-indigo-600 uppercase mb-2">Editing</p>
+                            <p class="font-bold text-lg text-slate-900">${role.name}</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-900 mb-2">Description</label>
+                            <input type="text" id="roleEditDesc" value="${role.description || ''}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Role description">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-900 mb-2">Permissions</label>
+                            <div class="space-y-2 p-3 bg-slate-50 rounded-lg border border-slate-200" style="max-height: 250px; overflow-y: auto;">
+                                ${['view.reports', 'edit.reports', 'manage.team', 'view.data', 'delete.records', 'export.data'].map(perm => `
+                                    <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-white rounded">
+                                        <input type="checkbox" class="permissionCheckbox" value="${perm}" ${role.permissions.includes(perm) ? 'checked' : ''} class="w-4 h-4 rounded">
+                                        <span class="text-sm font-mono">${perm}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
                         </div>
                     </div>
-                    <div class="p-3 bg-slate-50 rounded-lg">
-                        <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Users</p>
-                        <p class="font-bold text-lg text-slate-900">${role.users}</p>
+                `;
+
+                document.getElementById('roleModalEditBtn').style.display = 'none';
+                document.getElementById('roleModalSaveBtn').style.display = 'block';
+            } else {
+                // VIEW MODE
+                document.getElementById('roleItemContent').innerHTML = `
+                    <div class="space-y-3">
+                        <div class="p-3 bg-slate-50 rounded-lg">
+                            <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Role Name</p>
+                            <p class="font-bold text-lg text-slate-900">${role.name}</p>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-lg">
+                            <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Description</p>
+                            <p class="text-slate-900">${role.description || 'No description'}</p>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-lg">
+                            <p class="text-xs font-semibold text-slate-600 uppercase mb-2">Permissions</p>
+                            <div class="flex flex-wrap gap-2">
+                                ${role.permissions.map(p => `<span class="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs font-mono">${p}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-lg">
+                            <p class="text-xs font-semibold text-slate-600 uppercase mb-1">Users Assigned</p>
+                            <p class="font-bold text-lg text-slate-900">${role.users}</p>
+                        </div>
                     </div>
-                </div>
-            `;
-            document.getElementById('roleItemModal').style.display = 'flex';
+                `;
+
+                document.getElementById('roleModalEditBtn').style.display = 'block';
+                document.getElementById('roleModalSaveBtn').style.display = 'none';
+                document.getElementById('roleModalCancelBtn').textContent = 'Close';
+            }
+        }
+
+        function toggleRoleEditMode() {
+            roleModalEditMode = !roleModalEditMode;
+            renderRoleModalContent(roleModalEditMode);
         }
 
         function closeRoleItemModal() {
             document.getElementById('roleItemModal').style.display = 'none';
+            roleModalEditMode = false;
+            currentRoleId = null;
         }
 
-        function editRoleItem() {
-            notify('✏️ Permission editing (future enhancement)', 'indigo');
+        function saveRoleEdit() {
+            const role = roles[currentRoleId];
+            if (!role) return;
+
+            role.description = document.getElementById('roleEditDesc').value;
+            role.permissions = Array.from(document.querySelectorAll('.permissionCheckbox:checked')).map(cb => cb.value);
+
+            localStorage.setItem('enterpriseRoles', JSON.stringify(roles));
+            notify('✅ Role updated!', 'emerald');
+
+            roleModalEditMode = false;
+            renderRoleModalContent(false);
+            console.log('💾 Role saved:', role);
         }
 
         function updateCharts(data) {
