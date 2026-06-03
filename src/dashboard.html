@@ -323,6 +323,14 @@
                     <i data-lucide="shield-check" class="h-3.5 w-3.5 flex-shrink-0"></i>
                     <span>Audit</span>
                 </button>
+                <button onclick="switchView('settings')" id="nav-settings" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
+                    <i data-lucide="settings" class="h-3.5 w-3.5 flex-shrink-0"></i>
+                    <span>Settings</span>
+                </button>
+                <button onclick="switchView('backup')" id="nav-backup" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
+                    <i data-lucide="database" class="h-3.5 w-3.5 flex-shrink-0"></i>
+                    <span>Backup</span>
+                </button>
             </nav>
         </div>
 
@@ -502,6 +510,104 @@
                 </div>
             </div>
 
+            <!-- ================= VIEW: SETTINGS ================= -->
+            <div id="view-settings" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 max-w-4xl mx-auto space-y-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-2">⚙️ System Settings</h2>
+                        <p class="text-slate-600">Configure shifts, defaults, and system preferences</p>
+                    </div>
+
+                    <!-- Shift Settings Section -->
+                    <div class="space-y-4 border-t border-slate-200 pt-6">
+                        <h3 class="text-lg font-bold text-slate-900">📅 Shift Definitions</h3>
+                        <div id="settingsShiftContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        <button onclick="addNewShift()" class="mt-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition">
+                            <i data-lucide="plus" class="inline h-4 w-4 mr-2"></i>Add Shift
+                        </button>
+                    </div>
+
+                    <!-- System Preferences Section -->
+                    <div class="space-y-4 border-t border-slate-200 pt-6">
+                        <h3 class="text-lg font-bold text-slate-900">🔧 Preferences</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                <input type="checkbox" id="prefAutoBackup" class="w-4 h-4 rounded border-slate-300" checked>
+                                <div>
+                                    <div class="font-semibold text-slate-900">Auto-backup Daily</div>
+                                    <div class="text-sm text-slate-500">Automatically backup data at midnight</div>
+                                </div>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                <input type="checkbox" id="prefNotifications" class="w-4 h-4 rounded border-slate-300" checked>
+                                <div>
+                                    <div class="font-semibold text-slate-900">Enable Notifications</div>
+                                    <div class="text-sm text-slate-500">Show alerts for absent employees</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Save Settings -->
+                    <div class="flex gap-2 border-t border-slate-200 pt-6">
+                        <button onclick="saveSettings()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition">
+                            💾 Save Settings
+                        </button>
+                        <button onclick="resetSettings()" class="px-6 py-2 bg-slate-200 hover:bg-slate-300 text-slate-900 rounded-lg font-semibold transition">
+                            ↺ Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW: BACKUP & RESTORE ================= -->
+            <div id="view-backup" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 max-w-4xl mx-auto space-y-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900 mb-2">💾 Backup & Restore</h2>
+                        <p class="text-slate-600">Manage system backups and restore data</p>
+                    </div>
+
+                    <!-- Quick Backup Section -->
+                    <div class="space-y-4 border-t border-slate-200 pt-6">
+                        <h3 class="text-lg font-bold text-slate-900">🚀 Quick Actions</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <button onclick="triggerBackup()" class="p-4 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-semibold transition shadow-md">
+                                <div class="text-2xl mb-2">⬇️</div>
+                                <div>Create Backup Now</div>
+                                <div class="text-xs opacity-90 mt-1">Backup all data to file</div>
+                            </button>
+                            <button onclick="triggerRestore()" class="p-4 bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg font-semibold transition shadow-md">
+                                <div class="text-2xl mb-2">⬆️</div>
+                                <div>Restore from Backup</div>
+                                <div class="text-xs opacity-90 mt-1">Restore previous data</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Backup History Section -->
+                    <div class="space-y-4 border-t border-slate-200 pt-6">
+                        <h3 class="text-lg font-bold text-slate-900">📋 Backup History</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-slate-50 border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left font-semibold text-slate-700">Backup Date</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-slate-700">Records</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-slate-700">Size</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-slate-700">Type</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-slate-700">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="backupHistoryBody">
+                                    <tr><td colspan="5" class="px-4 py-8 text-center text-slate-500">No backups yet. Create one to get started.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -541,7 +647,7 @@
 
         // Navigation Controller
         function switchView(viewId) {
-            ['dashboard', 'employees', 'shifts', 'audit'].forEach(view => {
+            ['dashboard', 'employees', 'shifts', 'audit', 'settings', 'backup'].forEach(view => {
                 const viewEl = document.getElementById(`view-${view}`);
                 const navEl = document.getElementById(`nav-${view}`);
                 if (viewEl) {
@@ -915,6 +1021,206 @@
             closeAdvancedFilter();
         }
 
+        // ====== PHASE 4: ADMINISTRATIVE FEATURES ======
+
+        // Settings Management
+        let systemSettings = {
+            shifts: {},
+            autoBackup: true,
+            notifications: true
+        };
+
+        function loadSettings() {
+            const saved = localStorage.getItem('systemSettings');
+            if (saved) {
+                systemSettings = JSON.parse(saved);
+            }
+            loadSettingsUI();
+        }
+
+        function loadSettingsUI() {
+            // Load shift configurations
+            const shiftsContainer = document.getElementById('settingsShiftContainer');
+            if (!shiftsContainer) return;
+            shiftsContainer.innerHTML = '';
+
+            Object.entries(shiftDefinitions || {}).forEach(([key, shift]) => {
+                const card = document.createElement('div');
+                card.className = 'p-3 border border-slate-200 rounded-lg';
+                card.innerHTML = `
+                    <div class="font-bold text-slate-900 mb-2">${key}</div>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                            <label class="text-slate-600">Start</label>
+                            <input type="time" value="${shift.startTime || '09:00'}" data-shift="${key}" data-field="startTime" onchange="updateShift(event)" class="w-full px-2 py-1 border border-slate-300 rounded text-xs">
+                        </div>
+                        <div>
+                            <label class="text-slate-600">End</label>
+                            <input type="time" value="${shift.endTime || '17:00'}" data-shift="${key}" data-field="endTime" onchange="updateShift(event)" class="w-full px-2 py-1 border border-slate-300 rounded text-xs">
+                        </div>
+                    </div>
+                `;
+                shiftsContainer.appendChild(card);
+            });
+
+            // Load preferences
+            document.getElementById('prefAutoBackup').checked = systemSettings.autoBackup || false;
+            document.getElementById('prefNotifications').checked = systemSettings.notifications || false;
+        }
+
+        function updateShift(event) {
+            const shiftKey = event.target.dataset.shift;
+            const field = event.target.dataset.field;
+            if (!shiftDefinitions[shiftKey]) shiftDefinitions[shiftKey] = {};
+            shiftDefinitions[shiftKey][field] = event.target.value;
+        }
+
+        function addNewShift() {
+            const name = prompt('Enter shift name (e.g., EV, WK):');
+            if (!name) return;
+            if (!shiftDefinitions) shiftDefinitions = {};
+            shiftDefinitions[name] = { startTime: '09:00', endTime: '17:00' };
+            loadSettingsUI();
+        }
+
+        function saveSettings() {
+            systemSettings.autoBackup = document.getElementById('prefAutoBackup').checked;
+            systemSettings.notifications = document.getElementById('prefNotifications').checked;
+            localStorage.setItem('systemSettings', JSON.stringify(systemSettings));
+            localStorage.setItem('shiftDefinitions', JSON.stringify(shiftDefinitions));
+            notify('✅ Settings saved successfully', 'emerald');
+        }
+
+        function resetSettings() {
+            if (confirm('Reset all settings to defaults?')) {
+                systemSettings = { shifts: {}, autoBackup: true, notifications: true };
+                loadSettingsUI();
+            }
+        }
+
+        // Backup & Restore Management
+        let backupHistory = [];
+
+        function loadBackupHistory() {
+            const saved = localStorage.getItem('backupHistory');
+            if (saved) {
+                backupHistory = JSON.parse(saved);
+            }
+            displayBackupHistory();
+        }
+
+        function displayBackupHistory() {
+            const tbody = document.getElementById('backupHistoryBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (backupHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-slate-500">No backups yet. Create one to get started.</td></tr>';
+                return;
+            }
+
+            backupHistory.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 10).forEach((backup, idx) => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-slate-200 hover:bg-slate-50';
+                row.innerHTML = `
+                    <td class="px-4 py-3">${new Date(backup.timestamp).toLocaleDateString()} ${new Date(backup.timestamp).toLocaleTimeString()}</td>
+                    <td class="px-4 py-3">${backup.recordCount}</td>
+                    <td class="px-4 py-3">${(backup.size / 1024).toFixed(2)} KB</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs font-semibold ${backup.type === 'auto' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'}">${backup.type}</span></td>
+                    <td class="px-4 py-3">
+                        <button onclick="restoreBackup('${backup.timestamp}')" class="text-xs px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded transition">Restore</button>
+                        <button onclick="deleteBackup('${backup.timestamp}')" class="text-xs px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded transition ml-1">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function triggerBackup() {
+            const backup = {
+                timestamp: new Date().toISOString(),
+                recordCount: rawData.length,
+                data: {
+                    rawData: rawData,
+                    shiftDefinitions: shiftDefinitions,
+                    systemSettings: systemSettings
+                },
+                type: 'manual'
+            };
+            backup.size = new Blob([JSON.stringify(backup.data)]).size;
+            
+            backupHistory.push(backup);
+            localStorage.setItem('backupHistory', JSON.stringify(backupHistory));
+            
+            // Download backup file
+            const dataStr = JSON.stringify(backup.data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `attendance-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            
+            displayBackupHistory();
+            notify(`💾 Backup created: ${rawData.length} records`, 'emerald');
+        }
+
+        function triggerRestore() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const backup = JSON.parse(event.target.result);
+                        rawData = backup.rawData || [];
+                        filteredData = [...rawData];
+                        shiftDefinitions = backup.shiftDefinitions || shiftDefinitions;
+                        systemSettings = backup.systemSettings || systemSettings;
+                        
+                        displayEmployeeData(rawData);
+                        notify(`✅ Data restored: ${rawData.length} records`, 'emerald');
+                    } catch (err) {
+                        notify('❌ Failed to restore backup. Invalid file.', 'red');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function restoreBackup(timestamp) {
+            if (!confirm('Restore this backup? Current data will be replaced.')) return;
+            
+            const backup = backupHistory.find(b => b.timestamp === timestamp);
+            if (!backup) {
+                notify('Backup not found', 'red');
+                return;
+            }
+            
+            rawData = backup.data.rawData || [];
+            filteredData = [...rawData];
+            shiftDefinitions = backup.data.shiftDefinitions || shiftDefinitions;
+            systemSettings = backup.data.systemSettings || systemSettings;
+            
+            displayEmployeeData(rawData);
+            notify(`✅ Restored backup from ${new Date(timestamp).toLocaleString()}`, 'emerald');
+            switchView('dashboard');
+        }
+
+        function deleteBackup(timestamp) {
+            if (!confirm('Delete this backup? This cannot be undone.')) return;
+            backupHistory = backupHistory.filter(b => b.timestamp !== timestamp);
+            localStorage.setItem('backupHistory', JSON.stringify(backupHistory));
+            displayBackupHistory();
+            notify('🗑️ Backup deleted', 'amber');
+        }
+
         // Load Initial Assets on load
         window.addEventListener('load', () => {
             initializeDarkMode();
@@ -923,6 +1229,8 @@
             loadShiftDefinitions();
             loadEmployeeFormMapping();
             setupDataParsers();
+            loadSettings();
+            loadBackupHistory();
         });
 
         // Initialize Upload Portals
