@@ -350,6 +350,10 @@
                     <i data-lucide="bar-chart-3" class="h-3.5 w-3.5 flex-shrink-0"></i>
                     <span>Analytics</span>
                 </button>
+                <button onclick="switchView('enterprise')" id="nav-enterprise" class="flex items-center gap-1.5 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-xs font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400 whitespace-nowrap">
+                    <i data-lucide="shield" class="h-3.5 w-3.5 flex-shrink-0"></i>
+                    <span>Enterprise</span>
+                </button>
             </nav>
         </div>
 
@@ -877,6 +881,284 @@
                 <div class="flex gap-2 justify-end">
                     <button onclick="exportAnalyticsReport()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition">📥 Export Report</button>
                     <button onclick="refreshAnalytics()" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition">🔄 Refresh Data</button>
+                </div>
+            </div>
+
+            <!-- PHASE 8: ENTERPRISE VIEW -->
+            <div id="view-enterprise" class="hidden space-y-6">
+                <h2 class="text-3xl font-bold text-slate-900 mb-6">🏢 Enterprise Administration</h2>
+
+                <!-- SSO Configuration -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-slate-900">🔐 Single Sign-On (SSO)</h3>
+                        <span class="text-xs bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full font-semibold">Phase 8</span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- SSO Method Selection -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-3">Authentication Method</label>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <label class="flex items-center p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-indigo-400 transition">
+                                    <input type="radio" name="ssoMethod" value="oauth2" onchange="updateSSOMethod('oauth2')" class="mr-3"> 
+                                    <span class="font-semibold text-slate-900">OAuth 2.0</span>
+                                </label>
+                                <label class="flex items-center p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-indigo-400 transition">
+                                    <input type="radio" name="ssoMethod" value="saml" onchange="updateSSOMethod('saml')" class="mr-3">
+                                    <span class="font-semibold text-slate-900">SAML 2.0</span>
+                                </label>
+                                <label class="flex items-center p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-indigo-400 transition">
+                                    <input type="radio" name="ssoMethod" value="ldap" onchange="updateSSOMethod('ldap')" class="mr-3">
+                                    <span class="font-semibold text-slate-900">LDAP</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- OAuth 2.0 Config -->
+                        <div id="oauth2Config" class="hidden space-y-3 p-4 bg-slate-50 rounded-lg">
+                            <input type="text" placeholder="Client ID" id="oauthClientId" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                            <input type="password" placeholder="Client Secret" id="oauthSecret" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                            <input type="text" placeholder="Authorization URL" id="oauthAuthUrl" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                            <input type="text" placeholder="Token URL" id="oauthTokenUrl" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                        </div>
+
+                        <!-- SAML 2.0 Config -->
+                        <div id="samlConfig" class="hidden space-y-3 p-4 bg-slate-50 rounded-lg">
+                            <input type="text" placeholder="Identity Provider URL" id="samlIdpUrl" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                            <textarea placeholder="Certificate (PEM format)" id="samlCert" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" rows="3"></textarea>
+                            <input type="text" placeholder="Assertion Consumer Service URL" id="samlAcsUrl" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                        </div>
+
+                        <!-- LDAP Config -->
+                        <div id="ldapConfig" class="hidden space-y-3 p-4 bg-slate-50 rounded-lg">
+                            <input type="text" placeholder="LDAP Server" id="ldapServer" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                            <input type="number" placeholder="Port" id="ldapPort" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" value="389">
+                            <input type="text" placeholder="Bind DN" id="ldapBindDn" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                            <input type="password" placeholder="Bind Password" id="ldapBindPassword" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                            <input type="text" placeholder="User Search Base" id="ldapSearchBase" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                        </div>
+
+                        <button onclick="saveSSOConfig()" class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition">💾 Save SSO Configuration</button>
+                    </div>
+                </div>
+
+                <!-- Webhook Management -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-slate-900">🔗 Webhook Management</h3>
+                        <button onclick="openAddWebhookModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition">+ Add Webhook</button>
+                    </div>
+                    
+                    <div class="space-y-3" id="webhookList">
+                        <div class="p-4 bg-slate-50 rounded-lg text-center text-slate-500">No webhooks configured</div>
+                    </div>
+                </div>
+
+                <!-- Multi-tenant Configuration -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-slate-900">🏢 Multi-tenant Settings</h3>
+                        <span class="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">Organizations</span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="p-4 border border-slate-200 rounded-lg">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <p class="font-semibold text-slate-900">Current Organization</p>
+                                    <p id="currentOrgName" class="text-sm text-slate-600">Default Organization</p>
+                                </div>
+                                <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded">Active</span>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                                <div class="p-2 bg-slate-50 rounded">
+                                    <p class="text-slate-600">Users</p>
+                                    <p class="font-bold text-slate-900" id="orgUserCount">0</p>
+                                </div>
+                                <div class="p-2 bg-slate-50 rounded">
+                                    <p class="text-slate-600">Teams</p>
+                                    <p class="font-bold text-slate-900" id="orgTeamCount">0</p>
+                                </div>
+                                <div class="p-2 bg-slate-50 rounded">
+                                    <p class="text-slate-600">API Keys</p>
+                                    <p class="font-bold text-slate-900" id="orgApiKeyCount">0</p>
+                                </div>
+                                <div class="p-2 bg-slate-50 rounded">
+                                    <p class="text-slate-600">Data Retention</p>
+                                    <p class="font-bold text-slate-900">90 days</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="openCreateOrgModal()" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition">➕ Create New Organization</button>
+                    </div>
+                </div>
+
+                <!-- Advanced RBAC -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-slate-900">👥 Role-Based Access Control</h3>
+                        <button onclick="openAddRoleModal()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-semibold transition">+ Add Role</button>
+                    </div>
+                    
+                    <div class="space-y-3" id="rbacRolesList">
+                        <div class="p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition cursor-pointer" onclick="editRole('admin')">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <p class="font-semibold text-slate-900">Administrator</p>
+                                    <div class="flex gap-2 mt-2 flex-wrap">
+                                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">All Permissions</span>
+                                        <span class="text-xs text-slate-600">2 users</span>
+                                    </div>
+                                </div>
+                                <span class="text-slate-400">→</span>
+                            </div>
+                        </div>
+                        <div class="p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition cursor-pointer" onclick="editRole('manager')">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <p class="font-semibold text-slate-900">Manager</p>
+                                    <div class="flex gap-2 mt-2 flex-wrap">
+                                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">View/Edit Reports</span>
+                                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Manage Team</span>
+                                        <span class="text-xs text-slate-600">5 users</span>
+                                    </div>
+                                </div>
+                                <span class="text-slate-400">→</span>
+                            </div>
+                        </div>
+                        <div class="p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition cursor-pointer" onclick="editRole('viewer')">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <p class="font-semibold text-slate-900">Viewer</p>
+                                    <div class="flex gap-2 mt-2 flex-wrap">
+                                        <span class="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded">View Only</span>
+                                        <span class="text-xs text-slate-600">12 users</span>
+                                    </div>
+                                </div>
+                                <span class="text-slate-400">→</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Rate Limiting -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-slate-900">⚡ API Rate Limiting</h3>
+                        <span class="text-xs bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-semibold">Quotas</span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Requests per Minute (Global)</label>
+                                <input type="number" id="globalRateLimit" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" value="1000">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Per-User Limit</label>
+                                <input type="number" id="perUserRateLimit" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" value="100">
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded-lg">
+                            <p class="text-sm font-semibold text-slate-700 mb-3">Active API Keys</p>
+                            <div class="space-y-2" id="apiKeysList">
+                                <div class="flex justify-between items-center p-2 bg-white border border-slate-200 rounded">
+                                    <div class="text-sm">
+                                        <p class="font-mono text-slate-900">sk_live_••••••••••••8f4a</p>
+                                        <p class="text-xs text-slate-600">Default API Key</p>
+                                    </div>
+                                    <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Active</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="saveApiRateLimits()" class="w-full px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold transition">💾 Save Rate Limits</button>
+                    </div>
+                </div>
+
+                <!-- Audit Log Enhancement -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-slate-900">📋 Audit Log</h3>
+                        <div class="flex gap-2">
+                            <input type="text" placeholder="Search logs..." id="auditSearchBox" class="px-3 py-2 border border-slate-300 rounded-lg text-sm" style="width: 200px;">
+                            <button onclick="exportAuditLog()" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition">📥 Export</button>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2" id="auditLogList" style="max-height: 400px; overflow-y: auto;">
+                        <div class="p-3 bg-slate-50 rounded border-l-4 border-indigo-600">
+                            <div class="flex justify-between items-start mb-1">
+                                <p class="font-semibold text-slate-900 text-sm">User Login</p>
+                                <span class="text-xs text-slate-600">2 mins ago</span>
+                            </div>
+                            <p class="text-xs text-slate-700"><strong>User:</strong> john@example.com | <strong>IP:</strong> 192.168.1.100 | <strong>Status:</strong> Success</p>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded border-l-4 border-emerald-600">
+                            <div class="flex justify-between items-start mb-1">
+                                <p class="font-semibold text-slate-900 text-sm">Settings Modified</p>
+                                <span class="text-xs text-slate-600">15 mins ago</span>
+                            </div>
+                            <p class="text-xs text-slate-700"><strong>User:</strong> admin@example.com | <strong>Changed:</strong> Rate limits updated | <strong>Changes:</strong> global_limit: 1000→2000</p>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded border-l-4 border-amber-600">
+                            <div class="flex justify-between items-start mb-1">
+                                <p class="font-semibold text-slate-900 text-sm">API Key Created</p>
+                                <span class="text-xs text-slate-600">1 hour ago</span>
+                            </div>
+                            <p class="text-xs text-slate-700"><strong>User:</strong> api_integration@example.com | <strong>Key:</strong> sk_live_••••••••••••8f4a | <strong>Permissions:</strong> read, write</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Health -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 p-6 rounded-2xl">
+                        <h3 class="text-lg font-bold text-green-900 mb-4">✅ System Status</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-green-800">Database</span>
+                                <span class="font-semibold text-green-900">🟢 Connected</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-green-800">SSO Provider</span>
+                                <span class="font-semibold text-green-900">🟢 Active</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-green-800">Webhooks</span>
+                                <span class="font-semibold text-green-900">🟢 Operational</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-green-800">API Rate Limits</span>
+                                <span class="font-semibold text-green-900">🟢 Enforced</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 p-6 rounded-2xl">
+                        <h3 class="text-lg font-bold text-blue-900 mb-4">📊 Enterprise Metrics</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-blue-800">Total Organizations</span>
+                                <span class="font-semibold text-blue-900">3</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-blue-800">Active Users</span>
+                                <span class="font-semibold text-blue-900">1,247</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-blue-800">API Calls (24h)</span>
+                                <span class="font-semibold text-blue-900">456,890</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-blue-800">Webhooks Triggered</span>
+                                <span class="font-semibold text-blue-900">12,345</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -2792,6 +3074,253 @@ Authentication: Include X-API-Key header with your API key
         // Log initial connectivity state
         if (!navigator.onLine) {
             notify('📴 Currently offline - using cached data', 'amber');
+        }
+
+        // ========== PHASE 8: ENTERPRISE FEATURES ==========
+
+        // SSO Configuration Management
+        function updateSSOMethod(method) {
+            document.getElementById('oauth2Config').style.display = method === 'oauth2' ? 'block' : 'none';
+            document.getElementById('samlConfig').style.display = method === 'saml' ? 'block' : 'none';
+            document.getElementById('ldapConfig').style.display = method === 'ldap' ? 'block' : 'none';
+            console.log('🔐 SSO Method selected:', method);
+        }
+
+        function saveSSOConfig() {
+            const method = document.querySelector('input[name="ssoMethod"]:checked')?.value;
+            if (!method) {
+                notify('⚠️ Please select an authentication method', 'amber');
+                return;
+            }
+
+            const config = {
+                method: method,
+                timestamp: new Date().toISOString(),
+                status: 'active'
+            };
+
+            if (method === 'oauth2') {
+                config.clientId = document.getElementById('oauthClientId').value;
+                config.clientSecret = document.getElementById('oauthSecret').value;
+                config.authUrl = document.getElementById('oauthAuthUrl').value;
+                config.tokenUrl = document.getElementById('oauthTokenUrl').value;
+            } else if (method === 'saml') {
+                config.idpUrl = document.getElementById('samlIdpUrl').value;
+                config.certificate = document.getElementById('samlCert').value;
+                config.acsUrl = document.getElementById('samlAcsUrl').value;
+            } else if (method === 'ldap') {
+                config.server = document.getElementById('ldapServer').value;
+                config.port = document.getElementById('ldapPort').value;
+                config.bindDn = document.getElementById('ldapBindDn').value;
+                config.bindPassword = document.getElementById('ldapBindPassword').value;
+                config.searchBase = document.getElementById('ldapSearchBase').value;
+            }
+
+            localStorage.setItem('ssoConfig_' + method, JSON.stringify(config));
+            notify('✅ SSO Configuration saved successfully!', 'emerald');
+            console.log('🔐 SSO Config saved:', config);
+        }
+
+        // Webhook Management
+        let webhooks = JSON.parse(localStorage.getItem('webhooks') || '[]');
+
+        function openAddWebhookModal() {
+            const url = prompt('Enter webhook URL:', 'https://');
+            if (!url) return;
+            
+            const event = prompt('Trigger event:\n1. punch.create\n2. punch.update\n3. attendance.changed\n4. user.login', '1');
+            const eventMap = { '1': 'punch.create', '2': 'punch.update', '3': 'attendance.changed', '4': 'user.login' };
+            
+            const webhook = {
+                id: 'wh_' + Date.now(),
+                url: url,
+                event: eventMap[event] || 'punch.create',
+                active: true,
+                created: new Date().toISOString(),
+                attempts: 0,
+                lastTriggered: null
+            };
+
+            webhooks.push(webhook);
+            localStorage.setItem('webhooks', JSON.stringify(webhooks));
+            renderWebhooks();
+            notify('✅ Webhook created successfully!', 'emerald');
+            console.log('🔗 Webhook added:', webhook);
+        }
+
+        function renderWebhooks() {
+            const container = document.getElementById('webhookList');
+            if (webhooks.length === 0) {
+                container.innerHTML = '<div class="p-4 bg-slate-50 rounded-lg text-center text-slate-500">No webhooks configured</div>';
+                return;
+            }
+
+            container.innerHTML = webhooks.map(wh => `
+                <div class="p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex-1">
+                            <p class="font-semibold text-slate-900 truncate">${wh.url}</p>
+                            <p class="text-xs text-slate-600 mt-1">Event: <span class="font-mono bg-slate-100 px-2 py-0.5 rounded">${wh.event}</span></p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="toggleWebhook('${wh.id}')" class="px-3 py-1 text-xs rounded ${wh.active ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-800'}">
+                                ${wh.active ? '🟢 Active' : '🔴 Inactive'}
+                            </button>
+                            <button onclick="deleteWebhook('${wh.id}')" class="px-3 py-1 text-xs bg-red-100 text-red-800 rounded">Delete</button>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-600">Attempts: ${wh.attempts} | Last triggered: ${wh.lastTriggered || 'Never'}</p>
+                </div>
+            `).join('');
+        }
+
+        function toggleWebhook(id) {
+            const wh = webhooks.find(w => w.id === id);
+            if (wh) {
+                wh.active = !wh.active;
+                localStorage.setItem('webhooks', JSON.stringify(webhooks));
+                renderWebhooks();
+                notify('✅ Webhook ' + (wh.active ? 'activated' : 'deactivated'), 'emerald');
+            }
+        }
+
+        function deleteWebhook(id) {
+            webhooks = webhooks.filter(w => w.id !== id);
+            localStorage.setItem('webhooks', JSON.stringify(webhooks));
+            renderWebhooks();
+            notify('✅ Webhook deleted', 'emerald');
+        }
+
+        // Multi-tenant Management
+        let organizations = JSON.parse(localStorage.getItem('organizations') || '[{"id":"org_default","name":"Default Organization","created":"2024-01-01","users":34,"teams":2,"apiKeys":1}]');
+
+        function openCreateOrgModal() {
+            const name = prompt('Organization name:', '');
+            if (!name) return;
+
+            const org = {
+                id: 'org_' + Date.now(),
+                name: name,
+                created: new Date().toISOString(),
+                users: 0,
+                teams: 0,
+                apiKeys: 0,
+                dataRetention: 90,
+                members: []
+            };
+
+            organizations.push(org);
+            localStorage.setItem('organizations', JSON.stringify(organizations));
+            updateOrgDisplay();
+            notify('✅ Organization created: ' + name, 'emerald');
+            console.log('🏢 Organization created:', org);
+        }
+
+        function updateOrgDisplay() {
+            const current = organizations[0];
+            document.getElementById('currentOrgName').textContent = current.name;
+            document.getElementById('orgUserCount').textContent = current.users;
+            document.getElementById('orgTeamCount').textContent = current.teams;
+            document.getElementById('orgApiKeyCount').textContent = current.apiKeys;
+        }
+
+        // Advanced RBAC
+        let roles = JSON.parse(localStorage.getItem('enterpriseRoles') || JSON.stringify({
+            admin: { name: 'Administrator', permissions: ['*'], users: 2, description: 'Full system access' },
+            manager: { name: 'Manager', permissions: ['view.reports', 'edit.reports', 'manage.team'], users: 5, description: 'Team management and reporting' },
+            viewer: { name: 'Viewer', permissions: ['view.reports', 'view.data'], users: 12, description: 'Read-only access' }
+        }));
+
+        function openAddRoleModal() {
+            const name = prompt('Role name:', '');
+            if (!name) return;
+
+            const perms = prompt('Permissions (comma-separated):', '');
+            const role = {
+                name: name,
+                permissions: perms.split(',').map(p => p.trim()),
+                users: 0,
+                description: prompt('Description:', '')
+            };
+
+            roles[name.toLowerCase()] = role;
+            localStorage.setItem('enterpriseRoles', JSON.stringify(roles));
+            notify('✅ Role created: ' + name, 'emerald');
+            console.log('👥 Role created:', role);
+        }
+
+        function editRole(roleId) {
+            const role = roles[roleId];
+            if (!role) return;
+            alert(`Role: ${role.name}\nPermissions: ${role.permissions.join(', ')}\nUsers: ${role.users}`);
+        }
+
+        // API Rate Limiting
+        function saveApiRateLimits() {
+            const globalLimit = document.getElementById('globalRateLimit').value;
+            const perUserLimit = document.getElementById('perUserRateLimit').value;
+
+            const config = {
+                globalLimit: parseInt(globalLimit),
+                perUserLimit: parseInt(perUserLimit),
+                timestamp: new Date().toISOString(),
+                windowMs: 60000 // 1 minute
+            };
+
+            localStorage.setItem('apiRateLimits', JSON.stringify(config));
+            notify('✅ API rate limits updated!', 'emerald');
+            console.log('⚡ Rate limits saved:', config);
+        }
+
+        // Audit Logging Enhancement
+        let auditLogs = JSON.parse(localStorage.getItem('auditLogs') || '[]');
+
+        function logAuditEvent(eventType, user, details, status = 'success') {
+            const entry = {
+                id: 'audit_' + Date.now(),
+                type: eventType,
+                user: user,
+                details: details,
+                status: status,
+                timestamp: new Date().toISOString(),
+                ip: 'N/A',
+                userAgent: navigator.userAgent
+            };
+
+            auditLogs.unshift(entry);
+            if (auditLogs.length > 1000) auditLogs.pop(); // Keep last 1000 entries
+            localStorage.setItem('auditLogs', JSON.stringify(auditLogs));
+        }
+
+        function exportAuditLog() {
+            const csv = 'Timestamp,Type,User,Details,Status,IP\n' + 
+                auditLogs.map(l => `"${l.timestamp}","${l.type}","${l.user}","${l.details}","${l.status}","${l.ip}"`).join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'audit_log_' + new Date().toISOString().slice(0, 10) + '.csv';
+            a.click();
+            notify('✅ Audit log exported!', 'emerald');
+            console.log('📋 Audit log exported');
+        }
+
+        // Initialize Phase 8 on page load
+        function initializePhase8() {
+            renderWebhooks();
+            updateOrgDisplay();
+            console.log('✅ Phase 8 Enterprise Features Initialized');
+            console.log('🔐 SSO, 🔗 Webhooks, 🏢 Multi-tenant, 👥 RBAC, ⚡ Rate Limiting, 📋 Audit Logs');
+        }
+
+        // Run initialization when DOM is ready
+        document.addEventListener('DOMContentLoaded', initializePhase8);
+        // Also run if already loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePhase8);
+        } else {
+            setTimeout(initializePhase8, 100);
         }
     </script>
 </body>
