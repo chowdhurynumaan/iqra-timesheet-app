@@ -772,37 +772,31 @@
                     </div>
 
                     <div class="p-2.5 bg-slate-50/40 space-y-2.5">
-                        <!-- 6 Metrics Grid (2x3 Layout) -->
-                        <div class="grid grid-cols-2 gap-1.5">
-                            <!-- Attendance -->
-                            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded p-2 text-white shadow-sm">
-                                <div class="text-6px font-semibold">Attendance</div>
-                                <div class="text-xl font-black">${attendancePercent.toFixed(0)}%</div>
+                        <!-- 6 Metrics Grid - Uniform 3x2 Layout -->
+                        <div class="grid grid-cols-3 gap-1">
+                            <div class="bg-green-500 rounded p-1.5 text-center text-white shadow">
+                                <div class="text-5px font-bold leading-tight">ATT</div>
+                                <div class="text-lg font-black">${attendancePercent.toFixed(0)}%</div>
                             </div>
-                            <!-- Punctuality -->
-                            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded p-2 text-white shadow-sm">
-                                <div class="text-6px font-semibold">Punctuality</div>
-                                <div class="text-xl font-black">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
+                            <div class="bg-blue-500 rounded p-1.5 text-center text-white shadow">
+                                <div class="text-5px font-bold leading-tight">PUN</div>
+                                <div class="text-lg font-black">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
                             </div>
-                            <!-- Hours -->
-                            <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded p-2 text-white shadow-sm">
-                                <div class="text-6px font-semibold">Hours</div>
-                                <div class="text-xl font-black">${hoursNum.toFixed(1)}</div>
+                            <div class="bg-indigo-500 rounded p-1.5 text-center text-white shadow">
+                                <div class="text-5px font-bold leading-tight">HRS</div>
+                                <div class="text-lg font-black">${hoursNum.toFixed(1)}</div>
                             </div>
-                            <!-- Late Minutes -->
-                            <div class="bg-gradient-to-br from-amber-500 to-amber-600 rounded p-2 text-white shadow-sm">
-                                <div class="text-6px font-semibold">Late Min</div>
-                                <div class="text-xl font-black">${lateMin}</div>
+                            <div class="bg-amber-500 rounded p-1.5 text-center text-white shadow">
+                                <div class="text-5px font-bold leading-tight">LATE</div>
+                                <div class="text-lg font-black">${lateMin}</div>
                             </div>
-                            <!-- Absences -->
-                            <div class="bg-gradient-to-br from-red-500 to-red-600 rounded p-2 text-white shadow-sm">
-                                <div class="text-6px font-semibold">Absences</div>
-                                <div class="text-xl font-black">${absences}</div>
+                            <div class="bg-red-500 rounded p-1.5 text-center text-white shadow">
+                                <div class="text-5px font-bold leading-tight">ABS</div>
+                                <div class="text-lg font-black">${absences}</div>
                             </div>
-                            <!-- Worked Days -->
-                            <div class="bg-gradient-to-br from-teal-500 to-teal-600 rounded p-2 text-white shadow-sm">
-                                <div class="text-6px font-semibold">Days Worked</div>
-                                <div class="text-xl font-black">${daysWorked}</div>
+                            <div class="bg-teal-500 rounded p-1.5 text-center text-white shadow">
+                                <div class="text-5px font-bold leading-tight">WKD</div>
+                                <div class="text-lg font-black">${daysWorked}</div>
                             </div>
                         </div>
 
