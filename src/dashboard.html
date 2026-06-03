@@ -364,9 +364,12 @@
             /* Department filter pills */
             #deptFilter .rounded-full { font-size: 11px !important; padding: 4px 10px !important; }
 
-            <!-- Overall section spacing -->
+            /* Overall section spacing - dashboard only */
             #view-dashboard { gap: 8px !important; display: flex; flex-direction: column; }
             #view-dashboard.space-y-6 > * + * { margin-top: 0 !important; }
+
+            /* Force non-active views to stay hidden regardless of specificity */
+            .mobile-compact-padding > .hidden { display: none !important; }
 
             /* Overflow menu for hidden actions */
             .mobile-overflow-menu {
