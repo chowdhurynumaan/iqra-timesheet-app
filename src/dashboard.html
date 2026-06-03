@@ -1161,23 +1161,33 @@
                 const outTime = day.punchPairs?.[0]?.out || day.outTime || '';
                 
                 html += `
-                    <div style="display: grid; grid-template-columns: 120px 1fr 1fr auto; gap: 12px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; align-items: center;">
-                        <div style="border-right: 2px solid #cbd5e1; padding-right: 12px;">
-                            <div style="font-size: 12px; font-weight: 700; color: #1e293b;">${day.date || day.dayNum}</div>
-                            <div style="font-size: 11px; color: #64748b; margin-top: 2px;">${day.dayName || ''}</div>
+                    <div style="display: grid; grid-template-columns: 100px 1fr; gap: 12px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
+                        <!-- Left: Date -->
+                        <div style="border-right: 2px solid #cbd5e1; padding-right: 12px; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="font-size: 13px; font-weight: 700; color: #1e293b; line-height: 1.2;">${day.date || day.dayNum}</div>
+                            <div style="font-size: 11px; color: #64748b; margin-top: 3px;">${day.dayName || ''}</div>
                         </div>
-                        <div>
-                            <label style="font-size: 10px; font-weight: 600; color: #6b7280; display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">IN Time</label>
-                            <input type="time" data-idx="${idx}" class="punchEditInput" data-type="in" value="${inTime}" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; font-family: 'Courier New', monospace;">
-                        </div>
-                        <div>
-                            <label style="font-size: 10px; font-weight: 600; color: #6b7280; display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">OUT Time</label>
-                            <input type="time" data-idx="${idx}" class="punchEditInput" data-type="out" value="${outTime}" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; font-family: 'Courier New', monospace;">
-                        </div>
-                        <div style="text-align: center; min-width: 70px;">
-                            <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px;">STATUS</div>
-                            <div style="font-size: 13px; font-weight: 600; color: ${day.isMissed ? '#ef4444' : (day.lateMin > 0 ? '#f59e0b' : '#10b981')};">
-                                ${day.isMissed ? '❌' : (day.lateMin > 0 ? `⚠️ +${day.lateMin}m` : '✅')}
+                        
+                        <!-- Right: Time inputs and status -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 70px; gap: 8px; align-items: flex-start;">
+                            <!-- IN Time -->
+                            <div style="min-width: 0;">
+                                <label style="font-size: 9px; font-weight: 700; color: #6b7280; display: block; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px;">IN Time</label>
+                                <input type="time" data-idx="${idx}" class="punchEditInput" data-type="in" value="${inTime}" style="width: 100%; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; font-family: 'Courier New', monospace; box-sizing: border-box;">
+                            </div>
+                            
+                            <!-- OUT Time -->
+                            <div style="min-width: 0;">
+                                <label style="font-size: 9px; font-weight: 700; color: #6b7280; display: block; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px;">OUT Time</label>
+                                <input type="time" data-idx="${idx}" class="punchEditInput" data-type="out" value="${outTime}" style="width: 100%; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; font-family: 'Courier New', monospace; box-sizing: border-box;">
+                            </div>
+                            
+                            <!-- Status -->
+                            <div style="text-align: center; padding-top: 18px;">
+                                <div style="font-size: 14px; font-weight: 700; color: ${day.isMissed ? '#ef4444' : (day.lateMin > 0 ? '#f59e0b' : '#10b981')}; line-height: 1;">
+                                    ${day.isMissed ? '❌' : (day.lateMin > 0 ? `⚠️` : '✅')}
+                                </div>
+                                ${day.lateMin > 0 ? `<div style="font-size: 9px; color: #f59e0b; font-weight: 600; margin-top: 2px;">+${day.lateMin}m</div>` : ''}
                             </div>
                         </div>
                     </div>
