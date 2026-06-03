@@ -4182,9 +4182,15 @@ Authentication: Include X-API-Key header with your API key
         document.addEventListener('DOMContentLoaded', initializePhase8);
         // Also run if already loaded
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializePhase8);
+            document.addEventListener('DOMContentLoaded', function() {
+                initializePhase8();
+                initializeDashboardUI();
+            });
         } else {
-            setTimeout(initializePhase8, 100);
+            setTimeout(() => {
+                initializePhase8();
+                initializeDashboardUI();
+            }, 100);
         }
     </script>
 </body>
