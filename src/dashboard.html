@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
@@ -893,9 +893,81 @@
         }
 
         async function loadMonthData() {
-            const currentMonth = document.getElementById('monthSelector').value;
-            if (!currentMonth) return;
-            notify(`Loaded schedule data segment: ${currentMonth}`, 'indigo');
+            const monthId = document.getElementById('monthSelector').value;
+            if (!monthId) return;
+            
+            try {
+                const monthDoc = await db.collection(MONTHS_COLLECTION).doc(monthId).get();
+                
+                if (monthDoc.exists) {
+                    const reportData = monthDoc.data();
+                    dateRange = reportData.dateRange || { start: null, end: null, actualDays: 0 };
+                    console.log(`📅 Loaded month data. Date range:`, dateRange);
+                    
+                    // Load individual employees from EMPLOYEES_COLLECTION (they have full dailyBreakdown data)
+                    const empSnapshot = await db.collection(EMPLOYEES_COLLECTION)
+                        .where('monthId', '==', monthId)
+                        .get();
+                    
+                    rawData = [];
+                    const seenIds = new Set(); // Track unique employee IDs
+                    
+                    empSnapshot.forEach(doc => {
+                        const empData = doc.data();
+                        
+                        // Skip duplicates (keep first occurrence)
+                        if (seenIds.has(empData.id)) {
+                            console.warn(`⚠️ Duplicate employee found: ${empData.name} (ID ${empData.id}), skipping duplicate`);
+                            return;
+                        }
+                        seenIds.add(empData.id);
+                        
+                        // Ensure shift property exists, default to 'WK' if missing
+                        if (!empData.shift) {
+                            empData.shift = 'WK';
+                        }
+                        rawData.push(empData);
+                    });
+                    
+                    // Fall back to month document employees if individual records not found
+                    if (rawData.length === 0) {
+                        rawData = (reportData.employees || []).map(emp => ({
+                            ...emp,
+                            shift: emp.shift || 'WK'
+                        }));
+                        console.warn(`⚠️ No employees found in ${EMPLOYEES_COLLECTION}, using month document data`);
+                    } else if (seenIds.size < empSnapshot.docs.length) {
+                        console.warn(`⚠️ Removed ${empSnapshot.docs.length - seenIds.size} duplicate employee records`);
+                    }
+                    
+                    filteredData = [...rawData];
+                    
+                    console.log(`✅ Loaded ${rawData.length} employees from ${monthId}`);
+                    console.log(`📅 Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);
+                    
+                    // Show data panels
+                    document.getElementById('statsGrid').style.display = 'grid';
+                    document.getElementById('filtersStation').style.display = 'block';
+                    document.getElementById('chartsContainer').style.display = 'grid';
+                    
+                    // Initialize department filter & shift settings
+                    initializeControlPanel();
+                    
+                    // Update stats cards with actual data
+                    renderDashboard(filteredData);
+                    
+                    // Display employee data in the table
+                    displayEmployeeData(rawData);
+                    
+                    notify(`✅ Loaded ${rawData.length} employees from ${monthId}`, 'emerald');
+                } else {
+                    console.warn(`⚠️ No data found for month: ${monthId}`);
+                    notify('No data found for selected month', 'amber');
+                }
+            } catch (error) {
+                console.error('❌ Error loading month data:', error);
+                notify('Error loading data from Firestore', 'red');
+            }
         }
     </script>
 </body>
