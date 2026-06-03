@@ -3672,7 +3672,7 @@ Authentication: Include X-API-Key header with your API key
                             labels: chartData.map(d => d.name),
                             datasets: [{ label: 'Minutes Late', data: chartData.map(d => d.lateMin || d.minutesLate || 0), backgroundColor: 'rgba(249, 115, 22, 0.8)', borderColor: 'rgba(249, 115, 22, 1)', borderWidth: 1 }]
                         },
-                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } } }
                     });
                 }
             } else if (chartId === 'deptChart') {
@@ -3688,7 +3688,7 @@ Authentication: Include X-API-Key header with your API key
                     modalChartInstances[chartId] = new Chart(ctx, {
                         type: 'bar',
                         data: { labels, datasets: [{ label: 'Attendance %', data: attendanceData, backgroundColor: 'rgba(59, 130, 246, 0.8)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 1 }] },
-                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { max: 100 } } }
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } }, scales: { x: { max: 100 } } }
                     });
                 }
             } else if (chartId === 'deptLateChart') {
@@ -3703,7 +3703,7 @@ Authentication: Include X-API-Key header with your API key
                     modalChartInstances[chartId] = new Chart(ctx, {
                         type: 'bar',
                         data: { labels, datasets: [{ label: 'Total Late Minutes', data: lateData, backgroundColor: 'rgba(239, 68, 68, 0.8)', borderColor: 'rgba(239, 68, 68, 1)', borderWidth: 1 }] },
-                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } } }
                     });
                 }
             } else if (chartId === 'attendanceTrendChart') {
@@ -3716,7 +3716,7 @@ Authentication: Include X-API-Key header with your API key
                     modalChartInstances[chartId] = new Chart(ctx, {
                         type: 'bar',
                         data: { labels: empData.map(d => d.name), datasets: [{ label: 'Attendance %', data: empData.map(d => d.attendance), backgroundColor: 'rgba(34, 197, 94, 0.8)', borderColor: 'rgba(34, 197, 94, 1)', borderWidth: 1 }] },
-                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { max: 100 } } }
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } }, scales: { x: { max: 100 } } }
                     });
                 }
             } else if (chartId === 'lateTrendChart') {
@@ -3726,7 +3726,7 @@ Authentication: Include X-API-Key header with your API key
                     modalChartInstances[chartId] = new Chart(ctx, {
                         type: 'bar',
                         data: { labels: lateEmps.map(e => e.name), datasets: [{ label: 'Late Minutes', data: lateEmps.map(e => e.lateMin || e.minutesLate || 0), backgroundColor: 'rgba(251, 146, 60, 0.8)', borderColor: 'rgba(251, 146, 60, 1)', borderWidth: 1 }] },
-                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } } }
                     });
                 }
             } else if (chartId === 'distributionChart') {
@@ -3742,7 +3742,7 @@ Authentication: Include X-API-Key header with your API key
                 modalChartInstances[chartId] = new Chart(ctx, {
                     type: 'doughnut',
                     data: { labels: Object.keys(ranges), datasets: [{ data: Object.values(ranges), backgroundColor: colors }] },
-                    options: { responsive: true, maintainAspectRatio: false }
+                    options: { responsive: true, maintainAspectRatio: true }
                 });
             }
         }
