@@ -434,78 +434,330 @@
             }
         }
         @media (max-width: 768px) { .header { flex-direction: column; align-items: flex-start; } .table-header { flex-direction: column; align-items: stretch; } table { font-size: 0.875rem; } th, td { padding: 0.75rem; } }
+
+        /* ========== PROFESSIONAL LAYOUT STYLES ========== */
+        /* Collapsible Sections */
+        .collapsible-section { 
+            background: white; 
+            border-radius: 0.75rem; 
+            margin-bottom: 1.5rem; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+        
+        .section-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 0.75rem; 
+            padding: 1rem 1.5rem; 
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 2px solid #e2e8f0;
+            cursor: pointer; 
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .section-header:hover {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        }
+
+        .section-header .collapse-icon { 
+            font-size: 1rem; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        .section-header h2 { 
+            margin: 0; 
+            font-size: 1rem; 
+            font-weight: 700; 
+            color: #1e293b; 
+            text-transform: uppercase; 
+            letter-spacing: 0.05em; 
+            flex: 1;
+        }
+
+        .section-header .badge {
+            background: #2563eb;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .section-content { 
+            padding: 1.5rem; 
+            display: grid;
+            gap: 1rem;
+        }
+
+        .section-content.collapsed { 
+            display: none; 
+        }
+
+        /* Tools Grid */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .tool-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .tool-group-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tool-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Shift Settings Grid */
+        .shift-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        .shift-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px solid #cbd5e1;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .shift-card:hover {
+            border-color: #2563eb;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .shift-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .shift-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .shift-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            flex: 1;
+        }
+
+        .shift-time-group {
+            margin-bottom: 1rem;
+        }
+
+        .shift-time-group:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .shift-time-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .shift-time-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+            background: white;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        .shift-time-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+        /* Shifts Save Button */
+        .shift-save-button {
+            width: 100%;
+            padding: 1rem;
+            margin-top: 1rem;
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .shift-save-button:hover {
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .shift-save-button:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
     <!-- Main Application Container -->
     <div class="container">
-        <div class="header" style="display: block;">
-            <div class="header-left" style="margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e2e8f0;">
+        
+        <!-- ========== HEADER ========== -->
+        <div class="header" style="display: block; margin-bottom: 0;">
+            <div class="header-left">
                 <h1>Attendance Dashboard</h1>
-                <p class="subtitle">Upload your attendance report (CSV or Excel) to visualize performance</p>
+                <p class="subtitle">Upload your attendance report (CSV or Excel) to visualize and manage performance</p>
             </div>
-            
-            <!-- Tools Section -->
-            <div style="margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e2e8f0;">
-                <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="toggleHeaderButtons()">
-                    <span id="headerCollapseIcon" style="font-size: 0.85rem; transition: transform 0.3s; transform: rotate(180deg);">▼</span>
-                    <h3 style="margin: 0; font-size: 0.8rem; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em;">🛠️ TOOLS</h3>
-                </div>
-                <div id="headerButtonsContainer" style="display: none; gap: 1rem; flex-wrap: wrap; align-items: flex-end; margin-top: 0.5rem;">
-                    <div class="button-group">
-                        <label class="btn-upload">
-                            <span>📋 Upload Employee Form</span>
-                            <input type="file" id="employeeFormFile" accept=".csv,.xlsx,.xls">
-                        </label>
-                        <label class="btn-upload">
-                            <span>📊 Upload Report</span>
-                            <input type="file" id="csvFile" accept=".csv,.xlsx,.xls">
-                        </label>
+        </div>
+
+        <!-- ========== TOOLS SECTION ========== -->
+        <div class="collapsible-section">
+            <div class="section-header" onclick="toggleToolsSection(this)">
+                <span class="collapse-icon">▼</span>
+                <h2>🛠️ Tools</h2>
+            </div>
+            <div class="section-content">
+                <div class="tools-grid">
+                    <!-- Upload Group -->
+                    <div class="tool-group">
+                        <span class="tool-group-label">Upload Files</span>
+                        <div class="tool-buttons">
+                            <label class="btn-upload" title="Upload employee roster">
+                                <span>📋 Employee Form</span>
+                                <input type="file" id="employeeFormFile" accept=".csv,.xlsx,.xls">
+                            </label>
+                        </div>
                     </div>
-                    <div class="button-group">
-                        <button class="btn-export" onclick="exportToCSV()">📥 Export CSV</button>
-                        <button class="btn-export" onclick="exportToExcel()">📑 Export Excel</button>
-                        <button class="btn-export" onclick="saveReportToFirebase()">☁️ Save Cloud</button>
-                        <button class="btn-export" onclick="printSelected()" style="background: #059669;">🖨️ Print</button>
-                        <button class="btn-export" onclick="cleanupDuplicateEmployees()" style="background: #8b5cf6;">🧹 Clean Duplicates</button>
+
+                    <div class="tool-group">
+                        <span class="tool-group-label">Upload Report</span>
+                        <div class="tool-buttons">
+                            <label class="btn-upload" title="Upload attendance data">
+                                <span>📊 Report</span>
+                                <input type="file" id="csvFile" accept=".csv,.xlsx,.xls">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Export Group -->
+                    <div class="tool-group">
+                        <span class="tool-group-label">Export Data</span>
+                        <div class="tool-buttons">
+                            <button class="btn-export" onclick="exportToCSV()" title="Download as CSV">📥 CSV</button>
+                            <button class="btn-export" onclick="exportToExcel()" title="Download as Excel">📑 Excel</button>
+                        </div>
+                    </div>
+
+                    <!-- Cloud & Actions Group -->
+                    <div class="tool-group">
+                        <span class="tool-group-label">Actions</span>
+                        <div class="tool-buttons">
+                            <button class="btn-export" onclick="saveReportToFirebase()" title="Save to cloud">☁️ Cloud</button>
+                            <button class="btn-export" onclick="printSelected()" style="background: #059669;" title="Print reports">🖨️ Print</button>
+                        </div>
+                    </div>
+
+                    <!-- Maintenance Group -->
+                    <div class="tool-group">
+                        <span class="tool-group-label">Maintenance</span>
+                        <div class="tool-buttons">
+                            <button class="btn-export" onclick="cleanupDuplicateEmployees()" style="background: #8b5cf6;" title="Remove duplicate records">🧹 Clean Duplicates</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Shift Settings Section -->
-            <div style="margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e2e8f0;">
-                <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="toggleShiftSettings()">
-                    <span id="shiftCollapseIcon" style="font-size: 0.85rem; transition: transform 0.3s;">▶</span>
-                    <h3 style="margin: 0; font-size: 0.8rem; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em;">🏢 SHIFT SETTINGS</h3>
-                </div>
-                <div id="deptShiftEditor" style="display: none; gap: 1rem; flex-wrap: wrap; align-items: flex-end; margin-top: 0.5rem;">
-                    <!-- Shifts will be populated dynamically -->
-                </div>
+        </div>
+
+        <!-- ========== SHIFT SETTINGS SECTION ========== -->
+        <div class="collapsible-section">
+            <div class="section-header" onclick="toggleShiftSettings(this)">
+                <span class="collapse-icon">▶</span>
+                <h2>🏢 Shift Settings</h2>
             </div>
-            
-            <!-- Analytics Section -->
-            <div style="margin-bottom: 0.5rem; padding-bottom: 0.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="toggleChartsSection()">
-                    <span id="chartsCollapseIcon" style="font-size: 0.85rem; transition: transform 0.3s; transform: rotate(180deg);">▼</span>
-                    <h3 style="margin: 0; font-size: 0.8rem; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em;">📊 ANALYTICS</h3>
+            <div class="section-content collapsed" id="shiftSettingsContent">
+                <div id="deptShiftEditor" style="width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- ========== ANALYTICS & FILTERS SECTION ========== -->
+        <div class="collapsible-section">
+            <div class="section-header" onclick="toggleAnalyticsSection(this)">
+                <span class="collapse-icon">▼</span>
+                <h2>📊 Analytics & Filters</h2>
+            </div>
+            <div class="section-content">
+                <!-- Month Selector -->
+                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                    <label style="font-size: 0.85rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap;">📅 Select Month:</label>
+                    <select id="monthSelector" onchange="loadMonthData()" style="padding: 0.75rem; border: 2px solid #cbd5e1; border-radius: 0.5rem; font-size: 1rem; transition: all 0.2s; min-width: 200px; font-weight: 600;">
+                        <option value="">Loading months...</option>
+                    </select>
                 </div>
-                
-                <div id="chartsContainer" class="charts-section" style="display: none; margin-top: 0.5rem;">
-                    <div class="chart-card" id="lateChartWrapper">
+
+                <!-- Department Filter -->
+                <div id="deptFilterContainer" style="display: none;">
+                    <label style="display: block; margin-bottom: 0.75rem; font-weight: 700; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">🏢 Filter by Department:</label>
+                    <div id="deptFilter" style="display: flex; flex-wrap: wrap; gap: 1rem;"></div>
+                </div>
+
+                <!-- Analytics Charts -->
+                <div id="chartsContainer" class="charts-section" style="display: none; margin-top: 1.5rem;">
+                    <div class="chart-card">
                         <div class="chart-title">⏰ Top 15 Late Arrivals</div>
                         <div class="chart-container">
                             <canvas id="lateChart"></canvas>
                         </div>
                     </div>
 
-                    <div class="chart-card" id="deptChartWrapper">
+                    <div class="chart-card">
                         <div class="chart-title">📈 Attendance by Department</div>
                         <div class="chart-container">
                             <canvas id="deptChart"></canvas>
                         </div>
                     </div>
 
-                    <div class="chart-card" id="deptLateChartWrapper">
+                    <div class="chart-card">
                         <div class="chart-title">⏱️ Late Minutes by Department</div>
                         <div class="chart-container">
                             <canvas id="deptLateChart"></canvas>
@@ -514,25 +766,8 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Simple Month Selector -->
-        <div style="background: white; border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;">
-            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                <label style="font-size: 0.85rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">📅 Select Month:</label>
-                <select id="monthSelector" onchange="loadMonthData()" style="padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 1rem; transition: all 0.2s;">
-                    <option value="">Loading months...</option>
-                </select>
-            </div>
-        </div>
-        
-        <!-- Department Filter -->
-        <div id="deptFilterContainer" style="background: white; border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; display: none;">
-            <label style="display: block; margin-bottom: 1rem; font-weight: 600; font-size: 0.85rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;">🏢 Department:</label>
-            <div id="deptFilter" style="display: flex; flex-wrap: wrap; gap: 1rem;">
-                <!-- Radio buttons will be populated dynamically -->
-            </div>
-        </div>
 
+        <!-- ========== STATISTICS CARDS ========== -->
         <div id="statsGrid" class="stats-grid" style="display: none;">
             <div class="stat-card primary">
                 <div class="stat-label">Total Employees</div>
@@ -552,7 +787,7 @@
             </div>
         </div>
 
-
+        <!-- ========== EMPLOYEE SECTION ========== -->
         <div class="employees-section">
             <div class="section-title">👤 Employee Performance Cards</div>
             <input type="text" id="searchBox" placeholder="🔍 Search name or ID..." class="search-box" style="margin-bottom: 1.5rem; max-width: 500px;">
@@ -786,19 +1021,14 @@
             return deptName.replace(/\//g, '_');
         }
         
-        function toggleShiftSettings() {
-            const editor = document.getElementById('deptShiftEditor');
-            const icon = document.getElementById('shiftCollapseIcon');
+        function toggleShiftSettings(headerElement) {
+            const content = document.getElementById('shiftSettingsContent');
+            const icon = headerElement.querySelector('.collapse-icon');
             
-            if (editor.style.display === 'none' || editor.style.display === '') {
-                editor.style.display = 'grid';
-                icon.style.transform = 'rotate(90deg)';
-            } else {
-                editor.style.display = 'none';
-                icon.style.transform = 'rotate(0deg)';
-            }
+            content.classList.toggle('collapsed');
+            icon.style.transform = content.classList.contains('collapsed') ? 'rotate(0deg)' : 'rotate(90deg)';
         }
-        
+
         function toggleHeaderButtons() {
             const container = document.getElementById('headerButtonsContainer');
             const icon = document.getElementById('headerCollapseIcon');
@@ -811,7 +1041,7 @@
                 icon.style.transform = 'rotate(180deg)';
             }
         }
-        
+
         function toggleChartsSection() {
             const container = document.getElementById('chartsContainer');
             const icon = document.getElementById('chartsCollapseIcon');
@@ -824,6 +1054,22 @@
                 icon.style.transform = 'rotate(180deg)';
             }
         }
+
+        function toggleToolsSection(headerElement) {
+            const content = headerElement.nextElementSibling;
+            const icon = headerElement.querySelector('.collapse-icon');
+            
+            content.classList.toggle('collapsed');
+            icon.style.transform = content.classList.contains('collapsed') ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+
+        function toggleAnalyticsSection(headerElement) {
+            const content = headerElement.nextElementSibling;
+            const icon = headerElement.querySelector('.collapse-icon');
+            
+            content.classList.toggle('collapsed');
+            icon.style.transform = content.classList.contains('collapsed') ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
         
         // Dynamic UI rendering for shift definitions - RESPONSIVE LAYOUT
         function renderShiftDefinitionsUI() {
@@ -835,56 +1081,28 @@
             
             // Create responsive container
             const container = document.createElement('div');
-            container.style.cssText = `
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 1rem;
-                margin-bottom: 1rem;
-                width: 100%;
-            `;
+            container.className = 'shift-cards-container';
             
             let shiftNum = 1;
             // Show only fundamental shifts (NOT compound ones with "/" or "Slot")
             Object.entries(shiftDefinitions)
                 .filter(([deptName]) => !deptName.includes('/') && !deptName.includes('Slot'))
                 .forEach(([deptName, times]) => {
-                    // Create card for each shift
+                    // Create professional card for each shift
                     const card = document.createElement('div');
-                    card.style.cssText = `
-                        background: linear-gradient(135deg, #FFFBF5 0%, #FFF4E6 100%);
-                        border: 2px solid #8B7355;
-                        border-radius: 6px;
-                        padding: 1rem;
-                        font-family: Arial, sans-serif;
-                    `;
+                    card.className = 'shift-card';
                     
                     // Header with shift number and name
                     const header = document.createElement('div');
-                    header.style.cssText = `
-                        background: linear-gradient(135deg, #C8A882 0%, #D4B5A0 100%);
-                        padding: 0.8rem;
-                        border-radius: 4px;
-                        margin-bottom: 1rem;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                    `;
+                    header.className = 'shift-card-header';
                     
-                    const numSpan = document.createElement('span');
-                    numSpan.textContent = `#${shiftNum}`;
-                    numSpan.style.cssText = `
-                        font-weight: 700;
-                        font-size: 1.1rem;
-                        color: #2c1810;
-                    `;
+                    const numSpan = document.createElement('div');
+                    numSpan.className = 'shift-number';
+                    numSpan.textContent = shiftNum;
                     
-                    const nameSpan = document.createElement('span');
+                    const nameSpan = document.createElement('div');
+                    nameSpan.className = 'shift-name';
                     nameSpan.textContent = deptName;
-                    nameSpan.style.cssText = `
-                        font-weight: 700;
-                        font-size: 1.1rem;
-                        color: #2c1810;
-                    `;
                     
                     header.appendChild(numSpan);
                     header.appendChild(nameSpan);
@@ -895,65 +1113,35 @@
                     
                     // In Time field
                     const startGroup = document.createElement('div');
-                    startGroup.style.cssText = `
-                        margin-bottom: 1rem;
-                    `;
+                    startGroup.className = 'shift-time-group';
                     
                     const startLabel = document.createElement('label');
-                    startLabel.textContent = 'In Time';
-                    startLabel.style.cssText = `
-                        display: block;
-                        font-weight: 600;
-                        margin-bottom: 0.4rem;
-                        color: #2c1810;
-                        font-size: 0.9rem;
-                    `;
+                    startLabel.className = 'shift-time-label';
+                    startLabel.textContent = '⏥ In Time';
                     startGroup.appendChild(startLabel);
                     
                     const startInput = document.createElement('input');
                     startInput.type = 'time';
                     startInput.id = `shift${safeId}_start`;
+                    startInput.className = 'shift-time-input';
                     startInput.value = times.start || '09:00';
-                    startInput.style.cssText = `
-                        width: 100%;
-                        padding: 0.6rem;
-                        border: 1px solid #999;
-                        border-radius: 3px;
-                        font-size: 1rem;
-                        box-sizing: border-box;
-                    `;
                     startGroup.appendChild(startInput);
                     card.appendChild(startGroup);
                     
                     // Out Time field
                     const endGroup = document.createElement('div');
-                    endGroup.style.cssText = `
-                        margin-bottom: 0.5rem;
-                    `;
+                    endGroup.className = 'shift-time-group';
                     
                     const endLabel = document.createElement('label');
-                    endLabel.textContent = 'Out Time';
-                    endLabel.style.cssText = `
-                        display: block;
-                        font-weight: 600;
-                        margin-bottom: 0.4rem;
-                        color: #2c1810;
-                        font-size: 0.9rem;
-                    `;
+                    endLabel.className = 'shift-time-label';
+                    endLabel.textContent = '⏥ Out Time';
                     endGroup.appendChild(endLabel);
                     
                     const endInput = document.createElement('input');
                     endInput.type = 'time';
                     endInput.id = `shift${safeId}_end`;
+                    endInput.className = 'shift-time-input';
                     endInput.value = times.end || '17:30';
-                    endInput.style.cssText = `
-                        width: 100%;
-                        padding: 0.6rem;
-                        border: 1px solid #999;
-                        border-radius: 3px;
-                        font-size: 1rem;
-                        box-sizing: border-box;
-                    `;
                     endGroup.appendChild(endInput);
                     card.appendChild(endGroup);
                     
@@ -965,24 +1153,13 @@
             
             // Add Save button
             const saveButton = document.createElement('button');
-            saveButton.textContent = 'Save Shifts';
+            saveButton.textContent = '💾 Save All Shifts';
+            saveButton.className = 'shift-save-button';
             saveButton.onclick = saveShiftDefinitions;
-            saveButton.style.cssText = `
-                padding: 0.8rem 2rem;
-                background: #059669;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                font-weight: 600;
-                font-size: 1rem;
-                margin-top: 0.5rem;
-                width: 100%;
-            `;
             editor.appendChild(saveButton);
             
             const fundamentalShiftCount = Object.keys(shiftDefinitions).filter(name => !name.includes('/') && !name.includes('Slot')).length;
-            console.log(`🎯 Shift table (Responsive cards) rendered for ${fundamentalShiftCount} fundamental shifts (WK, EV, FT)`);
+            console.log(`🎯 Shift table (Professional cards) rendered for ${fundamentalShiftCount} fundamental shifts (WK, EV, FT)`);
         }
         
         async function saveShiftDefinitions() {
