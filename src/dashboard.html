@@ -66,20 +66,20 @@
             </div>
             
             <!-- Navigation -->
-            <nav class="p-4 flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-visible">
-                <button onclick="switchView('dashboard')" id="nav-dashboard" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white">
+            <nav class="p-2 flex flex-row md:flex-col gap-0.5 overflow-x-auto md:overflow-visible">
+                <button onclick="switchView('dashboard')" id="nav-dashboard" class="flex items-center justify-center md:justify-start gap-2 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white">
                     <i data-lucide="home" class="h-4 w-4"></i>
                     <span class="hidden md:inline">Dashboard</span>
                 </button>
-                <button onclick="switchView('employees')" id="nav-employees" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400">
+                <button onclick="switchView('employees')" id="nav-employees" class="flex items-center justify-center md:justify-start gap-2 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400">
                     <i data-lucide="users" class="h-4 w-4"></i>
                     <span class="hidden md:inline">Employees</span>
                 </button>
-                <button onclick="switchView('shifts')" id="nav-shifts" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400">
+                <button onclick="switchView('shifts')" id="nav-shifts" class="flex items-center justify-center md:justify-start gap-2 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400">
                     <i data-lucide="clock" class="h-4 w-4"></i>
                     <span class="hidden md:inline">Shifts</span>
                 </button>
-                <button onclick="switchView('audit')" id="nav-audit" class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400">
+                <button onclick="switchView('audit')" id="nav-audit" class="flex items-center justify-center md:justify-start gap-2 w-full md:px-3 md:py-2 px-2 py-1.5 rounded text-sm font-semibold transition-all duration-200 hover:bg-slate-800 hover:text-white text-slate-400">
                     <i data-lucide="shield-check" class="h-4 w-4"></i>
                     <span class="hidden md:inline">Audit</span>
                 </button>
@@ -120,22 +120,20 @@
             <div id="view-dashboard" class="space-y-6">
                 
                 <!-- Quick Upload Area / Intro Dropzone -->
-                <section class="no-print bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-                    <div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-1">Upload Attendance Data</h3>
-                        <p class="text-sm text-slate-600">Upload CSV or Excel files to analyze attendance patterns</p>
+                <section class="no-print bg-white rounded-lg p-3 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+                    <div class="min-w-0">
+                        <h3 class="text-base font-bold text-slate-900 mb-0.5">Upload Data</h3>
+                        <p class="text-xs text-slate-600 truncate">CSV or Excel files</p>
                     </div>
-                    <div class="flex gap-3">
-                        <label class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold cursor-pointer transition">
-                            <i data-lucide="upload" class="h-4 w-4"></i>
-                            Employee Form
+                    <div class="flex gap-2 flex-shrink-0">
+                        <label class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-semibold cursor-pointer transition whitespace-nowrap">
+                            <i data-lucide="upload" class="h-3.5 w-3.5"></i>
+                            <span class="hidden sm:inline">Employee</span>
                             <input type="file" id="employeeFormFile" accept=".csv,.xlsx,.xls" class="hidden">
                         </label>
-                    </div>
-                    <div class="flex gap-3">
-                        <label class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold cursor-pointer transition">
-                            <i data-lucide="upload" class="h-4 w-4"></i>
-                            Attendance Report
+                        <label class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-semibold cursor-pointer transition whitespace-nowrap">
+                            <i data-lucide="upload" class="h-3.5 w-3.5"></i>
+                            <span class="hidden sm:inline">Report</span>
                             <input type="file" id="csvFile" accept=".csv,.xlsx,.xls" class="hidden">
                         </label>
                     </div>
