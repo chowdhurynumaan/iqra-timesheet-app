@@ -254,11 +254,11 @@
             <!-- Expand/Collapse All (Dashboard only) -->
             <button id="expandCollapseBtn" onclick="toggleAllCards()" class="flex items-center gap-1 px-2 py-1 bg-indigo-600 hover:bg-indigo-700 rounded text-xs font-semibold transition" title="Expand/Collapse all cards">
                 <i data-lucide="chevrons-down" class="h-3 w-3"></i>
-                <span id="expandCollapseLabel" class="hidden sm:inline">Expand</span>
+                <span id="expandCollapseLabel" class="hidden sm:inline">Expand All</span>
             </button>
 
             <!-- Page Menu Hamburger (Dashboard only) -->
-            <button id="pageMenuBtn" onclick="switchView('charts')" class="flex px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-xs font-semibold transition flex-shrink-0" title="Charts">
+            <button id="pageMenuBtn" onclick="openChartsModal()" class="flex px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-xs font-semibold transition flex-shrink-0" title="Charts">
                 <i data-lucide="chart-bar" class="h-3 w-3"></i>
             </button>
         </div>
@@ -603,43 +603,56 @@
             </div>
 
             <!-- ================= VIEW: CHARTS ================= -->
-            <div id="view-charts" class="space-y-2 hidden p-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Late Arrivals -->
-                    <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                        <h3 class="font-bold text-slate-900 mb-1">⏰ Late Arrivals</h3>
-                        <p class="text-xs text-slate-600 mb-3">Top employees by lateness</p>
-                        <canvas id="chartLateArrivals" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
+            <!-- Charts Modal -->
+            <div id="chartsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                <div class="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] flex flex-col">
+                    <!-- Modal Header -->
+                    <div class="flex items-center justify-between p-4 border-b border-slate-200 flex-shrink-0">
+                        <h2 class="text-xl font-bold text-slate-900">📊 All Charts</h2>
+                        <button onclick="closeChartsModal()" class="text-slate-500 hover:text-slate-700 text-2xl" title="Close">×</button>
                     </div>
-                    <!-- Department Stats -->
-                    <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                        <h3 class="font-bold text-slate-900 mb-1">📈 Department Stats</h3>
-                        <p class="text-xs text-slate-600 mb-3">Attendance by department</p>
-                        <canvas id="chartDeptStats" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
-                    </div>
-                    <!-- Late Minutes -->
-                    <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                        <h3 class="font-bold text-slate-900 mb-1">⏱️ Late Minutes</h3>
-                        <p class="text-xs text-slate-600 mb-3">Department lateness comparison</p>
-                        <canvas id="chartLateMinutes" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
-                    </div>
-                    <!-- Trends -->
-                    <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                        <h3 class="font-bold text-slate-900 mb-1">📊 Trends</h3>
-                        <p class="text-xs text-slate-600 mb-3">Attendance trend analysis</p>
-                        <canvas id="chartTrends" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
-                    </div>
-                    <!-- Late Trend -->
-                    <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                        <h3 class="font-bold text-slate-900 mb-1">🔴 Late Trend</h3>
-                        <p class="text-xs text-slate-600 mb-3">Late arrivals trend</p>
-                        <canvas id="chartLateTrend" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
-                    </div>
-                    <!-- Distribution -->
-                    <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
-                        <h3 class="font-bold text-slate-900 mb-1">📍 Distribution</h3>
-                        <p class="text-xs text-slate-600 mb-3">Attendance distribution chart</p>
-                        <canvas id="chartDistribution" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
+                    <!-- Scrollable Content -->
+                    <div class="overflow-y-auto flex-1 p-4">
+                        <div class="space-y-2">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <!-- Late Arrivals -->
+                                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                                    <h3 class="font-bold text-slate-900 mb-1">⏰ Late Arrivals</h3>
+                                    <p class="text-xs text-slate-600 mb-3">Top employees by lateness</p>
+                                    <canvas id="chartLateArrivals" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
+                                </div>
+                                <!-- Department Stats -->
+                                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                                    <h3 class="font-bold text-slate-900 mb-1">📈 Department Stats</h3>
+                                    <p class="text-xs text-slate-600 mb-3">Attendance by department</p>
+                                    <canvas id="chartDeptStats" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
+                                </div>
+                                <!-- Late Minutes -->
+                                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                                    <h3 class="font-bold text-slate-900 mb-1">⏱️ Late Minutes</h3>
+                                    <p class="text-xs text-slate-600 mb-3">Department lateness comparison</p>
+                                    <canvas id="chartLateMinutes" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
+                                </div>
+                                <!-- Trends -->
+                                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                                    <h3 class="font-bold text-slate-900 mb-1">📊 Trends</h3>
+                                    <p class="text-xs text-slate-600 mb-3">Attendance trend analysis</p>
+                                    <canvas id="chartTrends" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
+                                </div>
+                                <!-- Late Trend -->
+                                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                                    <h3 class="font-bold text-slate-900 mb-1">🔴 Late Trend</h3>
+                                    <p class="text-xs text-slate-600 mb-3">Late arrivals trend</p>
+                                    <canvas id="chartLateTrend" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
+                                </div>
+                                <!-- Distribution -->
+                                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                                    <h3 class="font-bold text-slate-900 mb-1">📍 Distribution</h3>
+                                    <p class="text-xs text-slate-600 mb-3">Attendance distribution chart</p>
+                                    <canvas id="chartDistribution" width="300" height="250" style="max-width: 100%; display: block;"></canvas>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1352,7 +1365,7 @@
 
         // Navigation Controller
         function switchView(viewId) {
-            ['dashboard', 'employees', 'shifts', 'audit', 'settings', 'backup', 'integrations', 'analytics', 'charts'].forEach(view => {
+            ['dashboard', 'employees', 'shifts', 'audit', 'settings', 'backup', 'integrations', 'analytics'].forEach(view => {
                 const viewEl = document.getElementById(`view-${view}`);
                 const navEl = document.getElementById(`nav-${view}`);
                 if (viewEl) {
@@ -3527,11 +3540,6 @@ Authentication: Include X-API-Key header with your API key
                     // Display employee data in the table
                     displayEmployeeData(rawData);
                     
-                    // Also render charts if charts view is active
-                    if (document.getElementById('view-charts') && !document.getElementById('view-charts').classList.contains('hidden')) {
-                        setTimeout(renderAllCharts, 100);
-                    }
-                    
                     notify(`✅ Loaded ${rawData.length} employees from ${monthId}`, 'emerald');
                 } else {
                     console.warn(`⚠️ No data found for month: ${monthId}`);
@@ -3877,12 +3885,36 @@ Authentication: Include X-API-Key header with your API key
         const originalSwitchView = switchView;
         switchView = function(viewId) {
             originalSwitchView(viewId);
-            if (viewId === 'charts') {
-                setTimeout(renderAllCharts, 50);
-            } else {
+            if (viewId !== 'charts') {
                 setTimeout(initializeDashboardUI, 50);
             }
         };
+
+        // ========== CHARTS MODAL FUNCTIONS ==========
+        function openChartsModal() {
+            const modal = document.getElementById('chartsModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                setTimeout(renderAllCharts, 100);
+            }
+        }
+
+        function closeChartsModal() {
+            const modal = document.getElementById('chartsModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Close charts modal when clicking on the overlay
+        const chartsModal = document.getElementById('chartsModal');
+        if (chartsModal) {
+            chartsModal.addEventListener('click', (e) => {
+                if (e.target === chartsModal) {
+                    closeChartsModal();
+                }
+            });
+        }
 
         // ========== MODAL CLOSE FUNCTIONALITY ==========
         
