@@ -33,6 +33,9 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
+        /* Custom utilities */
+        .text-7px { font-size: 0.438rem; }
+        
         /* Print layout overrides */
         @media print {
             .no-print { display: none !important; }
@@ -213,7 +216,7 @@
                     </div>
 
                     <!-- Directory Grid Content -->
-                    <div id="tableBody" class="grid grid-cols-1 xl:grid-cols-2 gap-6 print-grid">
+                    <div id="tableBody" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 print-grid">
                         <div class="col-span-full text-center py-12 text-slate-500">No employee data loaded yet. Upload a report first.</div>
                     </div>
                 </section>
@@ -728,86 +731,137 @@
             }
 
             employees.forEach(emp => {
-                const daysWorked = emp.daysWorked || (emp.dailyBreakdown ? emp.dailyBreakdown.filter(d => !d.isMissed).length : 0) || 0;
-                const presencePct = dateRange.actualDays > 0 ? ((daysWorked / dateRange.actualDays) * 100).toFixed(0) : 0;
+                // Calculate all 6 metrics
+                let daysWorked = emp.daysWorked;
+                if (!daysWorked && emp.dailyBreakdown) {
+                    daysWorked = emp.dailyBreakdown.filter(d => !d.isMissed).length;
+                }
+                if (!daysWorked) {
+                    daysWorked = dateRange.actualDays - (emp.absences || 0);
+                }
+                daysWorked = Math.max(0, daysWorked);
                 
+                const attendancePercent = dateRange.actualDays > 0 ? (daysWorked / dateRange.actualDays * 100) : 0;
+                
+                let lateCount = 0;
+                if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
+                    lateCount = emp.dailyBreakdown.filter(d => d.lateMin > 0).length;
+                }
+                let punctualityPercent = '-';
+                if (daysWorked > 0) {
+                    punctualityPercent = Math.max(0, 100 - (lateCount / daysWorked * 100)).toFixed(0);
+                }
+                
+                const hoursNum = parseFloat(emp.hours) || 0;
+                const lateMin = emp.lateMin || 0;
+                const absences = Math.max(0, dateRange.actualDays - daysWorked);
+
                 const card = document.createElement('div');
-                card.className = 'bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 print-card';
+                card.className = 'bg-white rounded-lg border border-slate-200/80 shadow-xs overflow-hidden print-card';
+                card.setAttribute('data-id', emp.id);
                 card.innerHTML = `
-                    <div class="flex items-start justify-between">
-                        <div class="flex items-center gap-3">
-                            <div>
-                                <h4 class="font-bold text-slate-900 text-sm leading-tight">${emp.name}</h4>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">ID: ${emp.id}</span>
-                                    <span class="h-1 w-1 rounded-full bg-slate-300"></span>
-                                    <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-wide">${emp.dept}</span>
-                                </div>
+                    <div class="flex items-start justify-between bg-slate-50/60 border-b border-slate-200 px-3 py-2">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-slate-900 text-sm leading-tight">${emp.name}</h4>
+                            <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                                <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">ID: ${emp.id}</span>
+                                <span class="text-xs font-bold text-indigo-600 uppercase tracking-wide bg-indigo-50 px-1.5 py-0.5 rounded text-6px">${emp.dept}</span>
+                                <span class="text-xs font-bold text-slate-500 uppercase text-6px">Shift: ${emp.shift || 'WK'}</span>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] font-bold text-slate-600 uppercase">${emp.shift}</span>
-                        </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-3 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
-                        <div class="text-center">
-                            <span class="block text-[9px] font-bold text-slate-400 uppercase">Presence</span>
-                            <span class="text-sm font-extrabold text-indigo-600">${presencePct}%</span>
+                    <div class="p-2.5 bg-slate-50/40 space-y-2.5">
+                        <!-- 6 Metrics Grid (2x3 Layout) -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <!-- Attendance -->
+                            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-3 text-white shadow-md">
+                                <div class="text-xs font-semibold opacity-90">Attendance</div>
+                                <div class="text-3xl font-black">${attendancePercent.toFixed(0)}%</div>
+                            </div>
+                            <!-- Punctuality -->
+                            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-3 text-white shadow-md">
+                                <div class="text-xs font-semibold opacity-90">Punctuality</div>
+                                <div class="text-3xl font-black">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div>
+                            </div>
+                            <!-- Hours -->
+                            <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg p-3 text-white shadow-md">
+                                <div class="text-xs font-semibold opacity-90">Hours</div>
+                                <div class="text-3xl font-black">${hoursNum.toFixed(1)}</div>
+                            </div>
+                            <!-- Late Minutes -->
+                            <div class="bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg p-3 text-white shadow-md">
+                                <div class="text-xs font-semibold opacity-90">Late Min</div>
+                                <div class="text-3xl font-black">${lateMin}</div>
+                            </div>
+                            <!-- Absences -->
+                            <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-lg p-3 text-white shadow-md">
+                                <div class="text-xs font-semibold opacity-90">Absences</div>
+                                <div class="text-3xl font-black">${absences}</div>
+                            </div>
+                            <!-- Worked Days -->
+                            <div class="bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg p-3 text-white shadow-md">
+                                <div class="text-xs font-semibold opacity-90">Days Worked</div>
+                                <div class="text-3xl font-black">${daysWorked}</div>
+                            </div>
                         </div>
-                        <div class="text-center">
-                            <span class="block text-[9px] font-bold text-slate-400 uppercase">Late Minutes</span>
-                            <span class="text-sm font-extrabold text-amber-600">${emp.lateMin || 0}m</span>
-                        </div>
-                        <div class="text-center">
-                            <span class="block text-[9px] font-bold text-slate-400 uppercase">Absences</span>
-                            <span class="text-sm font-extrabold text-red-600">${emp.absences || 0}d</span>
-                        </div>
-                    </div>
 
-                    <div class="daily-breakdown space-y-1.5 max-h-40 overflow-y-auto pr-1">
-                        ${renderDailyTimeline(emp)}
+                        <!-- Daily Breakdown Table -->
+                        <div class="mt-2 overflow-x-auto">
+                            <table class="w-full border-collapse text-7px">
+                                <thead class="bg-slate-200/60 border-b border-slate-300">
+                                    <tr>
+                                        <th class="px-1.5 py-1 text-left font-bold text-slate-700">Date</th>
+                                        <th class="px-1 py-1 text-center font-bold text-slate-700">Day</th>
+                                        <th class="px-1 py-1 text-center font-bold text-slate-700 bg-yellow-50">IN</th>
+                                        <th class="px-1 py-1 text-center font-bold text-slate-700 bg-yellow-50">OUT</th>
+                                        <th class="px-1 py-1 text-center font-bold text-slate-700 bg-blue-50">Hr</th>
+                                        <th class="px-1 py-1 text-center font-bold text-slate-700">Late</th>
+                                        <th class="px-1 py-1 text-center font-bold text-slate-700">✓</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${renderDailyBreakdownTable(emp)}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 `;
                 container.appendChild(card);
             });
-            lucide.createIcons();
         }
 
-        function renderDailyTimeline(emp) {
+        function renderDailyBreakdownTable(emp) {
             if (!emp.dailyBreakdown || emp.dailyBreakdown.length === 0) {
-                return '<p class="text-[11px] text-slate-400 p-2">No daily breakdown available</p>';
+                return '<tr><td colspan="7" class="px-3 py-3 text-center text-slate-400">No daily data available</td></tr>';
             }
+
             return emp.dailyBreakdown.map((day, idx) => {
-                let statusColor = 'bg-slate-100 text-slate-600';
-                let statusLabel = 'Offline';
+                let rowBg = 'bg-white';
+                let statusIcon = '✅';
+                
                 if (day.isMissed) {
-                    statusColor = 'bg-red-50 text-red-600 border border-red-100';
-                    statusLabel = 'Absent';
-                } else if (day.lateMin && day.lateMin > 0) {
-                    statusColor = 'bg-red-50 text-red-600 border border-red-100';
-                    statusLabel = `Late: ${day.lateMin}m`;
-                } else if (day.hours && day.hours > 0) {
-                    statusColor = 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-                    statusLabel = `${day.hours} Hrs`;
+                    rowBg = 'bg-red-50';
+                    statusIcon = '❌';
+                } else if (day.lateMin > 0) {
+                    rowBg = 'bg-orange-50';
+                    statusIcon = '⚠️';
                 }
 
-                const dateStr = day.date || `Day ${idx + 1}`;
-                const dayName = day.dayName || '';
-                const inTime = day.inTime || day.punchPairs?.[0]?.in || '—';
-                const outTime = day.outTime || day.punchPairs?.[0]?.out || '—';
+                const inTime = day.punchPairs?.[0]?.in || day.inTime || '—';
+                const outTime = day.punchPairs?.[0]?.out || day.outTime || '—';
+                const hours = day.hours || (day.punchPairs?.[0]?.pairHours || '—');
 
                 return `
-                    <div class="flex items-center justify-between text-[11px] p-2 hover:bg-slate-50 rounded-lg transition">
-                        <div class="flex items-center gap-2 font-medium">
-                            <span class="font-bold text-slate-800">${dateStr}</span>
-                            <span class="text-slate-400">${dayName}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-mono text-slate-500">${inTime} → ${outTime}</span>
-                            <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${statusColor}">${statusLabel}</span>
-                        </div>
-                    </div>
+                    <tr class="${rowBg} border-b border-slate-100 hover:bg-slate-50 transition">
+                        <td class="px-1.5 py-1 font-bold text-slate-800">${day.date || day.dayNum}</td>
+                        <td class="px-1 py-1 text-center font-semibold text-slate-600">${day.dayName}</td>
+                        <td class="px-1 py-1 text-center font-mono text-slate-700 bg-yellow-50">${inTime}</td>
+                        <td class="px-1 py-1 text-center font-mono text-slate-700 bg-yellow-50">${outTime}</td>
+                        <td class="px-1 py-1 text-center font-bold text-blue-600 bg-blue-50">${typeof hours === 'number' ? hours.toFixed(1) : hours}</td>
+                        <td class="px-1 py-1 text-center font-bold ${day.lateMin > 0 ? 'text-red-600' : 'text-slate-500'}">${day.lateMin > 0 ? day.lateMin : '—'}</td>
+                        <td class="px-1 py-1 text-center">${statusIcon}</td>
+                    </tr>
                 `;
             }).join('');
         }
