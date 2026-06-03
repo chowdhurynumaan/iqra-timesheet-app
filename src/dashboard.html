@@ -240,6 +240,58 @@
         </div>
     </div>
 
+    <!-- Punch Edit Modal -->
+    <div id="punchEditModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-title" id="punchEditTitle">Edit Punch Times</div>
+            <div id="punchEditContent" style="max-height: 400px; overflow-y-auto; margin: 16px 0;"></div>
+            <div class="modal-buttons">
+                <button class="modal-button modal-button-cancel" onclick="closePunchEditModal()">Cancel</button>
+                <button class="modal-button modal-button-confirm" onclick="savePunchEdits()">Save Edits</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Filter Modal -->
+    <div id="advancedFilterModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-title">⚙️ Advanced Filters</div>
+            <div style="margin: 16px 0; space-y: 3;">
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 6px;">Min Attendance %</label>
+                    <input type="range" id="filterAttendance" min="0" max="100" value="0" style="width: 100%;">
+                    <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Target: <span id="filterAttendanceValue">0</span>%+</div>
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 6px;">Max Late Minutes</label>
+                    <input type="range" id="filterLateMin" min="0" max="500" value="500" style="width: 100%;">
+                    <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Maximum: <span id="filterLateMinValue">500</span> min</div>
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 6px;">Tier</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="checkbox" class="tierFilter" value="excellent" checked> <span style="font-size: 11px;">Excellent</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="checkbox" class="tierFilter" value="good" checked> <span style="font-size: 11px;">Good</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="checkbox" class="tierFilter" value="at_risk" checked> <span style="font-size: 11px;">At Risk</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="checkbox" class="tierFilter" value="critical" checked> <span style="font-size: 11px;">Critical</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-button modal-button-cancel" onclick="closeAdvancedFilter()">Cancel</button>
+                <button class="modal-button modal-button-confirm" onclick="applyAdvancedFilters()">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+
     <!-- SIDEBAR NAVIGATION (Collapsible on Mobile) -->
     <aside class="no-print w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between h-auto md:h-full border-r border-slate-800 z-50">
         <div>
@@ -391,6 +443,10 @@
                     <!-- Search & Actions -->
                     <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
                         <input type="text" id="searchBox" placeholder="🔍 Search by name or ID..." class="flex-1 px-4 py-2 border border-slate-300 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button onclick="openAdvancedFilterModal()" class="flex items-center gap-2 px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition">
+                            <i data-lucide="sliders" class="h-4 w-4"></i>
+                            Filters
+                        </button>
                         <button onclick="exportToExcel()" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition">
                             <i data-lucide="download" class="h-4 w-4"></i>
                             Export Excel
@@ -670,8 +726,193 @@
                     if (modal.style.display === 'flex') {
                         closeConfirmation();
                     }
+                    const punchModal = document.getElementById('punchEditModal');
+                    if (punchModal.style.display === 'flex') {
+                        closePunchEditModal();
+                    }
+                    const filterModal = document.getElementById('advancedFilterModal');
+                    if (filterModal.style.display === 'flex') {
+                        closeAdvancedFilter();
+                    }
                 }
             });
+        }
+
+        // ========== PHASE 3: ADVANCED FEATURES ==========
+        // Attendance Tier System
+        function calculateAttendanceTier(attendancePercent, lateMin, absences) {
+            // Excellent: 95%+ attendance, <30 min late per month, <1 absence
+            if (attendancePercent >= 95 && lateMin < 30 && absences <= 1) {
+                return { tier: 'excellent', label: '⭐ Excellent', color: 'from-green-500 to-emerald-600', textColor: 'text-green-700' };
+            }
+            // Good: 85-94% attendance, <60 min late, <3 absences
+            if (attendancePercent >= 85 && lateMin < 60 && absences <= 3) {
+                return { tier: 'good', label: '✓ Good', color: 'from-blue-500 to-cyan-600', textColor: 'text-blue-700' };
+            }
+            // At Risk: 75-84% attendance, <100 min late, <5 absences
+            if (attendancePercent >= 75 && lateMin < 100 && absences <= 5) {
+                return { tier: 'at_risk', label: '⚠ At Risk', color: 'from-amber-500 to-orange-600', textColor: 'text-amber-700' };
+            }
+            // Critical: Below 75% or >100 min late or >5 absences
+            return { tier: 'critical', label: '🚨 Critical', color: 'from-red-500 to-rose-600', textColor: 'text-red-700' };
+        }
+
+        // Punch Edit Modal
+        let currentEditingEmp = null;
+
+        function showPunchEditModal(emp) {
+            currentEditingEmp = emp;
+            const modal = document.getElementById('punchEditModal');
+            const title = document.getElementById('punchEditTitle');
+            const content = document.getElementById('punchEditContent');
+            
+            title.textContent = `✏️ Edit Punch Times - ${emp.name}`;
+            content.innerHTML = '';
+
+            if (!emp.dailyBreakdown || emp.dailyBreakdown.length === 0) {
+                content.innerHTML = '<div style="text-align: center; color: #9ca3af; padding: 20px;">No daily data to edit</div>';
+                modal.style.display = 'flex';
+                return;
+            }
+
+            let html = '<div style="space-y: 2;">';
+            emp.dailyBreakdown.forEach((day, idx) => {
+                const inTime = day.punchPairs?.[0]?.in || day.inTime || '';
+                const outTime = day.punchPairs?.[0]?.out || day.outTime || '';
+                
+                html += `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; padding: 12px; background: var(--bg-tertiary); border-radius: 8px;">
+                        <div>
+                            <label style="font-size: 11px; font-weight: 600; color: #6b7280; display: block; margin-bottom: 4px;">${day.date || day.dayNum}</label>
+                            <div style="font-size: 12px; color: #9ca3af;">${day.dayName}</div>
+                        </div>
+                        <div>
+                            <label style="font-size: 11px; font-weight: 600; color: #6b7280; display: block; margin-bottom: 4px;">IN Time</label>
+                            <input type="time" data-idx="${idx}" class="punchEditInput" data-type="in" value="${inTime}" style="width: 100%; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 11px; font-weight: 600; color: #6b7280; display: block; margin-bottom: 4px;">OUT Time</label>
+                            <input type="time" data-idx="${idx}" class="punchEditInput" data-type="out" value="${outTime}" style="width: 100%; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 11px; font-weight: 600; color: #6b7280; display: block; margin-bottom: 4px;">Status</label>
+                            <div style="font-size: 12px; color: ${day.lateMin > 0 ? '#ef4444' : '#10b981'}; font-weight: 600;">
+                                ${day.isMissed ? '❌ Absent' : (day.lateMin > 0 ? `⚠️ +${day.lateMin}m` : '✅ On Time')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            content.innerHTML = html;
+            modal.style.display = 'flex';
+        }
+
+        function closePunchEditModal() {
+            document.getElementById('punchEditModal').style.display = 'none';
+            currentEditingEmp = null;
+        }
+
+        function savePunchEdits() {
+            if (!currentEditingEmp) return;
+            
+            const inputs = document.querySelectorAll('.punchEditInput');
+            const changes = [];
+            
+            inputs.forEach(input => {
+                const idx = parseInt(input.getAttribute('data-idx'));
+                const type = input.getAttribute('data-type');
+                const newValue = input.value;
+                
+                if (type === 'in') {
+                    const oldValue = currentEditingEmp.dailyBreakdown[idx].punchPairs?.[0]?.in || currentEditingEmp.dailyBreakdown[idx].inTime || '';
+                    if (oldValue !== newValue) {
+                        if (!currentEditingEmp.dailyBreakdown[idx].punchPairs) {
+                            currentEditingEmp.dailyBreakdown[idx].punchPairs = [{}];
+                        }
+                        currentEditingEmp.dailyBreakdown[idx].punchPairs[0].in = newValue;
+                        changes.push(`${currentEditingEmp.dailyBreakdown[idx].date}: IN time changed to ${newValue}`);
+                    }
+                } else {
+                    const oldValue = currentEditingEmp.dailyBreakdown[idx].punchPairs?.[0]?.out || currentEditingEmp.dailyBreakdown[idx].outTime || '';
+                    if (oldValue !== newValue) {
+                        if (!currentEditingEmp.dailyBreakdown[idx].punchPairs) {
+                            currentEditingEmp.dailyBreakdown[idx].punchPairs = [{}];
+                        }
+                        currentEditingEmp.dailyBreakdown[idx].punchPairs[0].out = newValue;
+                        changes.push(`${currentEditingEmp.dailyBreakdown[idx].date}: OUT time changed to ${newValue}`);
+                    }
+                }
+            });
+
+            if (changes.length > 0) {
+                recordChange(`Edited ${changes.length} punch times for ${currentEditingEmp.name}`, { changes });
+                notify(`✓ Updated ${changes.length} punch times for ${currentEditingEmp.name}`, 'emerald');
+            } else {
+                notify('No changes made', 'amber');
+            }
+            closePunchEditModal();
+        }
+
+        // Advanced Filter Modal
+        function openAdvancedFilterModal() {
+            const modal = document.getElementById('advancedFilterModal');
+            
+            // Set up event listeners for live updates
+            document.getElementById('filterAttendance').oninput = (e) => {
+                document.getElementById('filterAttendanceValue').textContent = e.target.value;
+            };
+            
+            document.getElementById('filterLateMin').oninput = (e) => {
+                document.getElementById('filterLateMinValue').textContent = e.target.value;
+            };
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeAdvancedFilter() {
+            document.getElementById('advancedFilterModal').style.display = 'none';
+        }
+
+        function applyAdvancedFilters() {
+            const minAttendance = parseInt(document.getElementById('filterAttendance').value);
+            const maxLateMin = parseInt(document.getElementById('filterLateMin').value);
+            const selectedTiers = Array.from(document.querySelectorAll('.tierFilter:checked')).map(el => el.value);
+
+            if (selectedTiers.length === 0) {
+                notify('Please select at least one tier', 'amber');
+                return;
+            }
+
+            filteredData = rawData.filter(emp => {
+                let daysWorked = emp.daysWorked;
+                if (!daysWorked && emp.dailyBreakdown) {
+                    daysWorked = emp.dailyBreakdown.filter(d => !d.isMissed).length;
+                }
+                if (!daysWorked) {
+                    daysWorked = dateRange.actualDays - (emp.absences || 0);
+                }
+                daysWorked = Math.max(0, daysWorked);
+                
+                const attendancePercent = dateRange.actualDays > 0 ? (daysWorked / dateRange.actualDays * 100) : 0;
+                const lateMin = emp.lateMin || 0;
+                const absences = Math.max(0, dateRange.actualDays - daysWorked);
+
+                // Check attendance threshold
+                if (attendancePercent < minAttendance) return false;
+                
+                // Check late minutes threshold
+                if (lateMin > maxLateMin) return false;
+                
+                // Check tier
+                const tier = calculateAttendanceTier(attendancePercent, lateMin, absences).tier;
+                return selectedTiers.includes(tier);
+            });
+
+            renderDashboard(filteredData);
+            displayEmployeeData(filteredData);
+            notify(`📊 Filtered to ${filteredData.length} employees matching criteria`, 'indigo');
+            closeAdvancedFilter();
         }
 
         // Load Initial Assets on load
@@ -1075,19 +1316,28 @@
                 const lateMin = emp.lateMin || 0;
                 const absences = Math.max(0, dateRange.actualDays - daysWorked);
 
+                // Calculate tier
+                const tier = calculateAttendanceTier(attendancePercent, lateMin, absences);
+
                 const card = document.createElement('div');
                 card.className = 'bg-white rounded-lg border border-slate-200/80 shadow-xs overflow-hidden print-card';
                 card.setAttribute('data-id', emp.id);
                 card.innerHTML = `
                     <div class="flex items-start justify-between bg-slate-50/60 border-b border-slate-200 px-3 py-2">
                         <div class="flex-1">
-                            <h4 class="font-bold text-slate-900 text-sm leading-tight">${emp.name}</h4>
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="font-bold text-slate-900 text-sm leading-tight">${emp.name}</h4>
+                                <span class="bg-gradient-to-r ${tier.color} text-white px-2 py-0.5 rounded text-6px font-bold">${tier.label}</span>
+                            </div>
                             <div class="flex items-center gap-1.5 mt-1 flex-wrap">
                                 <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">ID: ${emp.id}</span>
                                 <span class="text-xs font-bold text-indigo-600 uppercase tracking-wide bg-indigo-50 px-1.5 py-0.5 rounded text-6px">${emp.dept}</span>
                                 <span class="text-xs font-bold text-slate-500 uppercase text-6px">Shift: ${emp.shift || 'WK'}</span>
                             </div>
                         </div>
+                        <button onclick="showPunchEditModal(rawData.find(e => e.id === '${emp.id}'))" class="ml-2 px-2 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded text-xs font-bold transition whitespace-nowrap flex-shrink-0">
+                            ✏️ Edit
+                        </button>
                     </div>
 
                     <div class="p-2.5 bg-slate-50/40 space-y-2.5">
