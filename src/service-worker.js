@@ -1,11 +1,8 @@
 // Service Worker for Attendance Analytics Pro
-// Enables offline functionality and caching
+// Network-first for HTML, cache-first for static assets
 
-const CACHE_NAME = 'attendance-pro-v4';
+const CACHE_NAME = 'attendance-pro-v5';
 const URLS_TO_CACHE = [
-  './',
-  './index.html',
-  './dashboard.html',
   './lucide.min.js',
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.1',
   'https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js',
@@ -13,60 +10,72 @@ const URLS_TO_CACHE = [
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
 ];
 
-// Install event - cache resources
+// Install event - cache static assets only
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
         return cache.addAll(URLS_TO_CACHE).catch(() => {
-          // Continue even if some resources fail to cache
           return Promise.resolve();
         });
       })
       .catch(() => {
-        // Service worker installation continues even if caching fails
         return Promise.resolve();
       })
   );
   self.skipWaiting();
 });
 
-// Fetch event - serve from cache, fallback to network
+// Fetch event - network-first for HTML, cache-first for static assets
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests
   if (event.request.method !== 'GET') return;
 
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached response if available
-        if (response) {
-          return response;
-        }
+  const url = new URL(event.request.url);
+  const isHTML = event.request.destination === 'document' ||
+    url.pathname.endsWith('.html') ||
+    url.pathname.endsWith('/') ||
+    url.pathname === url.origin;
 
-        // Try to fetch from network
-        return fetch(event.request)
-          .then((response) => {
-            // Cache successful network responses
-            if (!response || response.status !== 200 || response.type === 'error') {
-              return response;
-            }
-
-            // Clone the response to cache
+  if (isHTML) {
+    // NETWORK-FIRST for HTML — always get fresh version, cache as fallback for offline
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
             const responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then((cache) => {
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          return caches.match(event.request).then((cached) => {
+            return cached || caches.match('./dashboard.html');
+          });
+        })
+    );
+  } else {
+    // CACHE-FIRST for static assets (JS libraries, icons)
+    event.respondWith(
+      caches.match(event.request)
+        .then((response) => {
+          if (response) return response;
+          return fetch(event.request).then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              const responseToCache = networkResponse.clone();
+              caches.open(CACHE_NAME).then((cache) => {
                 cache.put(event.request, responseToCache);
               });
-
-            return response;
-          })
-          .catch(() => {
-            // Fallback for offline - serve cached version or offline page
-            return caches.match('./dashboard.html');
+            }
+            return networkResponse;
           });
-      })
-  );
+        })
+        .catch(() => {
+          return caches.match('./dashboard.html');
+        })
+    );
+  }
 });
 
 // Activate event - clean up old caches

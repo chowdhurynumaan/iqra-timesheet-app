@@ -5134,20 +5134,29 @@ Authentication: Include X-API-Key header with your API key
                     .then(registration => {
                         console.log('Service Worker registered successfully:', registration.scope);
                         
-                        // Check for updates periodically
+                        // Check for updates every 30 seconds
                         setInterval(() => {
                             registration.update();
-                        }, 60000); // Check every minute
+                        }, 30000);
                         
-                        // Handle service worker updates
+                        // Handle service worker updates — auto-reload for seamless experience
                         registration.addEventListener('updatefound', () => {
                             const newWorker = registration.installing;
                             newWorker.addEventListener('statechange', () => {
                                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // New service worker available - notify user
-                                    notify('App update available. Refresh to get the latest version.', 'blue');
+                                    // New version ready — tell it to activate immediately
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
                                 }
                             });
+                        });
+                        
+                        // When new service worker takes over, reload the page automatically
+                        let refreshing = false;
+                        navigator.serviceWorker.addEventListener('controllerchange', () => {
+                            if (!refreshing) {
+                                refreshing = true;
+                                window.location.reload();
+                            }
                         });
                     })
                     .catch(error => {
