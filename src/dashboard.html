@@ -503,9 +503,13 @@
         <button onclick="switchView('analytics'); closeMainMenu()" class="w-full text-left px-3 py-2.5 hover:bg-slate-50 border-b border-slate-100 text-slate-700 text-[13px] font-medium flex items-center gap-2.5">
             <i data-lucide="trending-up" class="h-3.5 w-3.5 text-slate-400"></i> Analytics
         </button>
-        <button onclick="switchView('enterprise'); closeMainMenu()" class="w-full text-left px-3 py-2.5 hover:bg-slate-50 text-slate-700 text-[13px] font-medium flex items-center gap-2.5">
+        <button onclick="switchView('enterprise'); closeMainMenu()" class="w-full text-left px-3 py-2.5 hover:bg-slate-50 border-b border-slate-100 text-slate-700 text-[13px] font-medium flex items-center gap-2.5">
             <i data-lucide="shield" class="h-3.5 w-3.5 text-slate-400"></i> Enterprise
         </button>
+        <div class="px-3 py-2 border-t border-slate-200 bg-slate-50">
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Your ID</p>
+            <p id="menuUserUid" class="text-[11px] text-slate-500 font-mono select-all cursor-pointer" title="Click to copy" onclick="navigator.clipboard.writeText(this.textContent); notify('ID copied!','green')">Loading...</p>
+        </div>
     </nav>
 
     <!-- Page Menu Dropdown (Charts) -->
@@ -1618,7 +1622,10 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
         
-        auth.signInAnonymously().catch((error) => {
+        auth.signInAnonymously().then((cred) => {
+            const uidEl = document.getElementById('menuUserUid');
+            if (uidEl && cred.user) uidEl.textContent = cred.user.uid;
+        }).catch((error) => {
             console.error('Anonymous Authentication error:', error);
             notify('Firebase system connection failure', 'red');
         });
