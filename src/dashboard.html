@@ -514,8 +514,13 @@
             <i data-lucide="shield" class="h-3.5 w-3.5 text-slate-400"></i> Enterprise
         </button>
         <div class="px-3 py-2 border-t border-slate-200 bg-slate-50">
-            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Your ID</p>
-            <p id="menuUserUid" class="text-[11px] text-slate-500 font-mono select-all cursor-pointer" title="Click to copy" onclick="navigator.clipboard.writeText(this.textContent); notify('ID copied!','green')">Loading...</p>
+            <div id="menuUserInfo" class="flex items-center gap-2 mb-1">
+                <img id="menuUserPhoto" src="" alt="" class="w-5 h-5 rounded-full hidden">
+                <span id="menuUserName" class="text-[11px] font-semibold text-slate-600 truncate"></span>
+            </div>
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Your ID</p>
+            <p id="menuUserUid" class="text-[11px] text-slate-500 font-mono select-all cursor-pointer" title="Click to copy" onclick="navigator.clipboard.writeText(this.textContent); notify('ID copied!','green')">Not signed in</p>
+            <button id="menuSignOutBtn" onclick="firebase.auth().signOut()" class="hidden mt-1.5 w-full text-[10px] text-red-500 hover:text-red-700 font-semibold py-1 rounded border border-red-200 hover:bg-red-50 transition">Sign Out</button>
         </div>
     </nav>
 
@@ -1642,20 +1647,72 @@
             adminEls.forEach(el => {
                 el.style.display = isAdmin() ? '' : 'none';
             });
-            // Show read-only badge for non-admins
             const badge = document.getElementById('readOnlyBadge');
             if (badge) badge.style.display = isAdmin() ? 'none' : 'inline-flex';
         }
 
-        auth.signInAnonymously().then((cred) => {
+        function updateUserUI(user) {
             const uidEl = document.getElementById('menuUserUid');
-            if (uidEl && cred.user) uidEl.textContent = cred.user.uid;
-            currentUserUid = cred.user ? cred.user.uid : null;
+            const nameEl = document.getElementById('menuUserName');
+            const photoEl = document.getElementById('menuUserPhoto');
+            const signOutBtn = document.getElementById('menuSignOutBtn');
+            if (user) {
+                if (uidEl) uidEl.textContent = user.uid;
+                if (nameEl) nameEl.textContent = user.displayName || user.email || 'User';
+                if (photoEl && user.photoURL) { photoEl.src = user.photoURL; photoEl.classList.remove('hidden'); }
+                if (signOutBtn) signOutBtn.classList.remove('hidden');
+                currentUserUid = user.uid;
+            } else {
+                if (uidEl) uidEl.textContent = 'Not signed in';
+                if (nameEl) nameEl.textContent = '';
+                if (photoEl) photoEl.classList.add('hidden');
+                if (signOutBtn) signOutBtn.classList.add('hidden');
+                currentUserUid = null;
+            }
             applyAdminGating();
-        }).catch((error) => {
-            console.error('Anonymous Authentication error:', error);
-            notify('Firebase system connection failure', 'red');
+        }
+
+        // Google Sign-In
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+        function signInWithGoogle() {
+            auth.signInWithPopup(googleProvider).catch((error) => {
+                console.error('Google Sign-In error:', error);
+                notify('Sign-in failed: ' + error.message, 'red');
+            });
+        }
+
+        // Auth state listener — fires on sign-in, sign-out, and page load
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                updateUserUI(user);
+                document.getElementById('signInOverlay')?.remove();
+            } else {
+                updateUserUI(null);
+                showSignInOverlay();
+            }
         });
+
+        function showSignInOverlay() {
+            if (document.getElementById('signInOverlay')) return;
+            const overlay = document.createElement('div');
+            overlay.id = 'signInOverlay';
+            overlay.className = 'fixed inset-0 bg-white/95 backdrop-blur-sm z-[9999] flex items-center justify-center';
+            overlay.innerHTML = `
+                <div class="text-center p-8 max-w-sm">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-indigo-100 rounded-full flex items-center justify-center">
+                        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900 mb-2">Sign In Required</h2>
+                    <p class="text-sm text-slate-500 mb-6">Sign in with your Google account to access Attendance Pro.</p>
+                    <button onclick="signInWithGoogle()" class="inline-flex items-center gap-3 px-6 py-3 bg-white border-2 border-slate-200 rounded-xl hover:border-indigo-300 hover:shadow-lg transition-all font-semibold text-slate-700">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                        Sign in with Google
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
         
         const TIMESHEET_APP_ID = 'timesheet_app';
         const TIMESHEET_COLLECTION = 'timesheet_app';
