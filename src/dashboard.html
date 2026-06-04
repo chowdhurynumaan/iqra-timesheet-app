@@ -1748,9 +1748,20 @@
         // ===== USER APPROVAL SYSTEM =====
         async function registerOrGetUser(user) {
             const userRef = db.collection(USERS_COLLECTION).doc(user.uid);
-            const doc = await userRef.get();
+            console.log('[Auth] Checking if user doc exists:', USERS_COLLECTION + '/' + user.uid);
+            
+            let doc;
+            try {
+                doc = await userRef.get();
+                console.log('[Auth] Doc exists?', doc.exists);
+            } catch (readErr) {
+                console.error('[Auth] FAILED to read user doc:', readErr.code, readErr.message);
+                notify('DEBUG: Read failed - ' + readErr.code, 'red');
+                throw readErr;
+            }
             
             if (doc.exists) {
+                console.log('[Auth] Existing user data:', doc.data());
                 return doc.data();
             }
             
@@ -1766,7 +1777,16 @@
                 approvedAt: role === 'admin' ? firebase.firestore.FieldValue.serverTimestamp() : null,
                 approvedBy: role === 'admin' ? 'system' : null
             };
-            await userRef.set(userData);
+            
+            try {
+                await userRef.set(userData);
+                console.log('[Auth] User doc CREATED with role:', role);
+                notify('DEBUG: Doc created as ' + role, 'green');
+            } catch (writeErr) {
+                console.error('[Auth] FAILED to write user doc:', writeErr.code, writeErr.message);
+                notify('DEBUG: Write failed - ' + writeErr.code + ' - ' + writeErr.message, 'red');
+                throw writeErr;
+            }
             return userData;
         }
 
