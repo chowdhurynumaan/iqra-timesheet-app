@@ -3818,42 +3818,49 @@ Authentication: Include X-API-Key header with your API key
             let printHTML = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
             <title>Attendance Report - ${new Date().toLocaleDateString()}</title>
             <style>
-                @page { size: A4 landscape; margin: 12px; }
+                @page { size: A4 landscape; margin: 8mm; }
                 * { box-sizing: border-box; margin: 0; padding: 0; }
                 html, body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: white; }
                 .dept-header-page {
-                    page-break-after: always; width: 100%; height: 100vh;
+                    page-break-after: always;
+                    width: 100%;
+                    height: calc(100vh - 20mm);
                     display: flex; align-items: center; justify-content: center; text-align: center;
+                }
+                .dept-header-page .dept-inner {
                     border-bottom: 3px solid #1e293b;
+                    padding-bottom: 20px;
                 }
                 .dept-header-page h1 { font-size: 44px; color: #1e293b; text-transform: uppercase; letter-spacing: 2px; }
-                .dept-header-page p { font-size: 16px; color: #64748b; margin-top: 16px; }
+                .dept-header-page p { font-size: 16px; color: #64748b; margin-top: 12px; }
                 .cards-page {
                     page-break-after: always; display: grid; grid-template-columns: 1fr 1fr;
-                    gap: 10px; padding: 10px; width: 100%; min-height: 100vh;
+                    gap: 6px; padding: 4px; width: 100%; height: calc(100vh - 16mm);
+                    align-content: stretch;
                 }
                 .emp-print-card {
-                    border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden;
-                    background: white; display: flex; flex-direction: column; break-inside: avoid;
+                    border: 1px solid #e2e8f0; border-radius: 4px; overflow: hidden;
+                    background: white; display: flex; flex-direction: column;
+                    height: 100%;
                 }
-                .emp-print-title { background: #f1f5f9; padding: 8px 10px; border-bottom: 2px solid #cbd5e1; }
-                .emp-print-title h2 { font-size: 13px; color: #1e293b; margin: 0; }
-                .emp-print-title p { font-size: 10px; color: #64748b; margin: 2px 0 0 0; }
+                .emp-print-title { background: #f1f5f9; padding: 5px 8px; border-bottom: 2px solid #cbd5e1; flex-shrink: 0; }
+                .emp-print-title h2 { font-size: 12px; color: #1e293b; margin: 0; }
+                .emp-print-title p { font-size: 9px; color: #64748b; margin: 1px 0 0 0; }
                 .emp-print-metrics {
-                    display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;
-                    padding: 6px 8px; background: #fafbfc; border-bottom: 1px solid #e2e8f0;
+                    display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px;
+                    padding: 4px 6px; background: #fafbfc; border-bottom: 1px solid #e2e8f0; flex-shrink: 0;
                 }
                 .pm { text-align: center; }
-                .pm-label { font-size: 8px; font-weight: 600; color: #64748b; text-transform: uppercase; }
-                .pm-value { font-size: 12px; font-weight: 700; color: #1e293b; }
-                .pm-unit { font-size: 7px; color: #94a3b8; }
-                .daily-tbl { width: 100%; border-collapse: collapse; font-size: 9px; flex: 1; }
+                .pm-label { font-size: 7px; font-weight: 600; color: #64748b; text-transform: uppercase; }
+                .pm-value { font-size: 11px; font-weight: 700; color: #1e293b; }
+                .pm-unit { font-size: 6px; color: #94a3b8; }
+                .daily-tbl { width: 100%; border-collapse: collapse; font-size: 8px; flex: 1; }
                 .daily-tbl thead { background: #e2e8f0; }
-                .daily-tbl th { padding: 3px 2px; text-align: left; font-weight: 700; color: #1e293b; border: 0.5px solid #cbd5e1; }
-                .daily-tbl td { padding: 2px 2px; border: 0.5px solid #e2e8f0; }
+                .daily-tbl th { padding: 2px 2px; text-align: left; font-weight: 700; color: #1e293b; border: 0.5px solid #cbd5e1; font-size: 7px; }
+                .daily-tbl td { padding: 1px 2px; border: 0.5px solid #e2e8f0; line-height: 1.2; }
                 .daily-tbl tr:nth-child(odd) { background: white; }
                 .daily-tbl tr:nth-child(even) { background: #f8fafc; }
-                .daily-tbl tr.late-row { background: #fee2e2; border-left: 3px solid #dc2626; }
+                .daily-tbl tr.late-row { background: #fee2e2; border-left: 2px solid #dc2626; }
                 .daily-tbl td.late { color: #dc2626; font-weight: 700; }
                 @media print {
                     body { margin: 0; padding: 0; }
@@ -3866,7 +3873,7 @@ Authentication: Include X-API-Key header with your API key
                 const deptEmps = byDept[dept];
 
                 // Dept header page
-                printHTML += `<div class="dept-header-page"><div><h1>${escapeHtml(dept)}</h1><p>${deptEmps.length} Employee${deptEmps.length !== 1 ? 's' : ''}</p></div></div>`;
+                printHTML += `<div class="dept-header-page"><div class="dept-inner"><h1>${escapeHtml(dept)}</h1><p>${deptEmps.length} Employee${deptEmps.length !== 1 ? 's' : ''}</p></div></div>`;
 
                 // 2 cards per page
                 for (let i = 0; i < deptEmps.length; i += 2) {
