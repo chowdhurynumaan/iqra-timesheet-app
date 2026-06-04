@@ -4870,7 +4870,7 @@ Authentication: Include X-API-Key header with your API key
             <title>Attendance Report - ${new Date().toLocaleDateString()}</title>
             <style>
                 @page { size: landscape; margin: 8mm; }
-                * { box-sizing: border-box; margin: 0; padding: 0; }
+                * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                 html, body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: white; }
                 .dept-header-page {
                     page-break-after: always;
@@ -4891,32 +4891,30 @@ Authentication: Include X-API-Key header with your API key
                 }
                 .emp-print-card {
                     border: 1px solid #e2e8f0; border-radius: 4px; overflow: hidden;
-                    background: white; display: flex; flex-direction: column;
+                    display: flex; flex-direction: column;
                     page-break-inside: avoid;
                 }
-                .emp-print-title { background: #f1f5f9; padding: 5px 8px; border-bottom: 2px solid #cbd5e1; flex-shrink: 0; }
+                .emp-print-title { padding: 5px 8px; border-bottom: 2px solid #cbd5e1; flex-shrink: 0; box-shadow: inset 0 0 0 999px #f1f5f9; }
                 .emp-print-title h2 { font-size: 12px; color: #1e293b; margin: 0; }
                 .emp-print-title p { font-size: 9px; color: #64748b; margin: 1px 0 0 0; }
                 .emp-print-metrics {
                     display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px;
-                    padding: 4px 6px; background: #fafbfc; border-bottom: 1px solid #e2e8f0; flex-shrink: 0;
+                    padding: 4px 6px; box-shadow: inset 0 0 0 999px #fafbfc; border-bottom: 1px solid #e2e8f0; flex-shrink: 0;
                 }
                 .pm { text-align: center; }
                 .pm-label { font-size: 7px; font-weight: 600; color: #64748b; text-transform: uppercase; }
                 .pm-value { font-size: 11px; font-weight: 700; color: #1e293b; }
                 .pm-unit { font-size: 6px; color: #94a3b8; }
                 .daily-tbl { width: 100%; border-collapse: collapse; font-size: 8px; }
-                .daily-tbl thead { background: #e2e8f0; }
+                .daily-tbl thead th { box-shadow: inset 0 0 0 999px #e2e8f0; }
                 .daily-tbl th { padding: 2px 2px; text-align: left; font-weight: 700; color: #1e293b; border: 0.5px solid #cbd5e1; font-size: 7px; }
                 .daily-tbl td { padding: 1px 2px; border: 0.5px solid #e2e8f0; line-height: 1.2; }
-                .daily-tbl tr:nth-child(odd) { background: white; }
-                .daily-tbl tr:nth-child(even) { background: #f8fafc; }
-                .daily-tbl tr.late-row { background: #fee2e2; border-left: 2px solid #dc2626; }
+                .daily-tbl tr:nth-child(even) td { box-shadow: inset 0 0 0 999px #f8fafc; }
+                .daily-tbl tr.late-row td { box-shadow: inset 0 0 0 999px #fee2e2; }
+                .daily-tbl tr.late-row { border-left: 2px solid #dc2626; }
                 .daily-tbl td.late { color: #dc2626; font-weight: 700; }
                 @media print {
                     body { margin: 0; padding: 0; }
-                    -webkit-print-color-adjust: exact !important;
-                    print-color-adjust: exact !important;
                     .emp-print-card { page-break-inside: avoid; }
                 }
             </style></head><body>`;
