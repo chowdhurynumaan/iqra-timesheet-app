@@ -3617,11 +3617,6 @@ Authentication: Include X-API-Key header with your API key
             let msg = `Parsed ${filteredData.length} employees from ${bestResult.source}`;
             if (hiddenCount > 0) msg += ` (${hiddenCount} hidden)`;
             notify(msg, 'indigo');
-
-            // Auto-save to Firestore after successful upload
-            if (rawData.length > 0) {
-                saveReportToFirebase();
-            }
         }
 
         function detectDateRange(data) {
@@ -4701,15 +4696,10 @@ Authentication: Include X-API-Key header with your API key
                 });
                 await batch.commit();
 
-                // Update month selector if this month isn't listed
+                // Refresh the month dropdown so the new month appears with proper formatting
+                await loadAvailableMonths();
                 const selector = document.getElementById('monthSelector');
-                if (selector && !selector.querySelector(`option[value="${monthId}"]`)) {
-                    const opt = document.createElement('option');
-                    opt.value = monthId;
-                    opt.textContent = `${year} - ${String(month).padStart(2, '0')}`;
-                    selector.appendChild(opt);
-                }
-                selector.value = monthId;
+                if (selector) selector.value = monthId;
 
                 recordChange('Report saved', { employees: rawData.length, monthId });
                 notify(`Saved ${rawData.length} employees to ${year}-${String(month).padStart(2,'0')}`, 'emerald');
