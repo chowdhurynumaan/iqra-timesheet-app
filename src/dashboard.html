@@ -3951,7 +3951,14 @@ Authentication: Include X-API-Key header with your API key
                 return;
             }
 
-            employees.forEach(emp => {
+            // Always sort by ID ascending for consistent order
+            const sorted = [...employees].sort((a, b) => {
+                const aId = parseInt(a.id) || 0;
+                const bId = parseInt(b.id) || 0;
+                return aId - bId;
+            });
+
+            sorted.forEach(emp => {
                 // Calculate all 6 metrics
                 let daysWorked = emp.daysWorked;
                 if (!daysWorked && emp.dailyBreakdown) {
