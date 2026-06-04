@@ -692,6 +692,7 @@
                 <button onclick="switchAdminTab('approved')" id="adminTabApproved" class="flex-1 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:text-slate-700">Approved</button>
                 <button onclick="switchAdminTab('admins')" id="adminTabAdmins" class="flex-1 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:text-slate-700">Admins</button>
                 <button onclick="switchAdminTab('rejected')" id="adminTabRejected" class="flex-1 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:text-slate-700">Rejected</button>
+                <button onclick="switchAdminTab('hidden')" id="adminTabHidden" class="flex-1 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:text-slate-700">Hidden <span id="adminHiddenCount" class="ml-1 bg-amber-500 text-white text-[9px] rounded-full px-1.5 py-0.5">0</span></button>
             </div>
             <!-- Tab Content -->
             <div id="adminPortalContent" class="flex-1 overflow-y-auto p-4">
@@ -1714,6 +1715,7 @@
         let allUsersCache = [];
         let pendingUsersListener = null;
         let myStatusListener = null;
+        let hiddenEmployeeIds = []; // Employee IDs hidden by admin — persisted in Firestore
 
         function isSuperAdmin(uid) {
             return SUPER_ADMIN_UIDS.includes(uid || currentUserUid);
@@ -1836,6 +1838,7 @@
                 }
                 applyAdminGating();
                 if (isAdmin()) startPendingUsersListener();
+                loadHiddenEmployees();
             });
         }
 
@@ -1909,7 +1912,7 @@
         }
 
         function switchAdminTab(tab) {
-            const tabs = ['pending', 'approved', 'admins', 'rejected'];
+            const tabs = ['pending', 'approved', 'admins', 'rejected', 'hidden'];
             tabs.forEach(t => {
                 const btn = document.getElementById('adminTab' + t.charAt(0).toUpperCase() + t.slice(1));
                 if (btn) {
@@ -1934,11 +1937,18 @@
             else if (tab === 'approved') users = allUsersCache.filter(u => u.role === 'approved');
             else if (tab === 'admins') users = allUsersCache.filter(u => u.role === 'admin');
             else if (tab === 'rejected') users = allUsersCache.filter(u => u.role === 'rejected');
+            else if (tab === 'hidden') {
+                renderHiddenTab(container);
+                return;
+            }
 
             // Update pending count badge
             const pendingCount = allUsersCache.filter(u => u.role === 'pending').length;
             const countEl = document.getElementById('adminPendingCount');
             if (countEl) countEl.textContent = pendingCount;
+            // Update hidden count badge
+            const hiddenCountEl = document.getElementById('adminHiddenCount');
+            if (hiddenCountEl) hiddenCountEl.textContent = hiddenEmployeeIds.length;
 
             if (users.length === 0) {
                 container.innerHTML = '<p class="text-sm text-slate-400 text-center py-8">No users in this category</p>';
@@ -1987,6 +1997,59 @@
             }).join('');
         }
 
+        function renderHiddenTab(container) {
+            const hiddenCountEl = document.getElementById('adminHiddenCount');
+            if (hiddenCountEl) hiddenCountEl.textContent = hiddenEmployeeIds.length;
+
+            let html = `
+                <div class="mb-4">
+                    <div class="flex items-center gap-2 mb-3">
+                        <input type="text" id="hideEmpIdInput" placeholder="Enter Employee ID to hide" class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        <button onclick="addHiddenFromInput()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg whitespace-nowrap">Hide ID</button>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mb-3">Hidden employees won't appear on the dashboard when data is uploaded. This persists across months.</p>
+                </div>
+            `;
+
+            if (hiddenEmployeeIds.length === 0) {
+                html += '<p class="text-sm text-slate-400 text-center py-6">No hidden employees</p>';
+            } else {
+                html += hiddenEmployeeIds.map(id => {
+                    const emp = rawData.find(e => String(e.id) === id);
+                    const name = emp ? emp.name : 'Unknown (not in current data)';
+                    const dept = emp ? emp.dept : '—';
+                    return `
+                        <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 border border-slate-100 mb-2">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-amber-100 flex-shrink-0">
+                                <i data-lucide="eye-off" class="h-4 w-4 text-amber-600"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-slate-800">ID: ${id}</p>
+                                <p class="text-xs text-slate-500">${name} • ${dept}</p>
+                            </div>
+                            <button onclick="unhideEmployee('${id}')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg">Unhide</button>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            container.innerHTML = html;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        async function addHiddenFromInput() {
+            const input = document.getElementById('hideEmpIdInput');
+            const id = (input.value || '').trim();
+            if (!id) { notify('Enter an employee ID', 'amber'); return; }
+            if (hiddenEmployeeIds.includes(id)) { notify('Already hidden', 'amber'); return; }
+            hiddenEmployeeIds.push(id);
+            await saveHiddenEmployees();
+            notify(`Employee ${id} hidden`, 'amber');
+            input.value = '';
+            applyHiddenFilter();
+            renderAdminTab();
+        }
+
         // ===== USER MANAGEMENT ACTIONS =====
         async function approveUser(uid) {
             await db.collection(USERS_COLLECTION).doc(uid).update({
@@ -2029,6 +2092,62 @@
             await db.collection(USERS_COLLECTION).doc(uid).update({ role: 'rejected' });
             notify('User access revoked', 'red');
             loadAllUsers();
+        }
+
+        // ===== HIDDEN EMPLOYEES MANAGEMENT =====
+        async function loadHiddenEmployees() {
+            try {
+                const doc = await db.collection(TIMESHEET_COLLECTION).doc('hiddenEmployees').get();
+                if (doc.exists) {
+                    hiddenEmployeeIds = doc.data().ids || [];
+                } else {
+                    hiddenEmployeeIds = [];
+                }
+            } catch (e) {
+                console.error('Failed to load hidden employees:', e);
+                hiddenEmployeeIds = [];
+            }
+        }
+
+        async function saveHiddenEmployees() {
+            try {
+                await db.collection(TIMESHEET_COLLECTION).doc('hiddenEmployees').set({
+                    ids: hiddenEmployeeIds,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: currentUserUid
+                });
+            } catch (e) {
+                console.error('Failed to save hidden employees:', e);
+                notify('Error saving hidden employees', 'red');
+            }
+        }
+
+        async function hideEmployee(empId) {
+            if (!isAdmin()) { notify('Admin only', 'red'); return; }
+            const id = String(empId);
+            if (!hiddenEmployeeIds.includes(id)) {
+                hiddenEmployeeIds.push(id);
+                await saveHiddenEmployees();
+                notify(`Employee ${id} hidden`, 'amber');
+                applyHiddenFilter();
+            }
+        }
+
+        async function unhideEmployee(empId) {
+            if (!isAdmin()) { notify('Admin only', 'red'); return; }
+            const id = String(empId);
+            hiddenEmployeeIds = hiddenEmployeeIds.filter(i => i !== id);
+            await saveHiddenEmployees();
+            notify(`Employee ${id} unhidden`, 'green');
+            applyHiddenFilter();
+            renderAdminTab();
+        }
+
+        function applyHiddenFilter() {
+            if (rawData.length === 0) return;
+            filteredData = rawData.filter(emp => !hiddenEmployeeIds.includes(String(emp.id)));
+            renderDashboard(filteredData);
+            displayEmployeeData(filteredData);
         }
 
         // Google Sign-In
@@ -2492,6 +2611,9 @@
             }
 
             filteredData = rawData.filter(emp => {
+                // Skip hidden employees
+                if (hiddenEmployeeIds.includes(String(emp.id))) return false;
+
                 let daysWorked = emp.daysWorked;
                 if (!daysWorked && emp.dailyBreakdown) {
                     daysWorked = emp.dailyBreakdown.filter(d => !d.isMissed).length;
@@ -3468,7 +3590,9 @@ Authentication: Include X-API-Key header with your API key
             }
 
             rawData = bestResult.employees;
-            filteredData = [...rawData];
+            // Filter out hidden employees
+            filteredData = rawData.filter(emp => !hiddenEmployeeIds.includes(String(emp.id)));
+            const hiddenCount = rawData.length - filteredData.length;
             
             initializeControlPanel();
             renderDashboard(filteredData);
@@ -3477,7 +3601,9 @@ Authentication: Include X-API-Key header with your API key
             document.getElementById('employeeCardsSection').style.display = 'block';
             document.getElementById('statsGrid').style.display = 'grid';
             document.getElementById('filtersStation').style.display = 'block';
-            notify(`Parsed ${rawData.length} active employees from ${bestResult.source}`, 'indigo');
+            let msg = `Parsed ${filteredData.length} employees from ${bestResult.source}`;
+            if (hiddenCount > 0) msg += ` (${hiddenCount} hidden)`;
+            notify(msg, 'indigo');
         }
 
         function detectDateRange(data) {
@@ -3559,7 +3685,8 @@ Authentication: Include X-API-Key header with your API key
         }
 
         function filterByDept(dept) {
-            filteredData = dept ? rawData.filter(e => e.dept === dept) : [...rawData];
+            const visible = rawData.filter(emp => !hiddenEmployeeIds.includes(String(emp.id)));
+            filteredData = dept ? visible.filter(e => e.dept === dept) : [...visible];
             renderDashboard(filteredData);
             displayEmployeeData(filteredData);
         }
@@ -3652,6 +3779,9 @@ Authentication: Include X-API-Key header with your API key
                         <button onclick="event.stopPropagation(); if(!isAdmin()){notify('Admin access required','red');return;} showPunchEditModal(rawData.find(e => e.id === '${escapeHtml(emp.id)}'))" class="emp-edit-btn ${isAdmin() ? '' : 'opacity-40 cursor-not-allowed'}" title="${isAdmin() ? 'Edit Punch Times' : 'Admin only'}">
                             <i data-lucide="pencil" class="h-3 w-3"></i>
                         </button>
+                        ${isAdmin() ? `<button onclick="event.stopPropagation(); hideEmployee('${escapeHtml(emp.id)}')" class="emp-edit-btn" title="Hide this employee" style="color: #d97706;">
+                            <i data-lucide="eye-off" class="h-3 w-3"></i>
+                        </button>` : ''}
                     </div>
 
                     <!-- ROW 2: Metric Pills -->
