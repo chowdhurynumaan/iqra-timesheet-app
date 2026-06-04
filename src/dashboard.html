@@ -2285,6 +2285,12 @@
         // Auth state listener
         auth.onAuthStateChanged((user) => {
             if (user) {
+                // Reject anonymous users — force Google sign-in
+                if (user.isAnonymous) {
+                    console.warn('[Auth] Anonymous user detected — signing out and requiring Google sign-in');
+                    auth.signOut();
+                    return;
+                }
                 handleAuthUser(user);
             } else {
                 updateUserUI(null);
