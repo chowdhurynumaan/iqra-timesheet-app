@@ -463,6 +463,13 @@
                 <i data-lucide="bar-chart" class="h-4 w-4"></i>
             </button>
 
+            <!-- Upload Button (hidden on mobile) -->
+            <label class="mobile-hide flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 rounded-lg text-xs font-semibold text-white transition cursor-pointer flex-shrink-0" title="Upload Excel Report">
+                <i data-lucide="upload" class="h-3.5 w-3.5"></i>
+                <span class="hidden sm:inline">Upload</span>
+                <input type="file" id="headerUploadFile" accept=".csv,.xlsx,.xls" class="hidden" onchange="if(this.files[0]) processReportFile(this.files[0]); this.value='';">
+            </label>
+
             <!-- Mobile overflow button (visible only on mobile) -->
             <button onclick="toggleMobileOverflow()" class="sm:hidden flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-500 transition flex-shrink-0" title="More actions">
                 <i data-lucide="more-vertical" class="h-4 w-4"></i>
@@ -480,6 +487,10 @@
             <button onclick="openChartsModal(); toggleMobileOverflow();">
                 <i data-lucide="bar-chart" class="h-3.5 w-3.5 text-slate-400"></i> Charts
             </button>
+            <label class="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer" onclick="toggleMobileOverflow();">
+                <i data-lucide="upload" class="h-3.5 w-3.5 text-purple-500"></i> Upload Report
+                <input type="file" id="mobileUploadFile" accept=".csv,.xlsx,.xls" class="hidden" onchange="if(this.files[0]) processReportFile(this.files[0]); this.value='';">
+            </label>
         </div>
     </header>
 
