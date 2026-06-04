@@ -428,8 +428,14 @@
                 <span class="hidden sm:inline">Save</span>
             </button>
 
+            <!-- Select All toggle -->
+            <button id="selectAllBtn" onclick="toggleSelectAll()" class="mobile-hide flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 hover:bg-slate-300 rounded-lg text-xs font-semibold text-slate-700 transition" title="Select/Deselect all employees">
+                <i data-lucide="check-square" class="h-3.5 w-3.5"></i>
+                <span id="selectAllLabel" class="hidden sm:inline">Select All</span>
+            </button>
+
             <!-- Print (hidden on mobile) -->
-            <button onclick="printSelected()" class="mobile-hide flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-500 transition" title="Print (Ctrl+P)">
+            <button onclick="printSelected()" class="mobile-hide flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-500 transition" title="Print Selected (Ctrl+P)">
                 <i data-lucide="printer" class="h-4 w-4"></i>
             </button>
 
@@ -3120,6 +3126,7 @@ Authentication: Include X-API-Key header with your API key
                     <!-- ROW 1: Header -->
                     <div class="emp-card-header" onclick="toggleCard('${escapeHtml(emp.id)}')">
                         <div class="flex-1 flex items-center gap-2 min-w-0">
+                            <input type="checkbox" class="employee-checkbox" data-id="${escapeHtml(emp.id)}" onclick="event.stopPropagation(); updateSelectCount();" style="width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; accent-color: #6366f1;">
                             <i data-lucide="chevron-right" data-expand-icon class="h-3.5 w-3.5 flex-shrink-0 text-slate-400" style="transition: transform 0.2s ease;"></i>
                             <span class="emp-name">${escapeHtml(emp.name)}</span>
                             <span class="emp-id">${escapeHtml(emp.id)}</span>
@@ -3756,12 +3763,199 @@ Authentication: Include X-API-Key header with your API key
             }
         }
 
+        // ===== SELECT ALL / PRINT SELECTED =====
+        let allSelected = false;
+
+        function toggleSelectAll() {
+            allSelected = !allSelected;
+            const checkboxes = document.querySelectorAll('.employee-checkbox');
+            checkboxes.forEach(cb => { cb.checked = allSelected; });
+            const label = document.getElementById('selectAllLabel');
+            if (label) label.textContent = allSelected ? 'Deselect All' : 'Select All';
+            updateSelectCount();
+        }
+
+        function updateSelectCount() {
+            const checked = document.querySelectorAll('.employee-checkbox:checked').length;
+            const label = document.getElementById('selectAllLabel');
+            if (label && checked > 0 && !allSelected) {
+                label.textContent = `${checked} selected`;
+            } else if (label && !allSelected) {
+                label.textContent = 'Select All';
+            }
+        }
+
         function printSelected() {
-            recordChange('Print report', { timestamp: new Date() });
-            notify('Opening print preview...', 'indigo');
-            setTimeout(() => {
-                window.print();
-            }, 500);
+            const checkedBoxes = document.querySelectorAll('.employee-checkbox:checked');
+
+            if (checkedBoxes.length === 0) {
+                notify('No employees selected. Check the boxes next to employees first.', 'amber');
+                return;
+            }
+
+            const selectedEmployees = [];
+            checkedBoxes.forEach(cb => {
+                const empId = cb.dataset.id;
+                const emp = rawData.find(e => String(e.id) === String(empId));
+                if (emp) selectedEmployees.push(emp);
+            });
+
+            if (selectedEmployees.length === 0) {
+                notify('Could not find employee data for selection', 'red');
+                return;
+            }
+
+            // Group by department
+            const byDept = {};
+            selectedEmployees.forEach(emp => {
+                const dept = emp.dept || 'UNASSIGNED';
+                if (!byDept[dept]) byDept[dept] = [];
+                byDept[dept].push(emp);
+            });
+            const deptList = Object.keys(byDept).sort();
+
+            // Build print HTML — landscape A4, 2 cards per page, grouped by dept
+            let printHTML = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+            <title>Attendance Report - ${new Date().toLocaleDateString()}</title>
+            <style>
+                @page { size: A4 landscape; margin: 12px; }
+                * { box-sizing: border-box; margin: 0; padding: 0; }
+                html, body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: white; }
+                .dept-header-page {
+                    page-break-after: always; width: 100%; height: 100vh;
+                    display: flex; align-items: center; justify-content: center; text-align: center;
+                    border-bottom: 3px solid #1e293b;
+                }
+                .dept-header-page h1 { font-size: 44px; color: #1e293b; text-transform: uppercase; letter-spacing: 2px; }
+                .dept-header-page p { font-size: 16px; color: #64748b; margin-top: 16px; }
+                .cards-page {
+                    page-break-after: always; display: grid; grid-template-columns: 1fr 1fr;
+                    gap: 10px; padding: 10px; width: 100%; min-height: 100vh;
+                }
+                .emp-print-card {
+                    border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden;
+                    background: white; display: flex; flex-direction: column; break-inside: avoid;
+                }
+                .emp-print-title { background: #f1f5f9; padding: 8px 10px; border-bottom: 2px solid #cbd5e1; }
+                .emp-print-title h2 { font-size: 13px; color: #1e293b; margin: 0; }
+                .emp-print-title p { font-size: 10px; color: #64748b; margin: 2px 0 0 0; }
+                .emp-print-metrics {
+                    display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;
+                    padding: 6px 8px; background: #fafbfc; border-bottom: 1px solid #e2e8f0;
+                }
+                .pm { text-align: center; }
+                .pm-label { font-size: 8px; font-weight: 600; color: #64748b; text-transform: uppercase; }
+                .pm-value { font-size: 12px; font-weight: 700; color: #1e293b; }
+                .pm-unit { font-size: 7px; color: #94a3b8; }
+                .daily-tbl { width: 100%; border-collapse: collapse; font-size: 9px; flex: 1; }
+                .daily-tbl thead { background: #e2e8f0; }
+                .daily-tbl th { padding: 3px 2px; text-align: left; font-weight: 700; color: #1e293b; border: 0.5px solid #cbd5e1; }
+                .daily-tbl td { padding: 2px 2px; border: 0.5px solid #e2e8f0; }
+                .daily-tbl tr:nth-child(odd) { background: white; }
+                .daily-tbl tr:nth-child(even) { background: #f8fafc; }
+                .daily-tbl tr.late-row { background: #fee2e2; border-left: 3px solid #dc2626; }
+                .daily-tbl td.late { color: #dc2626; font-weight: 700; }
+                @media print {
+                    body { margin: 0; padding: 0; }
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+            </style></head><body>`;
+
+            deptList.forEach(dept => {
+                const deptEmps = byDept[dept];
+
+                // Dept header page
+                printHTML += `<div class="dept-header-page"><div><h1>${escapeHtml(dept)}</h1><p>${deptEmps.length} Employee${deptEmps.length !== 1 ? 's' : ''}</p></div></div>`;
+
+                // 2 cards per page
+                for (let i = 0; i < deptEmps.length; i += 2) {
+                    printHTML += `<div class="cards-page">`;
+                    printHTML += generatePrintCard(deptEmps[i]);
+                    if (i + 1 < deptEmps.length) {
+                        printHTML += generatePrintCard(deptEmps[i + 1]);
+                    }
+                    printHTML += `</div>`;
+                }
+            });
+
+            printHTML += `</body></html>`;
+
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                notify('Popup blocked — please allow popups for this site', 'red');
+                return;
+            }
+            printWindow.document.write(printHTML);
+            printWindow.document.close();
+            setTimeout(() => { printWindow.print(); }, 400);
+
+            recordChange('Print report', { employees: selectedEmployees.length, departments: deptList.length });
+            notify(`Printing ${selectedEmployees.length} employee(s) across ${deptList.length} department(s)`, 'emerald');
+        }
+
+        function generatePrintCard(emp) {
+            const daysWorked = emp.daysWorked || (emp.dailyBreakdown ? emp.dailyBreakdown.filter(d => !d.isMissed).length : (dateRange.actualDays - (emp.absences || 0)));
+            const attendancePercent = dateRange.actualDays > 0 ? (daysWorked / dateRange.actualDays * 100) : 0;
+            let lateCount = 0;
+            if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
+                lateCount = emp.dailyBreakdown.filter(d => d.lateMin > 0).length;
+            }
+            const punctualityPercent = daysWorked > 0 ? Math.max(0, 100 - (lateCount / daysWorked * 100)).toFixed(0) : '-';
+            const hoursNum = parseFloat(emp.hours) || 0;
+            const absences = Math.max(0, dateRange.actualDays - daysWorked);
+
+            let html = `<div class="emp-print-card">
+                <div class="emp-print-title">
+                    <h2>${escapeHtml(emp.name)}</h2>
+                    <p>ID: ${escapeHtml(emp.id)} &nbsp;|&nbsp; Dept: ${escapeHtml(emp.dept)} &nbsp;|&nbsp; Shift: ${escapeHtml(emp.shift || 'WK')}</p>
+                </div>
+                <div class="emp-print-metrics">
+                    <div class="pm"><div class="pm-label">Attendance</div><div class="pm-value">${attendancePercent.toFixed(0)}%</div></div>
+                    <div class="pm"><div class="pm-label">Punctuality</div><div class="pm-value">${punctualityPercent}${punctualityPercent !== '-' ? '%' : ''}</div></div>
+                    <div class="pm"><div class="pm-label">Hours</div><div class="pm-value">${hoursNum.toFixed(1)}</div><div class="pm-unit">${Math.floor(hoursNum)}h ${Math.round((hoursNum % 1) * 60)}m</div></div>
+                    <div class="pm"><div class="pm-label">Late Min</div><div class="pm-value">${emp.lateMin || 0}</div><div class="pm-unit">min</div></div>
+                    <div class="pm"><div class="pm-label">Absences</div><div class="pm-value">${absences}</div><div class="pm-unit">days</div></div>
+                    <div class="pm"><div class="pm-label">Worked</div><div class="pm-value">${daysWorked}</div><div class="pm-unit">days</div></div>
+                </div>`;
+
+            // Daily breakdown table
+            if (emp.dailyBreakdown && emp.dailyBreakdown.length > 0) {
+                html += `<table class="daily-tbl"><thead><tr><th>Date</th><th>Day</th><th>IN</th><th>OUT</th><th>Hrs</th><th>Late</th><th>St</th></tr></thead><tbody>`;
+                emp.dailyBreakdown.forEach(day => {
+                    const rowClass = day.lateMin > 0 ? 'late-row' : '';
+                    const status = day.isMissed ? '✗' : (day.lateMin > 0 ? '⚠' : '✓');
+                    const pairs = day.punchPairs && day.punchPairs.length > 0 ? day.punchPairs : [{ in: day.inTime || '', out: day.outTime || '' }];
+
+                    pairs.forEach((pair, pIdx) => {
+                        const inT = pair.in || '—';
+                        const outT = pair.out || '—';
+                        let hrs = '—';
+                        if (pIdx === 0) {
+                            const totalH = day.hours || pairs.reduce((s, p) => s + (parseFloat(p.pairHours) || 0), 0);
+                            hrs = totalH > 0 ? parseFloat(totalH).toFixed(1) : '—';
+                        }
+                        html += `<tr class="${rowClass}">`;
+                        if (pIdx === 0) {
+                            html += `<td ${pairs.length > 1 ? `rowspan="${pairs.length}"` : ''}>${day.date || day.dayNum || ''}</td>`;
+                            html += `<td ${pairs.length > 1 ? `rowspan="${pairs.length}"` : ''}>${day.dayName || ''}</td>`;
+                        }
+                        html += `<td>${inT}</td><td>${outT}</td>`;
+                        if (pIdx === 0) {
+                            html += `<td ${pairs.length > 1 ? `rowspan="${pairs.length}"` : ''}>${hrs}</td>`;
+                            html += `<td class="${day.lateMin > 0 ? 'late' : ''}" ${pairs.length > 1 ? `rowspan="${pairs.length}"` : ''}>${day.lateMin > 0 ? day.lateMin : '—'}</td>`;
+                            html += `<td ${pairs.length > 1 ? `rowspan="${pairs.length}"` : ''}>${status}</td>`;
+                        }
+                        html += `</tr>`;
+                    });
+                });
+                html += `</tbody></table>`;
+            } else {
+                html += `<div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 11px;">No daily breakdown data</div>`;
+            }
+
+            html += `</div>`;
+            return html;
         }
 
         function exportToExcel() {
