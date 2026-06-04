@@ -3752,24 +3752,40 @@ Authentication: Include X-API-Key header with your API key
                         if (!dayNum) continue;
 
                         const isMissed = !punchStr || punchStr === 'null' || punchStr.trim() === '';
-                        const punches = punchStr ? punchStr.split('\n').filter(p => p.trim()) : [];
-                        const inTime = punches.length > 0 ? punches[0] : '';
-                        const outTime = punches.length > 1 ? punches[punches.length - 1] : '';
+                        const rawPunches = punchStr ? punchStr.split('\n').filter(p => p.trim() && p.trim() !== 'null') : [];
 
-                        // Calculate hours if we have in/out
-                        let hours = 0;
-                        if (inTime && outTime && inTime !== outTime) {
-                            const [ih, im] = inTime.split(':').map(Number);
-                            const [oh, om] = outTime.split(':').map(Number);
-                            if (!isNaN(ih) && !isNaN(oh)) {
-                                hours = Math.max(0, (oh * 60 + (om || 0)) - (ih * 60 + (im || 0))) / 60;
+                        // Pair punches: IN→OUT→IN→OUT alternating
+                        // Odd count = last punch is IN with missed OUT
+                        const punchPairs = [];
+                        let dayHours = 0;
+                        for (let p = 0; p < rawPunches.length; p += 2) {
+                            const inP = rawPunches[p] || '';
+                            const outP = rawPunches[p + 1] || ''; // empty if odd (missed punch out)
+                            let pairHours = 0;
+                            if (inP && outP) {
+                                const [ih, im] = inP.split(':').map(Number);
+                                const [oh, om] = outP.split(':').map(Number);
+                                if (!isNaN(ih) && !isNaN(oh)) {
+                                    pairHours = Math.max(0, (oh * 60 + (om || 0)) - (ih * 60 + (im || 0))) / 60;
+                                }
                             }
+                            dayHours += pairHours;
+                            punchPairs.push({
+                                in: inP,
+                                out: outP,
+                                pairHours: pairHours.toFixed(2),
+                                missedOut: inP && !outP // forgot to punch out
+                            });
                         }
 
-                        // Late if arrived after 9:15 (configurable)
+                        const firstIn = rawPunches.length > 0 ? rawPunches[0] : '';
+                        const lastOut = rawPunches.length > 1 ? rawPunches[rawPunches.length - 1] : '';
+                        const hasMissedOut = rawPunches.length % 2 !== 0;
+
+                        // Late if first arrival after 9:15
                         let dayLate = 0;
-                        if (inTime && !isMissed) {
-                            const [ih, im] = inTime.split(':').map(Number);
+                        if (firstIn && !isMissed) {
+                            const [ih, im] = firstIn.split(':').map(Number);
                             if (!isNaN(ih) && !isNaN(im)) {
                                 const arrivalMin = ih * 60 + im;
                                 const thresholdMin = 9 * 60 + 15; // 9:15 AM
@@ -3789,12 +3805,14 @@ Authentication: Include X-API-Key header with your API key
                         dailyBreakdown.push({
                             date: dayNum,
                             dayName: dayName,
-                            inTime: inTime,
-                            outTime: outTime,
+                            inTime: firstIn,
+                            outTime: lastOut,
                             isMissed: isMissed,
                             lateMin: dayLate,
-                            hours: hours.toFixed(1),
-                            punchPairs: punches
+                            hours: dayHours.toFixed(1),
+                            punchPairs: punchPairs,
+                            missedOut: hasMissedOut,
+                            sessions: punchPairs.length
                         });
                     }
 
@@ -4063,6 +4081,9 @@ Authentication: Include X-API-Key header with your API key
                 if (day.isMissed) {
                     rowBg = 'bg-red-50';
                     statusDot = '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;"></span>';
+                } else if (day.missedOut) {
+                    rowBg = 'bg-amber-50';
+                    statusDot = '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d97706;" title="Missed punch out"></span>';
                 } else if (day.lateMin > 0) {
                     rowBg = 'bg-orange-50';
                     statusDot = '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;"></span>';
@@ -4074,7 +4095,7 @@ Authentication: Include X-API-Key header with your API key
 
                 pairs.forEach((pair, pairIdx) => {
                     const inTime = pair.in || '—';
-                    const outTime = pair.out || '—';
+                    const outTime = pair.missedOut ? '<span style="color:#d97706;font-size:10px;">missed</span>' : (pair.out || '—');
 
                     html += `<tr class="${rowBg} border-b border-slate-100">`;
                     
@@ -4083,8 +4104,8 @@ Authentication: Include X-API-Key header with your API key
                         html += `<td class="px-1 py-1 text-center font-semibold text-slate-600" ${rowCount > 1 ? `rowspan="${rowCount}"` : ''}>${day.dayName}</td>`;
                     }
 
-                    html += `<td class="px-1 py-1 text-center font-mono text-slate-700 bg-yellow-50">${inTime}</td>`;
-                    html += `<td class="px-1 py-1 text-center font-mono text-slate-700 bg-yellow-50">${outTime}</td>`;
+                    html += `<td class="px-1 py-1 text-center font-mono text-slate-700 bg-emerald-50">${inTime}</td>`;
+                    html += `<td class="px-1 py-1 text-center font-mono text-slate-700 ${pair.missedOut ? 'bg-amber-50' : 'bg-purple-50'}">${outTime}</td>`;
 
                     if (pairIdx === 0) {
                         html += `<td class="px-1 py-1 text-center font-bold text-blue-600 bg-blue-50" ${rowCount > 1 ? `rowspan="${rowCount}"` : ''}>${typeof totalHours === 'number' ? totalHours.toFixed(1) : totalHours}</td>`;
@@ -4122,13 +4143,30 @@ Authentication: Include X-API-Key header with your API key
             const dateStr = day.date || day.dayNum || 'N/A';
             const dayName = day.dayName || 'Unknown Day';
 
-            const inTime = day.punchPairs?.[0]?.in || day.inTime || '';
-            const outTime = day.punchPairs?.[0]?.out || day.outTime || '';
-            const hours = day.hours || (day.punchPairs?.[0]?.pairHours || 0);
+            const pairs = day.punchPairs && day.punchPairs.length > 0 ? day.punchPairs : [{ in: day.inTime || '', out: day.outTime || '' }];
+            const totalHours = parseFloat(day.hours) || pairs.reduce((s, p) => s + (parseFloat(p.pairHours) || 0), 0);
+            const hasMissedOut = day.missedOut || pairs.some(p => p.missedOut);
 
             if (isEditMode) {
-                // EDIT MODE: Show editable fields
+                // EDIT MODE: Show editable fields for all sessions
                 document.getElementById('dayModalTitle').textContent = `Edit ${dayName}, ${dateStr}`;
+                let sessionsHtml = '';
+                pairs.forEach((pair, pIdx) => {
+                    sessionsHtml += `
+                        <div class="p-3 bg-white border border-slate-200 rounded-lg">
+                            <p class="text-xs font-semibold text-slate-500 uppercase mb-2">Session ${pIdx + 1}${pair.missedOut ? ' <span class="text-amber-600">(Missed Punch Out)</span>' : ''}</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-900 mb-1">IN</label>
+                                    <input type="time" data-pair="${pIdx}" data-type="in" value="${pair.in || ''}" class="day-edit-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-900 mb-1">OUT</label>
+                                    <input type="time" data-pair="${pIdx}" data-type="out" value="${pair.out || ''}" class="day-edit-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
+                        </div>`;
+                });
                 document.getElementById('dayModalContent').innerHTML = `
                     <div class="space-y-4">
                         <div class="p-3 bg-indigo-50 rounded-lg border border-indigo-200">
@@ -4136,17 +4174,7 @@ Authentication: Include X-API-Key header with your API key
                             <p class="font-bold text-slate-900">${emp.name}</p>
                             <p class="text-sm text-slate-600">${emp.dept || 'N/A'} | ${dateStr}</p>
                         </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-900 mb-2">IN Time (HH:MM)</label>
-                            <input type="time" id="dayEditInTime" value="${inTime}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-900 mb-2">OUT Time (HH:MM)</label>
-                            <input type="time" id="dayEditOutTime" value="${outTime}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
-
+                        ${sessionsHtml}
                         <div>
                             <label class="flex items-center gap-3 cursor-pointer p-3 border border-slate-200 rounded-lg hover:bg-slate-50">
                                 <input type="checkbox" id="dayEditMissed" ${day.isMissed ? 'checked' : ''} class="w-4 h-4 rounded">
@@ -4164,8 +4192,30 @@ Authentication: Include X-API-Key header with your API key
                 document.getElementById('dayModalSaveBtn').style.display = 'block';
                 document.getElementById('dayModalCancelBtn').textContent = 'Cancel';
             } else {
-                // VIEW MODE: Show read-only data
+                // VIEW MODE: Show all sessions
                 document.getElementById('dayModalTitle').textContent = `${dayName}, ${dateStr}`;
+                let sessionsViewHtml = '';
+                pairs.forEach((pair, pIdx) => {
+                    const pIn = pair.in || '—';
+                    const pOut = pair.out || (pair.missedOut ? '<span class="text-amber-500 text-sm">missed</span>' : '—');
+                    const pHrs = parseFloat(pair.pairHours) || 0;
+                    sessionsViewHtml += `
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-center">
+                                <p class="text-[10px] font-semibold text-emerald-700 uppercase mb-0.5">IN ${pairs.length > 1 ? '#' + (pIdx + 1) : ''}</p>
+                                <p class="text-lg font-mono font-bold text-emerald-900">${pIn}</p>
+                            </div>
+                            <div class="p-2.5 ${pair.missedOut ? 'bg-amber-50 border-amber-200' : 'bg-purple-50 border-purple-200'} border rounded-lg text-center">
+                                <p class="text-[10px] font-semibold ${pair.missedOut ? 'text-amber-700' : 'text-purple-700'} uppercase mb-0.5">OUT ${pairs.length > 1 ? '#' + (pIdx + 1) : ''}</p>
+                                <p class="text-lg font-mono font-bold ${pair.missedOut ? 'text-amber-600' : 'text-purple-900'}">${pOut}</p>
+                            </div>
+                            <div class="p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-center">
+                                <p class="text-[10px] font-semibold text-blue-700 uppercase mb-0.5">Hrs ${pairs.length > 1 ? '#' + (pIdx + 1) : ''}</p>
+                                <p class="text-lg font-bold text-blue-900">${pHrs > 0 ? pHrs.toFixed(1) : '—'}</p>
+                            </div>
+                        </div>`;
+                });
+
                 document.getElementById('dayModalContent').innerHTML = `
                     <div class="space-y-4">
                         <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
@@ -4181,21 +4231,12 @@ Authentication: Include X-API-Key header with your API key
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                <p class="text-xs font-semibold text-yellow-700 uppercase mb-1">IN Time</p>
-                                <p class="text-2xl font-mono font-bold text-yellow-900">${inTime || '—'}</p>
-                            </div>
-                            <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                <p class="text-xs font-semibold text-yellow-700 uppercase mb-1">OUT Time</p>
-                                <p class="text-2xl font-mono font-bold text-yellow-900">${outTime || '—'}</p>
-                            </div>
-                        </div>
+                        ${sessionsViewHtml}
 
                         <div class="grid grid-cols-2 gap-4">
                             <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                <p class="text-xs font-semibold text-blue-700 uppercase mb-1">Hours</p>
-                                <p class="text-2xl font-bold text-blue-900">${typeof hours === 'number' ? hours.toFixed(2) : hours}</p>
+                                <p class="text-xs font-semibold text-blue-700 uppercase mb-1">Total Hours</p>
+                                <p class="text-2xl font-bold text-blue-900">${totalHours > 0 ? totalHours.toFixed(2) : '—'}</p>
                             </div>
                             <div class="p-3 ${day.lateMin > 0 ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-slate-200'} border rounded-lg">
                                 <p class="text-xs font-semibold ${day.lateMin > 0 ? 'text-red-700' : 'text-slate-600'} uppercase mb-1">Late (Min)</p>
@@ -4206,8 +4247,9 @@ Authentication: Include X-API-Key header with your API key
                         <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
                             <p class="text-xs font-semibold text-slate-600 uppercase mb-2">Status</p>
                             <p class="text-lg font-bold text-slate-900">
-                                ${day.isMissed ? '<span class="text-red-600">Absent</span>' : (day.lateMin > 0 ? '<span class="text-amber-600">Late Arrival</span>' : '<span class="text-emerald-600">Present</span>')}
+                                ${day.isMissed ? '<span class="text-red-600">Absent</span>' : hasMissedOut ? '<span class="text-amber-600">Missed Punch Out</span>' : (day.lateMin > 0 ? '<span class="text-amber-600">Late Arrival</span>' : '<span class="text-emerald-600">Present</span>')}
                             </p>
+                            ${pairs.length > 1 ? `<p class="text-xs text-slate-500 mt-1">${pairs.length} sessions detected</p>` : ''}
                         </div>
                     </div>
                 `;
@@ -4242,25 +4284,38 @@ Authentication: Include X-API-Key header with your API key
             }
 
             const day = emp.dailyBreakdown[dayIdx];
-            const newInTime = document.getElementById('dayEditInTime').value;
-            const newOutTime = document.getElementById('dayEditOutTime').value;
             const isMissed = document.getElementById('dayEditMissed').checked;
-
-            // Update day data - localized to this day only
-            day.inTime = newInTime;
-            day.outTime = newOutTime;
             day.isMissed = isMissed;
 
-            // Recalculate hours if times provided
-            if (newInTime && newOutTime && !isMissed) {
-                const [inH, inM] = newInTime.split(':').map(Number);
-                const [outH, outM] = newOutTime.split(':').map(Number);
-                const inMin = inH * 60 + inM;
-                const outMin = outH * 60 + outM;
-                day.hours = Math.max(0, (outMin - inMin) / 60);
-            } else {
-                day.hours = 0;
-            }
+            // Read all session inputs
+            const inputs = document.querySelectorAll('.day-edit-input');
+            const newPairs = [];
+            inputs.forEach(input => {
+                const pIdx = parseInt(input.dataset.pair);
+                const type = input.dataset.type;
+                if (!newPairs[pIdx]) newPairs[pIdx] = { in: '', out: '' };
+                newPairs[pIdx][type] = input.value;
+            });
+
+            // Recalculate hours per session
+            let totalHours = 0;
+            newPairs.forEach(pair => {
+                pair.pairHours = '0.00';
+                pair.missedOut = pair.in && !pair.out;
+                if (pair.in && pair.out && !isMissed) {
+                    const [ih, im] = pair.in.split(':').map(Number);
+                    const [oh, om] = pair.out.split(':').map(Number);
+                    const diff = Math.max(0, (oh * 60 + (om || 0)) - (ih * 60 + (im || 0))) / 60;
+                    pair.pairHours = diff.toFixed(2);
+                    totalHours += diff;
+                }
+            });
+
+            day.punchPairs = newPairs;
+            day.inTime = newPairs[0]?.in || '';
+            day.outTime = newPairs[newPairs.length - 1]?.out || '';
+            day.hours = isMissed ? 0 : totalHours.toFixed(1);
+            day.missedOut = newPairs.some(p => p.missedOut);
 
             // Log audit event
             logAuditEvent('punch.update', 'Current User', `Updated ${emp.name} on ${day.date}`, 'success');
