@@ -1750,7 +1750,7 @@
 
         // Admin Configuration & User Approval System
         const SUPER_ADMIN_UIDS = ['pJfYEgsWthWdfZCBli83OOQDv462', 'bwZZL8MK1uRFYYJwzG3U0sx8vDK2']; // Cannot be demoted
-        const USERS_COLLECTION = 'timesheet_app_users';
+        const USERS_COLLECTION = 'timesheet/app/users';
         let currentUserUid = null;
         let currentUserRole = null; // 'pending' | 'approved' | 'admin' | 'rejected'
         let allUsersCache = [];
@@ -2323,10 +2323,10 @@
         }
         
         const TIMESHEET_APP_ID = 'timesheet_app';
-        const TIMESHEET_COLLECTION = 'timesheet_app';
-        const MONTHS_COLLECTION = 'timesheet_app_months';
-        const EMPLOYEES_COLLECTION = 'timesheet_app_employees';
-        const AUDIT_COLLECTION = 'timesheet_app_audit';
+        const TIMESHEET_COLLECTION = 'timesheet/app/config';
+        const MONTHS_COLLECTION = 'timesheet/app/months';
+        const EMPLOYEES_COLLECTION = 'timesheet/app/employees';
+        const AUDIT_COLLECTION = 'timesheet/app/audit';
 
         let uploadedMonths = [];
         let shiftDefinitions = {};
