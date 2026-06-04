@@ -3617,6 +3617,11 @@ Authentication: Include X-API-Key header with your API key
             let msg = `Parsed ${filteredData.length} employees from ${bestResult.source}`;
             if (hiddenCount > 0) msg += ` (${hiddenCount} hidden)`;
             notify(msg, 'indigo');
+
+            // Auto-save to Firestore after successful upload
+            if (rawData.length > 0) {
+                saveReportToFirebase();
+            }
         }
 
         function detectDateRange(data) {
@@ -3627,15 +3632,25 @@ Authentication: Include X-API-Key header with your API key
                     const cell = String(row[j] || '');
                     const match = cell.match(/(\d{2})-(\d{2})-(\d{4})\s*~\s*(\d{2})-(\d{2})-(\d{4})/);
                     if (match) {
+                        const startMonth = parseInt(match[1]);
                         const startDay = parseInt(match[2]);
+                        const startYear = parseInt(match[3]);
+                        const endMonth = parseInt(match[4]);
                         const endDay = parseInt(match[5]);
+                        const endYear = parseInt(match[6]);
+                        dateRange.start = `${startYear}-${String(startMonth).padStart(2,'0')}-${String(startDay).padStart(2,'0')}`;
+                        dateRange.end = `${endYear}-${String(endMonth).padStart(2,'0')}-${String(endDay).padStart(2,'0')}`;
+                        dateRange.month = startMonth;
+                        dateRange.year = startYear;
                         dateRange.actualDays = endDay - startDay + 1;
-                        // Count weekdays only for WK shifts (rough: subtract weekends)
-                        // For now just use calendar days and let per-employee logic handle it
                         return;
                     }
                 }
             }
+            // Fallback: use current date
+            const now = new Date();
+            dateRange.month = now.getMonth() + 1;
+            dateRange.year = now.getFullYear();
             dateRange.actualDays = 31;
         }
 
@@ -4659,15 +4674,48 @@ Authentication: Include X-API-Key header with your API key
                 return;
             }
             try {
-                await db.collection('timesheet_app_months').doc(`${new Date().getFullYear()}_${new Date().getMonth() + 1}`).set({
+                const month = dateRange.month || (new Date().getMonth() + 1);
+                const year = dateRange.year || new Date().getFullYear();
+                const monthId = `${year}_${month}`;
+
+                // Save month summary document
+                await db.collection(MONTHS_COLLECTION).doc(monthId).set({
                     employees: rawData,
                     timestamp: new Date(),
-                    totalEmployees: rawData.length
+                    totalEmployees: rawData.length,
+                    month: month,
+                    year: year,
+                    dateRange: dateRange
                 });
-                recordChange('Workspace backup', { employees: rawData.length });
-                notify('Workspace backup complete! (Ctrl+S)', 'emerald');
+
+                // Save individual employee documents with full dailyBreakdown
+                const batch = db.batch();
+                rawData.forEach(emp => {
+                    const empDocId = `${monthId}_${emp.id}`;
+                    const empRef = db.collection(EMPLOYEES_COLLECTION).doc(empDocId);
+                    batch.set(empRef, {
+                        ...emp,
+                        monthId: monthId,
+                        savedAt: new Date()
+                    });
+                });
+                await batch.commit();
+
+                // Update month selector if this month isn't listed
+                const selector = document.getElementById('monthSelector');
+                if (selector && !selector.querySelector(`option[value="${monthId}"]`)) {
+                    const opt = document.createElement('option');
+                    opt.value = monthId;
+                    opt.textContent = `${year} - ${String(month).padStart(2, '0')}`;
+                    selector.appendChild(opt);
+                }
+                selector.value = monthId;
+
+                recordChange('Report saved', { employees: rawData.length, monthId });
+                notify(`Saved ${rawData.length} employees to ${year}-${String(month).padStart(2,'0')}`, 'emerald');
             } catch (error) {
-                notify('Failed to backup data', 'red');
+                console.error('Save error:', error);
+                notify('Failed to save data: ' + error.message, 'red');
             }
         }
 
@@ -4913,7 +4961,14 @@ Authentication: Include X-API-Key header with your API key
                 
                 if (monthDoc.exists) {
                     const reportData = monthDoc.data();
-                    dateRange = reportData.dateRange || { start: null, end: null, actualDays: 0 };
+                    dateRange = reportData.dateRange || { start: null, end: null, actualDays: 31 };
+                    // Fallback: extract month/year from monthId if not in dateRange
+                    if (!dateRange.month || !dateRange.year) {
+                        const [yr, mo] = monthId.split('_').map(Number);
+                        dateRange.month = mo || (new Date().getMonth() + 1);
+                        dateRange.year = yr || new Date().getFullYear();
+                        dateRange.actualDays = dateRange.actualDays || 31;
+                    }
                     console.log(`Loaded month data. Date range:`, dateRange);
                     
                     // Load individual employees from EMPLOYEES_COLLECTION (they have full dailyBreakdown data)
@@ -4952,6 +5007,41 @@ Authentication: Include X-API-Key header with your API key
                         console.warn(`⚠️ Removed ${empSnapshot.docs.length - seenIds.size} duplicate employee records`);
                     }
                     
+                    filteredData = [...rawData];
+                    
+                    // Migrate old punchPairs format: flat strings → {in, out} objects
+                    rawData.forEach(emp => {
+                        if (!emp.dailyBreakdown) return;
+                        emp.dailyBreakdown.forEach(day => {
+                            if (!day.punchPairs || day.punchPairs.length === 0) return;
+                            // Check if first entry is a string (old format) vs object (new format)
+                            if (typeof day.punchPairs[0] === 'string') {
+                                const raw = day.punchPairs.filter(p => p && p.trim());
+                                const newPairs = [];
+                                let totalHours = 0;
+                                for (let p = 0; p < raw.length; p += 2) {
+                                    const inP = raw[p] || '';
+                                    const outP = raw[p + 1] || '';
+                                    let pairHours = 0;
+                                    if (inP && outP) {
+                                        const [ih, im] = inP.split(':').map(Number);
+                                        const [oh, om] = outP.split(':').map(Number);
+                                        if (!isNaN(ih) && !isNaN(oh)) {
+                                            pairHours = Math.max(0, (oh * 60 + (om || 0)) - (ih * 60 + (im || 0))) / 60;
+                                        }
+                                    }
+                                    totalHours += pairHours;
+                                    newPairs.push({ in: inP, out: outP, pairHours: pairHours.toFixed(2), missedOut: inP && !outP });
+                                }
+                                day.punchPairs = newPairs;
+                                day.inTime = newPairs[0]?.in || day.inTime || '';
+                                day.outTime = newPairs[newPairs.length - 1]?.out || day.outTime || '';
+                                day.hours = totalHours > 0 ? totalHours.toFixed(1) : day.hours;
+                                day.missedOut = raw.length % 2 !== 0;
+                                day.sessions = newPairs.length;
+                            }
+                        });
+                    });
                     filteredData = [...rawData];
                     
                     console.log(`Loaded ${rawData.length} employees from ${monthId}`);
