@@ -2027,6 +2027,12 @@
             updateUserUI(user);
             document.getElementById('signInOverlay')?.remove();
             
+            // BLOCK FIRST — show pending overlay immediately for non-super-admins
+            // Only remove it after confirming they're approved in Firestore
+            if (!isSuperAdmin(user.uid)) {
+                showPendingApproval(user);
+            }
+            
             try {
                 // Register user in Firestore (or get existing)
                 console.log('[Auth] Registering/fetching user in Firestore:', user.uid);
@@ -2034,10 +2040,11 @@
                 console.log('[Auth] User data from Firestore:', userData);
                 currentUserRole = userData.role;
                 
-                if (currentUserRole === 'pending' || currentUserRole === 'rejected') {
-                    showPendingApproval(user);
-                } else {
+                if (currentUserRole === 'approved' || currentUserRole === 'admin') {
                     hidePendingApproval();
+                } else {
+                    // Still pending or rejected — keep overlay shown
+                    showPendingApproval(user);
                 }
                 
                 applyAdminGating();
@@ -2051,16 +2058,16 @@
                 }
             } catch (err) {
                 console.error('[Auth] Firestore user registration failed:', err);
-                // If Firestore fails and user is NOT super admin, block access as a safety measure
-                if (!isSuperAdmin(user.uid)) {
+                if (isSuperAdmin(user.uid)) {
+                    // Super admin always gets through
+                    currentUserRole = 'admin';
+                    hidePendingApproval();
+                    applyAdminGating();
+                    startPendingUsersListener();
+                } else {
                     currentUserRole = 'pending';
                     showPendingApproval(user);
                     notify('Access check failed. Please try refreshing.', 'red');
-                } else {
-                    // Super admin always gets through
-                    currentUserRole = 'admin';
-                    applyAdminGating();
-                    startPendingUsersListener();
                 }
             }
         }
