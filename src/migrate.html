@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Migration — Attendance Pro</title>
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%234f46e5' width='192' height='192' rx='45'/><text x='50%' y='50%' font-size='100' fill='white' text-anchor='middle' dominant-baseline='central'>📊</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        #log::-webkit-scrollbar { width: 6px; }
+        #log::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+        #log::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .log-info { color: #64748b; }
+        .log-success { color: #059669; }
+        .log-error { color: #dc2626; }
+        .log-header { color: #4f46e5; font-weight: 700; }
+        .log-skip { color: #d97706; }
+    </style>
+</head>
+<body class="h-full flex flex-col">
+
+    <!-- TOP NAV BAR (matches dashboard.html) -->
+    <header class="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between gap-3 flex-shrink-0 z-40" style="box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04);">
+        <a href="dashboard.html" class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-600 transition flex-shrink-0" title="Back to Dashboard">
+            <i data-lucide="arrow-left" class="h-4 w-4"></i>
+        </a>
+        <div class="flex-1 text-center min-w-0 flex items-center justify-center gap-2">
+            <i data-lucide="database" class="h-4 w-4 text-indigo-500"></i>
+            <h1 class="text-sm font-bold text-slate-800 tracking-tight">Database Migration</h1>
+        </div>
+        <a href="dashboard.html" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 hover:bg-slate-300 rounded-lg text-xs font-semibold text-slate-700 transition">
+            <i data-lucide="layout-dashboard" class="h-3.5 w-3.5"></i>
+            <span class="hidden sm:inline">Dashboard</span>
+        </a>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 overflow-auto p-4 sm:p-6">
+        <div class="max-w-3xl mx-auto">
+
+            <!-- Auth Status Card -->
+            <div id="authCard" class="bg-white border border-slate-200 rounded-xl p-5 mb-4 shadow-sm">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-9 h-9 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="shield-check" class="h-4 w-4 text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-800">Authentication</h2>
+                        <p id="authStatus" class="text-xs text-slate-500">Checking sign-in status...</p>
+                    </div>
+                </div>
+                <div id="signInArea" class="hidden">
+                    <button onclick="doSignIn()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border-2 border-slate-200 rounded-xl hover:border-indigo-300 hover:shadow-lg transition font-semibold text-slate-700 text-sm">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                        Sign in with Google
+                    </button>
+                </div>
+                <div id="userInfoArea" class="hidden flex items-center gap-3 mt-2 p-2.5 bg-emerald-50 rounded-lg border border-emerald-200">
+                    <img id="userPhoto" src="" class="w-7 h-7 rounded-full hidden">
+                    <div class="min-w-0">
+                        <p id="userName" class="text-xs font-semibold text-emerald-800 truncate"></p>
+                        <p id="userEmail" class="text-[10px] text-emerald-600 truncate"></p>
+                    </div>
+                    <span class="ml-auto text-[10px] font-bold text-emerald-700 bg-emerald-200 px-2 py-0.5 rounded-full">Authenticated</span>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 mb-4 shadow-sm">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="info" class="h-4 w-4 text-amber-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-800">What This Does</h2>
+                        <p class="text-xs text-slate-500">One-time data restructuring</p>
+                    </div>
+                </div>
+                <div class="text-xs text-slate-600 space-y-1.5">
+                    <p>Copies all Firestore data from the old flat collections into clean app-grouped subcollections:</p>
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <div class="p-2 bg-slate-50 rounded-lg border border-slate-100">
+                            <p class="font-bold text-indigo-700 text-[10px] uppercase mb-1">Timesheet</p>
+                            <p class="text-[10px] text-slate-500">config, months, employees, audit, users</p>
+                        </div>
+                        <div class="p-2 bg-slate-50 rounded-lg border border-slate-100">
+                            <p class="font-bold text-indigo-700 text-[10px] uppercase mb-1">Attendance</p>
+                            <p class="text-[10px] text-slate-500">classes, reports, scores, rosters, users</p>
+                        </div>
+                        <div class="p-2 bg-slate-50 rounded-lg border border-slate-100">
+                            <p class="font-bold text-indigo-700 text-[10px] uppercase mb-1">Quran Tracker</p>
+                            <p class="text-[10px] text-slate-500">students, logs</p>
+                        </div>
+                        <div class="p-2 bg-slate-50 rounded-lg border border-slate-100">
+                            <p class="font-bold text-indigo-700 text-[10px] uppercase mb-1">Action Items</p>
+                            <p class="text-[10px] text-slate-500">ideas, notes</p>
+                        </div>
+                    </div>
+                    <p class="text-amber-700 font-semibold mt-2">Old data is NOT deleted. You can verify before removing old collections.</p>
+                </div>
+            </div>
+
+            <!-- Run Button -->
+            <button id="migrateBtn" onclick="startMigration()" disabled class="w-full mb-4 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold rounded-xl text-sm transition duration-200 uppercase tracking-wider shadow-lg shadow-indigo-600/10 flex items-center justify-center gap-2">
+                <i data-lucide="play" class="h-4 w-4"></i>
+                <span id="migrateBtnText">Sign in first</span>
+            </button>
+
+            <!-- Progress -->
+            <div id="progressCard" class="hidden bg-white border border-slate-200 rounded-xl p-4 mb-4 shadow-sm">
+                <div class="flex items-center gap-2 mb-2">
+                    <div id="progressIcon" class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+                        <i data-lucide="loader" class="h-3.5 w-3.5 text-blue-600 animate-spin"></i>
+                    </div>
+                    <p id="progressText" class="text-xs font-semibold text-slate-700">Migrating...</p>
+                    <span id="progressCount" class="ml-auto text-xs font-bold text-slate-500">0 docs</span>
+                </div>
+            </div>
+
+            <!-- Log Output -->
+            <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                <div class="px-4 py-2.5 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
+                    <i data-lucide="terminal" class="h-3.5 w-3.5 text-slate-400"></i>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Migration Log</p>
+                </div>
+                <div id="log" class="p-4 font-mono text-[11px] leading-relaxed h-64 sm:h-80 overflow-y-auto bg-slate-50">
+                    <div class="log-info">Ready. Sign in and click "Run Migration" to start.</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Firebase v8 CDN -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <script>
+        // === FIREBASE CONFIG ===
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjGzS58U5ybbI5CYJUk2NRZBuLJpMJihQ",
+            authDomain: "apps-e1163.firebaseapp.com",
+            projectId: "apps-e1163",
+            storageBucket: "apps-e1163.firebasestorage.app",
+            messagingSenderId: "855206153422",
+            appId: "1:855206153422:web:2a1366b2e7825304c3d49f"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const APP_ID = '1:855206153422:web:2a1366b2e7825304c3d49f';
+
+        // Admin UIDs (must match dashboard.html)
+        const SUPER_ADMIN_UIDS = ['pJfYEgsWthWdfZCBli83OOQDv462', 'bwZZL8MK1uRFYYJwzG3U0sx8vDK2'];
+
+        lucide.createIcons();
+
+        const logEl = document.getElementById('log');
+        let totalMigrated = 0;
+        let totalErrors = 0;
+
+        function log(msg, cls = 'log-info') {
+            const line = document.createElement('div');
+            line.className = cls;
+            line.textContent = msg;
+            logEl.appendChild(line);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        // === AUTH ===
+        function doSignIn() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(err => {
+                log('Sign-in error: ' + err.message, 'log-error');
+                auth.signInWithRedirect(provider);
+            });
+        }
+
+        auth.getRedirectResult().then(result => {
+            if (result && result.user) onUser(result.user);
+        });
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                if (user.isAnonymous) { auth.signOut(); return; }
+                onUser(user);
+            } else {
+                document.getElementById('signInArea').classList.remove('hidden');
+                document.getElementById('authStatus').textContent = 'Sign in with your admin account';
+            }
+        });
+
+        function onUser(user) {
+            // Check admin
+            if (!SUPER_ADMIN_UIDS.includes(user.uid)) {
+                document.getElementById('authStatus').textContent = 'Access denied — admin only';
+                document.getElementById('authStatus').className = 'text-xs text-red-600 font-semibold';
+                log('Access denied. Your UID (' + user.uid + ') is not a super admin.', 'log-error');
+                return;
+            }
+
+            document.getElementById('signInArea').classList.add('hidden');
+            document.getElementById('userInfoArea').classList.remove('hidden');
+            document.getElementById('userInfoArea').classList.add('flex');
+            document.getElementById('userName').textContent = user.displayName || 'Admin';
+            document.getElementById('userEmail').textContent = user.email;
+            if (user.photoURL) {
+                document.getElementById('userPhoto').src = user.photoURL;
+                document.getElementById('userPhoto').classList.remove('hidden');
+            }
+            document.getElementById('authStatus').textContent = 'Signed in as admin';
+            document.getElementById('authStatus').className = 'text-xs text-emerald-600 font-semibold';
+
+            const btn = document.getElementById('migrateBtn');
+            btn.disabled = false;
+            document.getElementById('migrateBtnText').textContent = 'Run Migration';
+
+            log('Authenticated as ' + user.email + ' (admin)', 'log-success');
+        }
+
+        // === MIGRATION FUNCTIONS ===
+        async function copyCollection(oldPath, newPath) {
+            log('📦 ' + oldPath + ' → ' + newPath);
+            try {
+                const snapshot = await db.collection(oldPath).get();
+                if (snapshot.empty) { log('   ⏭️ Empty — skipping', 'log-skip'); return 0; }
+                let count = 0;
+                const docs = snapshot.docs;
+                for (let i = 0; i < docs.length; i += 450) {
+                    const batch = db.batch();
+                    const chunk = docs.slice(i, i + 450);
+                    for (const docSnap of chunk) {
+                        batch.set(db.collection(newPath).doc(docSnap.id), docSnap.data());
+                        count++;
+                    }
+                    await batch.commit();
+                }
+                totalMigrated += count;
+                updateProgress();
+                log('   ✅ ' + count + ' docs copied', 'log-success');
+                return count;
+            } catch (e) {
+                log('   ❌ Failed: ' + e.message, 'log-error');
+                totalErrors++;
+                return 0;
+            }
+        }
+
+        async function copyDocument(oldPath, newPath) {
+            log('📄 ' + oldPath + ' → ' + newPath);
+            try {
+                const docSnap = await db.doc(oldPath).get();
+                if (!docSnap.exists) { log("   ⏭️ Doesn't exist — skipping", 'log-skip'); return false; }
+                await db.doc(newPath).set(docSnap.data());
+                totalMigrated++;
+                updateProgress();
+                log('   ✅ Copied', 'log-success');
+                return true;
+            } catch (e) {
+                log('   ❌ Failed: ' + e.message, 'log-error');
+                totalErrors++;
+                return false;
+            }
+        }
+
+        async function copyCollectionWithSubs(oldPath, newPath, subNames) {
+            log('📦 ' + oldPath + ' → ' + newPath + ' (with subcollections)');
+            try {
+                const snapshot = await db.collection(oldPath).get();
+                if (snapshot.empty) { log('   ⏭️ Empty — skipping', 'log-skip'); return 0; }
+                let count = 0;
+                for (const docSnap of snapshot.docs) {
+                    await db.doc(newPath + '/' + docSnap.id).set(docSnap.data());
+                    count++;
+                    for (const subName of subNames) {
+                        const subSnap = await db.collection(oldPath + '/' + docSnap.id + '/' + subName).get();
+                        if (!subSnap.empty) {
+                            for (let i = 0; i < subSnap.docs.length; i += 450) {
+                                const batch = db.batch();
+                                const chunk = subSnap.docs.slice(i, i + 450);
+                                for (const subDoc of chunk) {
+                                    batch.set(db.doc(newPath + '/' + docSnap.id + '/' + subName + '/' + subDoc.id), subDoc.data());
+                                    count++;
+                                }
+                                await batch.commit();
+                            }
+                            log('   ↳ ' + subName + ' for ' + docSnap.id + ': ' + subSnap.size + ' docs', 'log-info');
+                        }
+                    }
+                }
+                totalMigrated += count;
+                updateProgress();
+                log('   ✅ ' + count + ' total docs (incl. subcollections)', 'log-success');
+                return count;
+            } catch (e) {
+                log('   ❌ Failed: ' + e.message, 'log-error');
+                totalErrors++;
+                return 0;
+            }
+        }
+
+        function updateProgress() {
+            document.getElementById('progressCount').textContent = totalMigrated + ' docs';
+        }
+
+        async function startMigration() {
+            const btn = document.getElementById('migrateBtn');
+            btn.disabled = true;
+            document.getElementById('migrateBtnText').textContent = 'Running...';
+            document.getElementById('progressCard').classList.remove('hidden');
+            totalMigrated = 0;
+            totalErrors = 0;
+            logEl.innerHTML = '';
+
+            log('🚀 STARTING FIRESTORE MIGRATION', 'log-header');
+            log('================================', 'log-header');
+            log('');
+
+            // 1. TIMESHEET
+            log('📱 === TIMESHEET APP ===', 'log-header');
+            document.getElementById('progressText').textContent = 'Migrating Timesheet...';
+            await copyDocument('timesheet_app/shiftDefinitions', 'timesheet/app/config/shiftDefinitions');
+            await copyDocument('timesheet_app/employeeFormMapping', 'timesheet/app/config/employeeFormMapping');
+            await copyDocument('timesheet_app/hiddenEmployees', 'timesheet/app/config/hiddenEmployees');
+            try {
+                const tsSnap = await db.collection('timesheet_app').get();
+                const known = ['shiftDefinitions', 'employeeFormMapping', 'hiddenEmployees'];
+                for (const d of tsSnap.docs) {
+                    if (!known.includes(d.id)) {
+                        await copyDocument('timesheet_app/' + d.id, 'timesheet/app/config/' + d.id);
+                    }
+                }
+            } catch (e) { log('   ⚠️ ' + e.message, 'log-skip'); }
+            await copyCollection('timesheet_app_months', 'timesheet/app/months');
+            await copyCollection('timesheet_app_employees', 'timesheet/app/employees');
+            await copyCollection('timesheet_app_audit', 'timesheet/app/audit');
+            await copyCollection('timesheet_app_users', 'timesheet/app/users');
+            log('');
+
+            // 2. ATTENDANCE
+            log('📱 === ATTENDANCE APP ===', 'log-header');
+            document.getElementById('progressText').textContent = 'Migrating Attendance...';
+            await copyCollection('artifacts/' + APP_ID + '/public/data/class_definitions', 'attendance/app/class_definitions');
+            await copyCollection('artifacts/' + APP_ID + '/public/data/settings', 'attendance/app/settings');
+            await copyCollectionWithSubs('artifacts/' + APP_ID + '/public/data/daily_attendance_reports', 'attendance/app/daily_reports', ['audit_trail']);
+            await copyCollection('artifacts/' + APP_ID + '/public/data/accumulated_class_scores', 'attendance/app/scores');
+            await copyDocument('studentRosters/rosters', 'attendance/app/rosters/current');
+            await copyCollectionWithSubs('users', 'attendance/app/users', ['dailyReports', 'accumulatedScores']);
+            await copyCollection('hifz_classes', 'attendance/app/hifz_classes');
+            await copyCollection('hifz_students', 'attendance/app/hifz_students');
+            await copyCollection('attendance_records', 'attendance/app/attendance_records');
+            log('');
+
+            // 3. QURAN TRACKER
+            log('📱 === QURAN TRACKER ===', 'log-header');
+            document.getElementById('progressText').textContent = 'Migrating Quran Tracker...';
+            await copyCollection('artifacts/' + APP_ID + '/public/data/students', 'quran_tracker/app/students');
+            await copyCollection('artifacts/' + APP_ID + '/public/data/logs', 'quran_tracker/app/logs');
+            log('');
+
+            // 4. ACTION ITEMS
+            log('📱 === ACTION ITEMS ===', 'log-header');
+            document.getElementById('progressText').textContent = 'Migrating Action Items...';
+            await copyCollection('artifacts/' + APP_ID + '/public/data/ideas', 'action_items/app/ideas');
+            await copyCollection('artifacts/' + APP_ID + '/public/data/notes', 'action_items/app/notes');
+            log('');
+
+            // 5. ACCESS REQUESTS
+            log('📱 === ACCESS REQUESTS ===', 'log-header');
+            document.getElementById('progressText').textContent = 'Migrating Access Requests...';
+            await copyCollection('artifacts/' + APP_ID + '/public/data/access_requests', 'shared/app/access_requests');
+            log('');
+
+            // DONE
+            log('================================', 'log-header');
+            log('🎉 MIGRATION COMPLETE', 'log-header');
+            log('   Total documents migrated: ' + totalMigrated, 'log-success');
+            log('   Errors: ' + totalErrors, totalErrors > 0 ? 'log-error' : 'log-success');
+            log('');
+            log('⚠️  Old data is still in place — not deleted.', 'log-skip');
+            log('   Check Firestore Console to verify, then delete old collections.', 'log-skip');
+
+            if (totalErrors === 0) {
+                document.getElementById('progressIcon').className = 'w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center';
+                document.getElementById('progressIcon').innerHTML = '<svg class="h-3.5 w-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+                document.getElementById('progressText').textContent = 'Migration complete!';
+                document.getElementById('progressText').className = 'text-xs font-semibold text-emerald-700';
+            } else {
+                document.getElementById('progressIcon').className = 'w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center';
+                document.getElementById('progressIcon').innerHTML = '<svg class="h-3.5 w-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+                document.getElementById('progressText').textContent = 'Done with ' + totalErrors + ' error(s)';
+                document.getElementById('progressText').className = 'text-xs font-semibold text-amber-700';
+            }
+
+            document.getElementById('migrateBtnText').textContent = 'Complete ✓';
+        }
+    </script>
+</body>
+</html>
