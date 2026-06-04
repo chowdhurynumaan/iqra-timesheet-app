@@ -2027,24 +2027,41 @@
             updateUserUI(user);
             document.getElementById('signInOverlay')?.remove();
             
-            // Register user in Firestore (or get existing)
-            const userData = await registerOrGetUser(user);
-            currentUserRole = userData.role;
-            
-            if (currentUserRole === 'pending' || currentUserRole === 'rejected') {
-                showPendingApproval(user);
-            } else {
-                hidePendingApproval();
-            }
-            
-            applyAdminGating();
-            
-            // Start listening to own status changes (real-time approval)
-            listenToMyStatus(user.uid);
-            
-            // If admin, listen to pending users for notifications
-            if (isAdmin()) {
-                startPendingUsersListener();
+            try {
+                // Register user in Firestore (or get existing)
+                console.log('[Auth] Registering/fetching user in Firestore:', user.uid);
+                const userData = await registerOrGetUser(user);
+                console.log('[Auth] User data from Firestore:', userData);
+                currentUserRole = userData.role;
+                
+                if (currentUserRole === 'pending' || currentUserRole === 'rejected') {
+                    showPendingApproval(user);
+                } else {
+                    hidePendingApproval();
+                }
+                
+                applyAdminGating();
+                
+                // Start listening to own status changes (real-time approval)
+                listenToMyStatus(user.uid);
+                
+                // If admin, listen to pending users for notifications
+                if (isAdmin()) {
+                    startPendingUsersListener();
+                }
+            } catch (err) {
+                console.error('[Auth] Firestore user registration failed:', err);
+                // If Firestore fails and user is NOT super admin, block access as a safety measure
+                if (!isSuperAdmin(user.uid)) {
+                    currentUserRole = 'pending';
+                    showPendingApproval(user);
+                    notify('Access check failed. Please try refreshing.', 'red');
+                } else {
+                    // Super admin always gets through
+                    currentUserRole = 'admin';
+                    applyAdminGating();
+                    startPendingUsersListener();
+                }
             }
         }
 
