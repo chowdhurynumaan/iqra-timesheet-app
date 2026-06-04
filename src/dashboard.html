@@ -1677,10 +1677,24 @@
 
         function signInWithGoogle() {
             auth.signInWithPopup(googleProvider).catch((error) => {
-                console.error('Google Sign-In error:', error);
-                notify('Sign-in failed: ' + error.message, 'red');
+                console.error('Google Sign-In error:', error.code, error.message);
+                // If popup blocked (iframe/embedded browser), fall back to redirect
+                if (error.code === 'auth/popup-blocked' || error.code === 'auth/operation-not-supported-in-this-environment' || error.code === 'auth/cancelled-popup-request') {
+                    auth.signInWithRedirect(googleProvider);
+                } else {
+                    notify('Sign-in failed: ' + (error.message || error.code), 'red');
+                }
             });
         }
+
+        // Check for redirect result on page load
+        auth.getRedirectResult().then((result) => {
+            if (result && result.user) {
+                updateUserUI(result.user);
+            }
+        }).catch((error) => {
+            console.error('Redirect sign-in error:', error.code, error.message);
+        });
 
         // Auth state listener — fires on sign-in, sign-out, and page load
         auth.onAuthStateChanged((user) => {
