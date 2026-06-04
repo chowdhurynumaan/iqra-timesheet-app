@@ -1786,7 +1786,6 @@
                 console.log('[Auth] Doc exists?', doc.exists);
             } catch (readErr) {
                 console.error('[Auth] FAILED to read user doc:', readErr.code, readErr.message);
-                notify('DEBUG: Read failed - ' + readErr.code, 'red');
                 throw readErr;
             }
             
@@ -1850,6 +1849,7 @@
                     hidePendingApproval();
                     if (prevRole === 'pending' && (currentUserRole === 'approved' || currentUserRole === 'admin')) {
                         notify('Access approved! Welcome.', 'green');
+                        await loadAppData();
                     }
                 }
                 applyAdminGating();
@@ -2190,6 +2190,20 @@
             console.error('Redirect sign-in error:', error.code, error.message);
         });
 
+        // Load all Firestore app data — called AFTER auth succeeds
+        let appDataLoaded = false;
+        async function loadAppData() {
+            if (appDataLoaded) return; // Only load once per session
+            appDataLoaded = true;
+            await loadHiddenEmployees();
+            loadAvailableMonths();
+            loadShiftDefinitions();
+            loadEmployeeFormMapping();
+            loadSettings();
+            loadBackupHistory();
+            loadIntegrations();
+        }
+
         // Main auth handler
         async function handleAuthUser(user) {
             updateUserUI(user);
@@ -2210,6 +2224,8 @@
                 
                 if (currentUserRole === 'approved' || currentUserRole === 'admin') {
                     hidePendingApproval();
+                    // Auth confirmed — NOW safe to load Firestore data
+                    await loadAppData();
                 } else {
                     // Still pending or rejected — keep overlay shown
                     showPendingApproval(user);
@@ -2232,6 +2248,7 @@
                     hidePendingApproval();
                     applyAdminGating();
                     startPendingUsersListener();
+                    await loadAppData();
                 } else {
                     currentUserRole = 'pending';
                     showPendingApproval(user);
@@ -3340,19 +3357,12 @@ Authentication: Include X-API-Key header with your API key
             }, 500);
         }
 
-        // Load Initial Assets on load
-        window.addEventListener('load', async () => {
+        // Load Initial Assets on load — UI setup only, NO Firestore calls (auth not ready yet)
+        window.addEventListener('load', () => {
             switchView('dashboard');
             initializeDarkMode();
             setupKeyboardShortcuts();
-            await loadHiddenEmployees();
-            loadAvailableMonths();
-            loadShiftDefinitions();
-            loadEmployeeFormMapping();
             setupDataParsers();
-            loadSettings();
-            loadBackupHistory();
-            loadIntegrations();
         });
 
         // Initialize Upload Portals
