@@ -4862,17 +4862,24 @@ Authentication: Include X-API-Key header with your API key
             });
             const deptList = Object.keys(byDept).sort();
 
-            // Build print HTML — landscape A4, 2 cards per page, grouped by dept
+            // Detect mobile — if screen width ≤ 768px, use portrait 1-card-per-page layout
+            const isMobile = window.innerWidth <= 768;
+            const pageSize = isMobile ? 'A4 portrait' : 'A4 landscape';
+            const cardsPerPage = isMobile ? 1 : 2;
+            const gridCols = isMobile ? '1fr' : '1fr 1fr';
+            const cardFontScale = isMobile ? 1 : 1;
+
+            // Build print HTML
             let printHTML = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
             <title>Attendance Report - ${new Date().toLocaleDateString()}</title>
             <style>
-                @page { size: A4 landscape; margin: 8mm; }
+                @page { size: ${pageSize}; margin: 8mm; }
                 * { box-sizing: border-box; margin: 0; padding: 0; }
                 html, body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: white; }
                 .dept-header-page {
                     page-break-after: always;
                     width: 100%;
-                    height: calc(100vh - 20mm);
+                    height: 100%;
                     display: flex; align-items: center; justify-content: center; text-align: center;
                 }
                 .dept-header-page .dept-inner {
@@ -4882,14 +4889,14 @@ Authentication: Include X-API-Key header with your API key
                 .dept-header-page h1 { font-size: 44px; color: #1e293b; text-transform: uppercase; letter-spacing: 2px; }
                 .dept-header-page p { font-size: 16px; color: #64748b; margin-top: 12px; }
                 .cards-page {
-                    page-break-after: always; display: grid; grid-template-columns: 1fr 1fr;
-                    gap: 6px; padding: 4px; width: 100%; height: calc(100vh - 16mm);
-                    align-content: stretch;
+                    page-break-after: always; display: grid; grid-template-columns: ${gridCols};
+                    gap: 6px; padding: 4px; width: 100%;
+                    align-content: start;
                 }
                 .emp-print-card {
                     border: 1px solid #e2e8f0; border-radius: 4px; overflow: hidden;
                     background: white; display: flex; flex-direction: column;
-                    height: 100%;
+                    page-break-inside: avoid;
                 }
                 .emp-print-title { background: #f1f5f9; padding: 5px 8px; border-bottom: 2px solid #cbd5e1; flex-shrink: 0; }
                 .emp-print-title h2 { font-size: 12px; color: #1e293b; margin: 0; }
@@ -4902,7 +4909,7 @@ Authentication: Include X-API-Key header with your API key
                 .pm-label { font-size: 7px; font-weight: 600; color: #64748b; text-transform: uppercase; }
                 .pm-value { font-size: 11px; font-weight: 700; color: #1e293b; }
                 .pm-unit { font-size: 6px; color: #94a3b8; }
-                .daily-tbl { width: 100%; border-collapse: collapse; font-size: 8px; flex: 1; }
+                .daily-tbl { width: 100%; border-collapse: collapse; font-size: 8px; }
                 .daily-tbl thead { background: #e2e8f0; }
                 .daily-tbl th { padding: 2px 2px; text-align: left; font-weight: 700; color: #1e293b; border: 0.5px solid #cbd5e1; font-size: 7px; }
                 .daily-tbl td { padding: 1px 2px; border: 0.5px solid #e2e8f0; line-height: 1.2; }
@@ -4914,6 +4921,7 @@ Authentication: Include X-API-Key header with your API key
                     body { margin: 0; padding: 0; }
                     -webkit-print-color-adjust: exact !important;
                     print-color-adjust: exact !important;
+                    .emp-print-card { page-break-inside: avoid; }
                 }
             </style></head><body>`;
 
@@ -4923,11 +4931,11 @@ Authentication: Include X-API-Key header with your API key
                 // Dept header page
                 printHTML += `<div class="dept-header-page"><div class="dept-inner"><h1>${escapeHtml(dept)}</h1><p>${deptEmps.length} Employee${deptEmps.length !== 1 ? 's' : ''}</p></div></div>`;
 
-                // 2 cards per page
-                for (let i = 0; i < deptEmps.length; i += 2) {
+                // Cards per page (1 on mobile, 2 on desktop)
+                for (let i = 0; i < deptEmps.length; i += cardsPerPage) {
                     printHTML += `<div class="cards-page">`;
                     printHTML += generatePrintCard(deptEmps[i]);
-                    if (i + 1 < deptEmps.length) {
+                    if (cardsPerPage > 1 && i + 1 < deptEmps.length) {
                         printHTML += generatePrintCard(deptEmps[i + 1]);
                     }
                     printHTML += `</div>`;
