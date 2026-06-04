@@ -351,7 +351,7 @@
             /* Filters: compact */
             .filter-section { padding: 10px 12px !important; border-radius: 10px !important; }
             .filter-section label { font-size: 9px !important; margin-bottom: 2px !important; }
-            .filter-section select { padding: 5px 10px !important; font-size: 12px !important; }
+            .filter-section select { padding: 8px 10px !important; font-size: 13px !important; min-height: 38px !important; }
 
             /* Employee cards */
             .emp-card-header { padding: 8px 10px !important; gap: 6px !important; }
@@ -360,12 +360,26 @@
             .emp-dept { font-size: 9px !important; padding: 1px 6px !important; }
             .emp-tier { font-size: 9px !important; padding: 1px 6px !important; }
             .metrics-row { padding: 6px 8px !important; gap: 3px !important; }
-            .metric-pill { padding: 3px 6px !important; min-width: 42px !important; border-radius: 6px !important; }
-            .metric-pill-label { font-size: 7px !important; }
+            .metric-pill { padding: 4px 8px !important; min-width: 42px !important; border-radius: 6px !important; }
+            .metric-pill-label { font-size: 8px !important; }
             .metric-pill-value { font-size: 10px !important; }
 
-            /* Department filter pills */
-            #deptFilter .rounded-full { font-size: 11px !important; padding: 4px 10px !important; }
+            /* Edit/hide buttons — bigger touch target */
+            .emp-edit-btn { width: 34px !important; height: 34px !important; border-radius: 10px !important; }
+
+            /* Department filter pills — horizontal scroll on mobile */
+            #deptFilter { flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch; padding-bottom: 4px !important; }
+            #deptFilter .rounded-full { font-size: 11px !important; padding: 5px 12px !important; flex-shrink: 0 !important; }
+
+            /* Daily breakdown table — scrollable on mobile */
+            .daily-table-wrapper { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+
+            /* Modals — wider on mobile, scrollable */
+            .modal-content { max-width: 95vw !important; padding: 20px !important; max-height: 85vh !important; overflow-y: auto !important; }
+
+            /* Mobile overflow menu — scrollable, proper sizing */
+            .mobile-overflow-menu { max-height: calc(100vh - 56px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+            .mobile-overflow-menu button { padding: 12px 14px !important; min-height: 40px !important; font-size: 13px !important; }
 
             /* Overall section spacing - dashboard only */
             #view-dashboard { gap: 8px !important; display: flex; flex-direction: column; }
@@ -379,16 +393,17 @@
                 position: absolute; top: 42px; right: 8px;
                 background: var(--bg-secondary); border: 1px solid var(--border-color);
                 border-radius: 10px; box-shadow: var(--shadow-lg);
-                z-index: 100; min-width: 160px; overflow: hidden;
+                z-index: 100; min-width: 180px; overflow: hidden;
             }
-            .mobile-overflow-menu button {
+            .mobile-overflow-menu label {
                 display: flex; align-items: center; gap: 8px; width: 100%;
-                padding: 10px 14px; font-size: 12px; font-weight: 500;
+                padding: 12px 14px; font-size: 13px; font-weight: 500;
                 color: var(--text-primary); border: none; background: none; cursor: pointer;
                 border-bottom: 1px solid var(--border-subtle);
             }
+            .mobile-overflow-menu label:last-child { border-bottom: none; }
             .mobile-overflow-menu button:last-child { border-bottom: none; }
-            .mobile-overflow-menu button:hover { background: var(--accent-subtle); }
+            .mobile-overflow-menu button:hover, .mobile-overflow-menu label:hover { background: var(--accent-subtle); }
         }
 
         /* Global failsafe: ensure .hidden always wins */
@@ -478,6 +493,9 @@
 
         <!-- Mobile Overflow Menu -->
         <div id="mobileOverflowMenu" class="hidden mobile-overflow-menu">
+            <button onclick="toggleSelectAll(); toggleMobileOverflow();">
+                <i data-lucide="check-square" class="h-3.5 w-3.5 text-slate-400"></i> <span id="mobileSelectAllLabel">Select All</span>
+            </button>
             <button onclick="printSelected(); toggleMobileOverflow();">
                 <i data-lucide="printer" class="h-3.5 w-3.5 text-slate-400"></i> Print
             </button>
@@ -4073,7 +4091,7 @@ Authentication: Include X-API-Key header with your API key
                     </div>
 
                     <!-- EXPANDED: Full Month Timecard (Hidden by default) -->
-                    <div data-timecard class="border-t overflow-x-auto max-h-0 opacity-0" style="border-color: var(--border-color); transition: max-height 0.3s ease, opacity 0.3s ease;">
+                    <div data-timecard class="daily-table-wrapper border-t overflow-x-auto max-h-0 opacity-0" style="border-color: var(--border-color); transition: max-height 0.3s ease, opacity 0.3s ease;">
                         <table class="w-full border-collapse text-xs" style="font-size: 11px;">
                             <thead class="bg-slate-200/60 border-b border-slate-300 sticky top-0">
                                 <tr>
@@ -4790,17 +4808,24 @@ Authentication: Include X-API-Key header with your API key
             const checkboxes = document.querySelectorAll('.employee-checkbox');
             checkboxes.forEach(cb => { cb.checked = allSelected; });
             const label = document.getElementById('selectAllLabel');
-            if (label) label.textContent = allSelected ? 'Deselect All' : 'Select All';
+            const mobileLabel = document.getElementById('mobileSelectAllLabel');
+            const text = allSelected ? 'Deselect All' : 'Select All';
+            if (label) label.textContent = text;
+            if (mobileLabel) mobileLabel.textContent = text;
             updateSelectCount();
         }
 
         function updateSelectCount() {
             const checked = document.querySelectorAll('.employee-checkbox:checked').length;
             const label = document.getElementById('selectAllLabel');
-            if (label && checked > 0 && !allSelected) {
-                label.textContent = `${checked} selected`;
-            } else if (label && !allSelected) {
-                label.textContent = 'Select All';
+            const mobileLabel = document.getElementById('mobileSelectAllLabel');
+            if (checked > 0 && !allSelected) {
+                const text = `${checked} selected`;
+                if (label) label.textContent = text;
+                if (mobileLabel) mobileLabel.textContent = text;
+            } else if (!allSelected) {
+                if (label) label.textContent = 'Select All';
+                if (mobileLabel) mobileLabel.textContent = 'Select All';
             }
         }
 
