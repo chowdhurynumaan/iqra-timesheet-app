@@ -3572,11 +3572,13 @@ Authentication: Include X-API-Key header with your API key
                     const data = XLSX.read(e.target.result, { type: 'array' });
                     const sheets = {};
                     data.SheetNames.forEach(name => {
-                        sheets[name] = XLSX.utils.sheet_to_json(data.Sheets[name]);
+                        // Use header:1 to get raw arrays — the real file has multi-row headers
+                        sheets[name] = XLSX.utils.sheet_to_json(data.Sheets[name], { header: 1, defval: null });
                     });
                     processMultiSheetData(sheets);
                 } catch (error) {
-                    notify('Error parsing report file', 'red');
+                    console.error('Error parsing report file:', error);
+                    notify('Error parsing report file: ' + error.message, 'red');
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -3618,60 +3620,252 @@ Authentication: Include X-API-Key header with your API key
         }
 
         function detectDateRange(data) {
+            // Look for date range string like "05-01-2026 ~ 05-31-2026" in first few rows
             for (let i = 0; i < Math.min(5, data.length); i++) {
                 const row = data[i] || [];
-                // Simplified date detection
+                for (let j = 0; j < row.length; j++) {
+                    const cell = String(row[j] || '');
+                    const match = cell.match(/(\d{2})-(\d{2})-(\d{4})\s*~\s*(\d{2})-(\d{2})-(\d{4})/);
+                    if (match) {
+                        const startDay = parseInt(match[2]);
+                        const endDay = parseInt(match[5]);
+                        dateRange.actualDays = endDay - startDay + 1;
+                        // Count weekdays only for WK shifts (rough: subtract weekends)
+                        // For now just use calendar days and let per-employee logic handle it
+                        return;
+                    }
+                }
             }
             dateRange.actualDays = 31;
         }
 
         function parseSheet(data, name) {
-            const titleCell = (data[0]?.[Object.keys(data[0])[0]] || '').toString().toLowerCase();
             let employees = [];
             detectDateRange(data);
 
-            if (titleCell.includes('attend')) {
-                employees = parseAttendanceLogs(data);
-            } else if (titleCell.includes('summary')) {
+            const titleCell = String(data[0]?.[0] || '').toLowerCase();
+
+            if (name === 'Attendance summary' || titleCell.includes('summary')) {
                 employees = parseAttendanceSummary(data);
+            } else if (name === 'Attend. Logs' || titleCell.includes('attend')) {
+                employees = parseAttendanceLogs(data);
+            } else if (name === 'Abnormal' || titleCell.includes('abnormal')) {
+                employees = parseAbnormalSheet(data);
             }
             return { employees, source: name };
         }
 
-        function parseAttendanceLogs(data) {
+        // Parse the "Attendance summary" sheet
+        // Row 0: ["Attendance summary"]
+        // Row 1: ["Date", "05-01-2026 ~ 05-31-2026"]
+        // Row 2: ["ID","Name","Dept.","Working hours",null,"Late",null,"Early",null,"Overtime",null,"Attend(Standard/Actual)","Absences","Leave","Business trip",...]
+        // Row 3: [null,null,null,"Standard","Actual","Frequency","Min","Frequency","Min","Normal","Special",...]
+        // Row 4+: [1,"NUMAAN","WK","45:00","19:23",7,98,3,114,"00:00","00:00","10/7",3,0,0]
+        function parseAttendanceSummary(data) {
             const employees = [];
-            data.forEach((row, idx) => {
-                if (idx === 0) return;
-                const emp = {
-                    id: row.id || row['Emp ID'] || idx,
-                    name: row.name || row.Name || 'Unknown',
-                    dept: row.dept || row.Department || 'N/A',
-                    absences: parseInt(row.absences || row.Absences || 0) || 0,
-                    lateMin: parseInt(row.lateMin || row['Late Min'] || 0) || 0,
-                    shift: row.shift || row.Shift || 'WK',
+            // Data rows start at row 4 (after title, date, header1, header2)
+            for (let i = 4; i < data.length; i++) {
+                const row = data[i];
+                if (!row || row.length < 5) continue;
+
+                const id = row[0];
+                const name = row[1];
+                if (!id || !name) continue;
+                if (typeof name !== 'string' || name.trim() === '') continue;
+
+                const dept = String(row[2] || 'N/A');
+                const lateFreq = parseInt(row[5]) || 0;
+                const lateMin = parseInt(row[6]) || 0;
+                const attendStr = String(row[11] || '0/0');
+                const attendParts = attendStr.split('/');
+                const standardDays = parseInt(attendParts[0]) || 0;
+                const actualDays = parseInt(attendParts[1]) || 0;
+                const absences = parseInt(row[12]) || 0;
+
+                // Parse working hours "19:23" → decimal
+                let hoursWorked = 0;
+                const hoursStr = String(row[4] || '0');
+                if (hoursStr.includes(':')) {
+                    const [h, m] = hoursStr.split(':').map(Number);
+                    hoursWorked = (h || 0) + (m || 0) / 60;
+                } else {
+                    hoursWorked = parseFloat(hoursStr) || 0;
+                }
+
+                employees.push({
+                    id: id,
+                    name: name.trim(),
+                    dept: dept,
+                    absences: absences,
+                    lateMin: lateMin,
+                    lateCount: lateFreq,
+                    shift: dept,
+                    daysWorked: actualDays,
+                    standardDays: standardDays,
+                    hours: hoursWorked.toFixed(1),
                     dailyBreakdown: []
-                };
-                employees.push(emp);
-            });
+                });
+            }
             return employees;
         }
 
-        function parseAttendanceSummary(data) {
+        // Parse "Attend. Logs" sheet — each employee is a block of rows:
+        // Row: ["ID", null, <id>, ..., "Name", null, <name>, ..., "Dept.", null, <dept>]
+        // Row: [1, 2, 3, ..., 31]  (day numbers)
+        // Row: ["Fri", "Sat", ...] (day names)
+        // Row: [null, null, null, ..., "09:36\n14:34", ...] (punch times)
+        function parseAttendanceLogs(data) {
             const employees = [];
-            data.forEach((row, idx) => {
-                if (idx < 4) return;
-                const emp = {
-                    id: row.id || row['Emp ID'] || idx,
-                    name: row.name || row.Name || 'Unknown',
-                    dept: row.dept || row.Department || 'N/A',
-                    absences: parseInt(row.absences || row.Absences || 0) || 0,
-                    lateMin: parseInt(row.lateMin || row['Late Min'] || 0) || 0,
-                    shift: row.shift || row.Shift || 'WK',
-                    dailyBreakdown: []
-                };
-                employees.push(emp);
-            });
+            let i = 2; // Skip title and date rows
+            while (i < data.length) {
+                const row = data[i];
+                if (!row) { i++; continue; }
+
+                // Detect employee header row: has "ID" at [0] and "Name" at [9] and "Dept." at [18]
+                const cell0 = String(row[0] || '').trim();
+                const cell9 = String(row[9] || '').trim();
+                const cell18 = String(row[18] || '').trim();
+
+                if (cell0 === 'ID' && cell9 === 'Name' && cell18 === 'Dept.') {
+                    const empId = row[2];
+                    const empName = String(row[11] || '').trim();
+                    const empDept = String(row[20] || 'N/A').trim();
+
+                    // Next rows: day numbers, day names, punch times
+                    const dayNumberRow = data[i + 1] || [];
+                    const dayNameRow = data[i + 2] || [];
+                    const punchRow = data[i + 3] || [];
+
+                    const dailyBreakdown = [];
+                    let lateMin = 0;
+                    let absences = 0;
+                    let daysWorked = 0;
+
+                    for (let d = 0; d < 31; d++) {
+                        const dayNum = dayNumberRow[d];
+                        const dayName = String(dayNameRow[d] || '');
+                        const punchStr = String(punchRow[d] || '');
+
+                        if (!dayNum) continue;
+
+                        const isMissed = !punchStr || punchStr === 'null' || punchStr.trim() === '';
+                        const punches = punchStr ? punchStr.split('\n').filter(p => p.trim()) : [];
+                        const inTime = punches.length > 0 ? punches[0] : '';
+                        const outTime = punches.length > 1 ? punches[punches.length - 1] : '';
+
+                        // Calculate hours if we have in/out
+                        let hours = 0;
+                        if (inTime && outTime && inTime !== outTime) {
+                            const [ih, im] = inTime.split(':').map(Number);
+                            const [oh, om] = outTime.split(':').map(Number);
+                            if (!isNaN(ih) && !isNaN(oh)) {
+                                hours = Math.max(0, (oh * 60 + (om || 0)) - (ih * 60 + (im || 0))) / 60;
+                            }
+                        }
+
+                        // Late if arrived after 9:15 (configurable)
+                        let dayLate = 0;
+                        if (inTime && !isMissed) {
+                            const [ih, im] = inTime.split(':').map(Number);
+                            if (!isNaN(ih) && !isNaN(im)) {
+                                const arrivalMin = ih * 60 + im;
+                                const thresholdMin = 9 * 60 + 15; // 9:15 AM
+                                if (arrivalMin > thresholdMin) {
+                                    dayLate = arrivalMin - thresholdMin;
+                                }
+                            }
+                        }
+
+                        if (isMissed) {
+                            absences++;
+                        } else {
+                            daysWorked++;
+                            lateMin += dayLate;
+                        }
+
+                        dailyBreakdown.push({
+                            date: dayNum,
+                            dayName: dayName,
+                            inTime: inTime,
+                            outTime: outTime,
+                            isMissed: isMissed,
+                            lateMin: dayLate,
+                            hours: hours.toFixed(1),
+                            punchPairs: punches
+                        });
+                    }
+
+                    employees.push({
+                        id: empId,
+                        name: empName,
+                        dept: empDept,
+                        absences: absences,
+                        lateMin: lateMin,
+                        shift: empDept,
+                        daysWorked: daysWorked,
+                        hours: dailyBreakdown.reduce((sum, d) => sum + parseFloat(d.hours || 0), 0).toFixed(1),
+                        dailyBreakdown: dailyBreakdown
+                    });
+
+                    i += 4; // Skip past this employee's block
+                    continue;
+                }
+                i++;
+            }
             return employees;
+        }
+
+        // Parse "Abnormal" sheet — flat table with daily exception rows
+        // Row 2: ["ID","Name","Dept.","Date","Time1",null,"Time2",null,"Late time","Early time","Total","Remark"]
+        // Row 3: [null,null,null,null,"In","Out","In","Out"]
+        // Row 4+: [1,"NUMAAN","WK","05-02-2026","Missed","Missed",null,null,0,0,0]
+        function parseAbnormalSheet(data) {
+            const empMap = {};
+            for (let i = 4; i < data.length; i++) {
+                const row = data[i];
+                if (!row || row.length < 5) continue;
+                const id = row[0];
+                const name = String(row[1] || '').trim();
+                const dept = String(row[2] || 'N/A');
+                if (!id || !name) continue;
+
+                if (!empMap[id]) {
+                    empMap[id] = {
+                        id: id,
+                        name: name,
+                        dept: dept,
+                        absences: 0,
+                        lateMin: 0,
+                        shift: dept,
+                        dailyBreakdown: [],
+                        daysWorked: 0,
+                        hours: '0'
+                    };
+                }
+
+                const dateStr = String(row[3] || '');
+                const in1 = String(row[4] || '');
+                const out1 = String(row[5] || '');
+                const lateMins = parseInt(row[8]) || 0;
+                const isMissed = in1 === 'Missed' || out1 === 'Missed';
+
+                empMap[id].lateMin += lateMins;
+                if (isMissed && in1 === 'Missed' && out1 === 'Missed') {
+                    empMap[id].absences++;
+                }
+
+                empMap[id].dailyBreakdown.push({
+                    date: dateStr,
+                    dayName: '',
+                    inTime: in1 === 'Missed' ? '' : in1,
+                    outTime: out1 === 'Missed' ? '' : out1,
+                    isMissed: isMissed,
+                    lateMin: lateMins,
+                    hours: '0',
+                    punchPairs: []
+                });
+            }
+            return Object.values(empMap);
         }
 
         function initializeControlPanel() {
