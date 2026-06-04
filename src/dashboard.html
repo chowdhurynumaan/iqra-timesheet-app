@@ -3731,6 +3731,9 @@ Authentication: Include X-API-Key header with your API key
                     const empName = String(row[11] || '').trim();
                     const empDept = String(row[20] || 'N/A').trim();
 
+                    // Skip entries with no name (empty rows in the file)
+                    if (!empName) { i += 4; continue; }
+
                     // Next rows: day numbers, day names, punch times
                     const dayNumberRow = data[i + 1] || [];
                     const dayNameRow = data[i + 2] || [];
