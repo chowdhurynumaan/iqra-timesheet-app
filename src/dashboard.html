@@ -425,6 +425,12 @@
                 <i data-lucide="moon" class="h-4 w-4"></i>
             </button>
 
+            <!-- Notification Bell (admin only) -->
+            <button id="notifBellBtn" onclick="toggleNotifPanel()" class="admin-only relative flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-500 transition" title="Notifications">
+                <i data-lucide="bell" class="h-4 w-4"></i>
+                <span id="notifBadge" class="hidden absolute -top-0.5 -right-0.5 min-w-[16px] h-4 flex items-center justify-center bg-red-500 text-white text-[9px] font-bold rounded-full px-1">0</span>
+            </button>
+
             <!-- Save to Firebase -->
             <button onclick="saveReportToFirebase()" class="admin-only flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-xs font-semibold text-white transition" title="Save to Firebase (Ctrl+S)">
                 <i data-lucide="cloud" class="h-3.5 w-3.5"></i>
@@ -512,6 +518,9 @@
         </button>
         <button onclick="switchView('enterprise'); closeMainMenu()" class="admin-only w-full text-left px-3 py-2.5 hover:bg-slate-50 border-b border-slate-100 text-slate-700 text-[13px] font-medium flex items-center gap-2.5">
             <i data-lucide="shield" class="h-3.5 w-3.5 text-slate-400"></i> Enterprise
+        </button>
+        <button onclick="openAdminPortal(); closeMainMenu()" class="admin-only w-full text-left px-3 py-2.5 hover:bg-slate-50 border-b border-slate-100 text-indigo-700 text-[13px] font-medium flex items-center gap-2.5">
+            <i data-lucide="users" class="h-3.5 w-3.5 text-indigo-400"></i> Admin Portal <span id="menuPendingBadge" class="ml-auto bg-red-500 text-white text-[9px] rounded-full px-1.5 py-0.5 hidden">0</span>
         </button>
         <div class="px-3 py-2 border-t border-slate-200 bg-slate-50">
             <div id="menuUserInfo" class="flex items-center gap-2 mb-1">
@@ -643,6 +652,57 @@
             <div class="modal-buttons" style="display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid #e5e7eb; padding-top: 12px; margin-top: 12px;">
                 <button class="modal-button modal-button-cancel" onclick="closePunchEditModal()" style="flex: 0 1 auto; padding: 8px 16px;">Close</button>
                 <button class="modal-button modal-button-confirm" onclick="savePunchEdits()" style="flex: 0 1 auto; padding: 8px 16px; background: #10b981;">Save All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Panel (admin only) -->
+    <div id="notifPanel" class="hidden fixed top-14 right-4 w-80 max-h-96 bg-white border border-slate-200 rounded-xl shadow-2xl z-[60] overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
+            <p class="text-xs font-bold text-slate-600 uppercase">Notifications</p>
+            <button onclick="toggleNotifPanel()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="h-4 w-4"></i></button>
+        </div>
+        <div id="notifList" class="divide-y divide-slate-100 overflow-y-auto max-h-72">
+            <p class="text-xs text-slate-400 text-center py-6">No notifications</p>
+        </div>
+    </div>
+
+    <!-- Admin Portal Modal -->
+    <div id="adminPortalModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[70] p-4" style="display: none;" onclick="if(event.target===this) closeAdminPortal()">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2"><i data-lucide="shield" class="h-5 w-5 text-indigo-500"></i> Admin Portal</h2>
+                <button onclick="closeAdminPortal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="h-5 w-5"></i></button>
+            </div>
+            <!-- Tabs -->
+            <div class="flex border-b border-slate-200">
+                <button onclick="switchAdminTab('pending')" id="adminTabPending" class="flex-1 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-indigo-600 border-b-2 border-indigo-500">Pending <span id="adminPendingCount" class="ml-1 bg-red-500 text-white text-[9px] rounded-full px-1.5 py-0.5">0</span></button>
+                <button onclick="switchAdminTab('approved')" id="adminTabApproved" class="flex-1 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:text-slate-700">Approved</button>
+                <button onclick="switchAdminTab('admins')" id="adminTabAdmins" class="flex-1 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:text-slate-700">Admins</button>
+                <button onclick="switchAdminTab('rejected')" id="adminTabRejected" class="flex-1 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 border-b-2 border-transparent hover:text-slate-700">Rejected</button>
+            </div>
+            <!-- Tab Content -->
+            <div id="adminPortalContent" class="flex-1 overflow-y-auto p-4">
+                <p class="text-sm text-slate-400 text-center py-8">Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Approval Overlay (shown to non-approved users) -->
+    <div id="pendingApprovalOverlay" class="fixed inset-0 bg-white/98 backdrop-blur-sm z-[9998] flex items-center justify-center" style="display: none;">
+        <div class="text-center p-8 max-w-sm">
+            <div class="w-20 h-20 mx-auto mb-4 bg-amber-100 rounded-full flex items-center justify-center">
+                <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900 mb-2">Waiting for Approval</h2>
+            <p class="text-sm text-slate-500 mb-2">Your account is pending admin approval.</p>
+            <p class="text-xs text-slate-400 mb-6">You'll get access once an admin approves your request. This page will update automatically.</p>
+            <div id="pendingUserInfo" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-lg mb-4">
+                <img id="pendingUserPhoto" class="w-6 h-6 rounded-full" src="" alt="">
+                <span id="pendingUserName" class="text-sm font-medium text-slate-700"></span>
+            </div>
+            <div>
+                <button onclick="firebase.auth().signOut()" class="text-xs text-red-500 hover:text-red-700 font-semibold">Sign out and use a different account</button>
             </div>
         </div>
     </div>
@@ -1634,12 +1694,25 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // Admin Configuration
-        const ADMIN_UIDS = ['pJfYEgsWthWdfZCBli83OOQDv462'];
+        // Admin Configuration & User Approval System
+        const SUPER_ADMIN_UIDS = ['pJfYEgsWthWdfZCBli83OOQDv462']; // Cannot be demoted
+        const USERS_COLLECTION = 'timesheet_app_users';
         let currentUserUid = null;
+        let currentUserRole = null; // 'pending' | 'approved' | 'admin' | 'rejected'
+        let allUsersCache = [];
+        let pendingUsersListener = null;
+        let myStatusListener = null;
+
+        function isSuperAdmin(uid) {
+            return SUPER_ADMIN_UIDS.includes(uid || currentUserUid);
+        }
 
         function isAdmin() {
-            return ADMIN_UIDS.includes(currentUserUid);
+            return isSuperAdmin() || currentUserRole === 'admin';
+        }
+
+        function isApproved() {
+            return isAdmin() || currentUserRole === 'approved';
         }
 
         function applyAdminGating() {
@@ -1668,8 +1741,262 @@
                 if (photoEl) photoEl.classList.add('hidden');
                 if (signOutBtn) signOutBtn.classList.add('hidden');
                 currentUserUid = null;
+                currentUserRole = null;
             }
-            applyAdminGating();
+        }
+
+        // ===== USER APPROVAL SYSTEM =====
+        async function registerOrGetUser(user) {
+            const userRef = db.collection(USERS_COLLECTION).doc(user.uid);
+            const doc = await userRef.get();
+            
+            if (doc.exists) {
+                return doc.data();
+            }
+            
+            // Super admin auto-approved
+            const role = isSuperAdmin(user.uid) ? 'admin' : 'pending';
+            const userData = {
+                uid: user.uid,
+                email: user.email || '',
+                displayName: user.displayName || '',
+                photoURL: user.photoURL || '',
+                role: role,
+                requestedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                approvedAt: role === 'admin' ? firebase.firestore.FieldValue.serverTimestamp() : null,
+                approvedBy: role === 'admin' ? 'system' : null
+            };
+            await userRef.set(userData);
+            return userData;
+        }
+
+        function showPendingApproval(user) {
+            const overlay = document.getElementById('pendingApprovalOverlay');
+            if (overlay) {
+                overlay.style.display = 'flex';
+                const photo = document.getElementById('pendingUserPhoto');
+                const name = document.getElementById('pendingUserName');
+                if (photo && user.photoURL) photo.src = user.photoURL;
+                if (name) name.textContent = user.displayName || user.email || 'User';
+            }
+        }
+
+        function hidePendingApproval() {
+            const overlay = document.getElementById('pendingApprovalOverlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+
+        function listenToMyStatus(uid) {
+            if (myStatusListener) myStatusListener();
+            myStatusListener = db.collection(USERS_COLLECTION).doc(uid).onSnapshot((doc) => {
+                if (!doc.exists) return;
+                const data = doc.data();
+                const prevRole = currentUserRole;
+                currentUserRole = data.role;
+                
+                if (currentUserRole === 'pending' || currentUserRole === 'rejected') {
+                    showPendingApproval(auth.currentUser);
+                } else {
+                    hidePendingApproval();
+                    if (prevRole === 'pending' && (currentUserRole === 'approved' || currentUserRole === 'admin')) {
+                        notify('Access approved! Welcome.', 'green');
+                    }
+                }
+                applyAdminGating();
+                if (isAdmin()) startPendingUsersListener();
+            });
+        }
+
+        // ===== NOTIFICATION SYSTEM =====
+        function startPendingUsersListener() {
+            if (pendingUsersListener) return;
+            pendingUsersListener = db.collection(USERS_COLLECTION).where('role', '==', 'pending').onSnapshot((snapshot) => {
+                const pending = [];
+                snapshot.forEach(doc => pending.push({ id: doc.id, ...doc.data() }));
+                updateNotifBadge(pending.length);
+                updateNotifList(pending);
+            });
+        }
+
+        function updateNotifBadge(count) {
+            const badge = document.getElementById('notifBadge');
+            const menuBadge = document.getElementById('menuPendingBadge');
+            if (badge) {
+                badge.textContent = count;
+                badge.classList.toggle('hidden', count === 0);
+            }
+            if (menuBadge) {
+                menuBadge.textContent = count;
+                menuBadge.classList.toggle('hidden', count === 0);
+            }
+        }
+
+        function updateNotifList(pending) {
+            const list = document.getElementById('notifList');
+            if (!list) return;
+            if (pending.length === 0) {
+                list.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">No pending requests</p>';
+                return;
+            }
+            list.innerHTML = pending.map(u => `
+                <div class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50">
+                    <img src="${u.photoURL || ''}" class="w-8 h-8 rounded-full bg-slate-200" alt="">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-semibold text-slate-700 truncate">${u.displayName || u.email || 'Unknown'}</p>
+                        <p class="text-[10px] text-slate-400">${u.email || 'No email'}</p>
+                    </div>
+                    <div class="flex gap-1">
+                        <button onclick="approveUser('${u.uid}')" class="px-2 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold rounded">Approve</button>
+                        <button onclick="rejectUser('${u.uid}')" class="px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-[10px] font-bold rounded">Reject</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleNotifPanel() {
+            const panel = document.getElementById('notifPanel');
+            if (panel) panel.classList.toggle('hidden');
+        }
+
+        // ===== ADMIN PORTAL =====
+        function openAdminPortal() {
+            document.getElementById('adminPortalModal').style.display = 'flex';
+            switchAdminTab('pending');
+            loadAllUsers();
+        }
+
+        function closeAdminPortal() {
+            document.getElementById('adminPortalModal').style.display = 'none';
+        }
+
+        async function loadAllUsers() {
+            const snap = await db.collection(USERS_COLLECTION).get();
+            allUsersCache = [];
+            snap.forEach(doc => allUsersCache.push({ id: doc.id, ...doc.data() }));
+            renderAdminTab();
+        }
+
+        function switchAdminTab(tab) {
+            const tabs = ['pending', 'approved', 'admins', 'rejected'];
+            tabs.forEach(t => {
+                const btn = document.getElementById('adminTab' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (btn) {
+                    btn.className = btn.className.replace(/text-indigo-600|border-indigo-500/g, '').replace(/text-slate-500|border-transparent/g, '');
+                    if (t === tab) {
+                        btn.classList.add('text-indigo-600', 'border-indigo-500');
+                    } else {
+                        btn.classList.add('text-slate-500', 'border-transparent');
+                    }
+                }
+            });
+            document.getElementById('adminPortalModal').dataset.activeTab = tab;
+            renderAdminTab();
+        }
+
+        function renderAdminTab() {
+            const tab = document.getElementById('adminPortalModal').dataset.activeTab || 'pending';
+            const container = document.getElementById('adminPortalContent');
+            let users = [];
+            
+            if (tab === 'pending') users = allUsersCache.filter(u => u.role === 'pending');
+            else if (tab === 'approved') users = allUsersCache.filter(u => u.role === 'approved');
+            else if (tab === 'admins') users = allUsersCache.filter(u => u.role === 'admin');
+            else if (tab === 'rejected') users = allUsersCache.filter(u => u.role === 'rejected');
+
+            // Update pending count badge
+            const pendingCount = allUsersCache.filter(u => u.role === 'pending').length;
+            const countEl = document.getElementById('adminPendingCount');
+            if (countEl) countEl.textContent = pendingCount;
+
+            if (users.length === 0) {
+                container.innerHTML = '<p class="text-sm text-slate-400 text-center py-8">No users in this category</p>';
+                return;
+            }
+
+            container.innerHTML = users.map(u => {
+                const isSelf = u.uid === currentUserUid;
+                const isSuper = isSuperAdmin(u.uid);
+                let actions = '';
+                
+                if (tab === 'pending') {
+                    actions = `
+                        <button onclick="approveUser('${u.uid}')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg">Approve</button>
+                        <button onclick="rejectUser('${u.uid}')" class="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-lg">Reject</button>
+                    `;
+                } else if (tab === 'approved') {
+                    actions = `
+                        <button onclick="promoteUser('${u.uid}')" class="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold rounded-lg">Make Admin</button>
+                        <button onclick="revokeUser('${u.uid}')" class="px-3 py-1.5 bg-slate-400 hover:bg-slate-500 text-white text-xs font-bold rounded-lg">Revoke</button>
+                    `;
+                } else if (tab === 'admins') {
+                    if (isSuper) {
+                        actions = '<span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-full">Super Admin</span>';
+                    } else if (!isSelf) {
+                        actions = `<button onclick="demoteUser('${u.uid}')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg">Demote</button>`;
+                    } else {
+                        actions = '<span class="text-[10px] text-slate-400">(You)</span>';
+                    }
+                } else if (tab === 'rejected') {
+                    actions = `<button onclick="approveUser('${u.uid}')" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg">Approve</button>`;
+                }
+
+                const timeStr = u.requestedAt ? new Date(u.requestedAt.seconds * 1000).toLocaleDateString() : 'Unknown';
+                return `
+                    <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 border border-slate-100 mb-2">
+                        <img src="${u.photoURL || ''}" class="w-10 h-10 rounded-full bg-slate-200 flex-shrink-0" alt="">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold text-slate-800 truncate">${u.displayName || 'No name'}</p>
+                            <p class="text-xs text-slate-500 truncate">${u.email || 'No email'}</p>
+                            <p class="text-[10px] text-slate-400">Joined: ${timeStr}</p>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">${actions}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ===== USER MANAGEMENT ACTIONS =====
+        async function approveUser(uid) {
+            await db.collection(USERS_COLLECTION).doc(uid).update({
+                role: 'approved',
+                approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                approvedBy: currentUserUid
+            });
+            notify('User approved', 'green');
+            loadAllUsers();
+        }
+
+        async function rejectUser(uid) {
+            await db.collection(USERS_COLLECTION).doc(uid).update({
+                role: 'rejected',
+                approvedAt: null,
+                approvedBy: currentUserUid
+            });
+            notify('User rejected', 'red');
+            loadAllUsers();
+        }
+
+        async function promoteUser(uid) {
+            await db.collection(USERS_COLLECTION).doc(uid).update({
+                role: 'admin',
+                approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                approvedBy: currentUserUid
+            });
+            notify('User promoted to admin', 'indigo');
+            loadAllUsers();
+        }
+
+        async function demoteUser(uid) {
+            if (isSuperAdmin(uid)) { notify('Cannot demote super admin', 'red'); return; }
+            await db.collection(USERS_COLLECTION).doc(uid).update({ role: 'approved' });
+            notify('Admin demoted to regular user', 'amber');
+            loadAllUsers();
+        }
+
+        async function revokeUser(uid) {
+            await db.collection(USERS_COLLECTION).doc(uid).update({ role: 'rejected' });
+            notify('User access revoked', 'red');
+            loadAllUsers();
         }
 
         // Google Sign-In
@@ -1678,7 +2005,6 @@
         function signInWithGoogle() {
             auth.signInWithPopup(googleProvider).catch((error) => {
                 console.error('Google Sign-In error:', error.code, error.message);
-                // If popup blocked (iframe/embedded browser), fall back to redirect
                 if (error.code === 'auth/popup-blocked' || error.code === 'auth/operation-not-supported-in-this-environment' || error.code === 'auth/cancelled-popup-request') {
                     auth.signInWithRedirect(googleProvider);
                 } else {
@@ -1690,19 +2016,47 @@
         // Check for redirect result on page load
         auth.getRedirectResult().then((result) => {
             if (result && result.user) {
-                updateUserUI(result.user);
+                handleAuthUser(result.user);
             }
         }).catch((error) => {
             console.error('Redirect sign-in error:', error.code, error.message);
         });
 
-        // Auth state listener — fires on sign-in, sign-out, and page load
+        // Main auth handler
+        async function handleAuthUser(user) {
+            updateUserUI(user);
+            document.getElementById('signInOverlay')?.remove();
+            
+            // Register user in Firestore (or get existing)
+            const userData = await registerOrGetUser(user);
+            currentUserRole = userData.role;
+            
+            if (currentUserRole === 'pending' || currentUserRole === 'rejected') {
+                showPendingApproval(user);
+            } else {
+                hidePendingApproval();
+            }
+            
+            applyAdminGating();
+            
+            // Start listening to own status changes (real-time approval)
+            listenToMyStatus(user.uid);
+            
+            // If admin, listen to pending users for notifications
+            if (isAdmin()) {
+                startPendingUsersListener();
+            }
+        }
+
+        // Auth state listener
         auth.onAuthStateChanged((user) => {
             if (user) {
-                updateUserUI(user);
-                document.getElementById('signInOverlay')?.remove();
+                handleAuthUser(user);
             } else {
                 updateUserUI(null);
+                hidePendingApproval();
+                if (pendingUsersListener) { pendingUsersListener(); pendingUsersListener = null; }
+                if (myStatusListener) { myStatusListener(); myStatusListener = null; }
                 showSignInOverlay();
             }
         });
