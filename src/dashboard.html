@@ -4122,7 +4122,20 @@ Authentication: Include X-API-Key header with your API key
                     html += `<tr class="${rowBg} border-b border-slate-100">`;
                     
                     if (pairIdx === 0) {
-                        html += `<td class="px-1.5 py-1 font-bold text-slate-800" ${rowCount > 1 ? `rowspan="${rowCount}"` : ''}>${day.date || day.dayNum}</td>`;
+                        // Normalize date display: extract just the day number if full date string
+                        let displayDate = day.date || day.dayNum || '';
+                        if (typeof displayDate === 'string' && displayDate.includes('-')) {
+                            // Full date like "2026-04-01" or "05-02-2026" — build "YYYY-MM-DD" + day name
+                            const parts = displayDate.split('-').map(Number);
+                            let dateObj;
+                            if (parts[0] > 31) { // YYYY-MM-DD
+                                dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+                            } else { // MM-DD-YYYY
+                                dateObj = new Date(parts[2], parts[0] - 1, parts[1]);
+                            }
+                            if (!isNaN(dateObj)) displayDate = dateObj.getDate();
+                        }
+                        html += `<td class="px-1.5 py-1 font-bold text-slate-800" ${rowCount > 1 ? `rowspan="${rowCount}"` : ''}>${displayDate}</td>`;
                         html += `<td class="px-1 py-1 text-center font-semibold text-slate-600" ${rowCount > 1 ? `rowspan="${rowCount}"` : ''}>${day.dayName}</td>`;
                     }
 
@@ -5045,8 +5058,6 @@ Authentication: Include X-API-Key header with your API key
                         console.warn(`⚠️ Removed ${empSnapshot.docs.length - seenIds.size} duplicate employee records`);
                     }
                     
-                    filteredData = [...rawData];
-                    
                     // Migrate old punchPairs format: flat strings → {in, out} objects
                     rawData.forEach(emp => {
                         if (!emp.dailyBreakdown) return;
@@ -5080,9 +5091,11 @@ Authentication: Include X-API-Key header with your API key
                             }
                         });
                     });
-                    filteredData = [...rawData];
+                    // Filter out hidden employees
+                    filteredData = rawData.filter(emp => !hiddenEmployeeIds.includes(String(emp.id)));
+                    const hiddenCount = rawData.length - filteredData.length;
                     
-                    console.log(`Loaded ${rawData.length} employees from ${monthId}`);
+                    console.log(`Loaded ${rawData.length} employees from ${monthId}${hiddenCount > 0 ? ` (${hiddenCount} hidden)` : ''}`);
                     console.log(`Report: ${reportData.month}/${reportData.year}, ${reportData.totalEmployees} employees`);
                     
                     // Show employee cards and KPI sections
@@ -5097,9 +5110,9 @@ Authentication: Include X-API-Key header with your API key
                     renderDashboard(filteredData);
                     
                     // Display employee data in the table
-                    displayEmployeeData(rawData);
+                    displayEmployeeData(filteredData);
                     
-                    notify(`Loaded ${rawData.length} employees from ${monthId}`, 'emerald');
+                    notify(`Loaded ${filteredData.length} employees from ${monthId}${hiddenCount > 0 ? ` (${hiddenCount} hidden)` : ''}`, 'emerald');
                 } else {
                     console.warn(`⚠️ No data found for month: ${monthId}`);
                     notify('No data found for selected month', 'amber');
