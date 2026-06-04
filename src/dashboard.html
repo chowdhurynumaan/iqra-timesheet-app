@@ -3744,7 +3744,6 @@ Authentication: Include X-API-Key header with your API key
                     absences: absences,
                     lateMin: lateMin,
                     lateCount: lateFreq,
-                    shift: dept,
                     daysWorked: actualDays,
                     standardDays: standardDays,
                     hours: hoursWorked.toFixed(1),
@@ -3867,7 +3866,6 @@ Authentication: Include X-API-Key header with your API key
                         dept: empDept,
                         absences: absences,
                         lateMin: lateMin,
-                        shift: empDept,
                         daysWorked: daysWorked,
                         hours: dailyBreakdown.reduce((sum, d) => sum + parseFloat(d.hours || 0), 0).toFixed(1),
                         dailyBreakdown: dailyBreakdown
@@ -3902,7 +3900,6 @@ Authentication: Include X-API-Key header with your API key
                         dept: dept,
                         absences: 0,
                         lateMin: 0,
-                        shift: dept,
                         dailyBreakdown: [],
                         daysWorked: 0,
                         hours: '0'
@@ -4959,7 +4956,7 @@ Authentication: Include X-API-Key header with your API key
             let html = `<div class="emp-print-card">
                 <div class="emp-print-title">
                     <h2>${escapeHtml(emp.name)}</h2>
-                    <p>ID: ${escapeHtml(emp.id)} &nbsp;|&nbsp; Dept: ${escapeHtml(emp.dept)} &nbsp;|&nbsp; Shift: ${escapeHtml(emp.shift || 'WK')}</p>
+                    <p>ID: ${escapeHtml(emp.id)} &nbsp;|&nbsp; Dept: ${escapeHtml(emp.dept)}</p>
                 </div>
                 <div class="emp-print-metrics">
                     <div class="pm"><div class="pm-label">Attendance</div><div class="pm-value">${attendancePercent.toFixed(0)}%</div></div>
@@ -5014,7 +5011,6 @@ Authentication: Include X-API-Key header with your API key
                 'ID': emp.id,
                 'Name': emp.name,
                 'Department': emp.dept,
-                'Shift': emp.shift,
                 'Absences': emp.absences,
                 'Late Minutes': emp.lateMin
             }));
@@ -5076,19 +5072,13 @@ Authentication: Include X-API-Key header with your API key
                             return;
                         }
                         seenIds.add(empData.id);
-                        
-                        // Ensure shift property exists, default to 'WK' if missing
-                        if (!empData.shift) {
-                            empData.shift = 'WK';
-                        }
                         rawData.push(empData);
                     });
                     
                     // Fall back to month document employees if individual records not found
                     if (rawData.length === 0) {
                         rawData = (reportData.employees || []).map(emp => ({
-                            ...emp,
-                            shift: emp.shift || 'WK'
+                            ...emp
                         }));
                         console.warn(`⚠️ No employees found in ${EMPLOYEES_COLLECTION}, using month document data`);
                     } else if (seenIds.size < empSnapshot.docs.length) {
